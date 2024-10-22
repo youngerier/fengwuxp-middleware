@@ -6,6 +6,7 @@ import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.nodeTypes.NodeWithJavadoc;
 import com.github.javaparser.javadoc.Javadoc;
 import com.wind.common.WindConstants;
+import com.wind.common.util.WindReflectUtils;
 import com.wind.tools.mybatisflex.codegen.model.GenCodeInfo;
 import com.wuxp.codegen.SourceCodeProvider;
 import org.springframework.util.ReflectionUtils;
@@ -83,7 +84,7 @@ public class JavaEntityParser {
     }
 
     private Field[] getClassFields(Class<?> clazz) {
-        Field[] declaredFields = clazz.getDeclaredFields();
+        Field[] declaredFields = WindReflectUtils.getFields(clazz);
         Arrays.asList(declaredFields).forEach(ReflectionUtils::makeAccessible);
         return declaredFields;
     }
