@@ -31,7 +31,12 @@ public enum DefaultOrderField implements QueryOrderField {
     /**
      * 排序
      */
-    ORDER_INDEX("order_index");
+    ORDER_INDEX("order_index"),
+
+    /**
+     * 是否启用
+     */
+    ENABLED("is_enabled");
 
     /**
      * 排序字段
