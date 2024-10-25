@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.util.CollectionUtils;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -71,7 +70,11 @@ public final class SpringEventPublishUtils {
             if (event instanceof SpringTransactionEvent) {
                 String eventId = ((SpringTransactionEvent) event).getEventId();
                 Set<String> eventIds = TRANSACTION_EVENT_IDS.get();
-                if (CollectionUtils.isEmpty(eventIds) && eventIds.contains(eventId)) {
+                if (eventIds == null) {
+                    eventIds = new HashSet<>();
+                    TRANSACTION_EVENT_IDS.set(eventIds);
+                }
+                if (eventIds.contains(eventId)) {
                     // 如果该事件已注册，则不重复注册
                     return;
                 }
