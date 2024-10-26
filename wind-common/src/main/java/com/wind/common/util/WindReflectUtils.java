@@ -136,7 +136,7 @@ public final class WindReflectUtils {
      * 解析对象继承的超类或实现的接口上设置的泛型
      *
      * @param bean 对象
-     * @return 接口上设置的泛型
+     * @return 父类或者接口上设置的泛型
      */
     public static Type[] resolveSuperGenericType(@NotNull Object bean) {
         AssertUtils.notNull(bean, "argument bean must not null");
