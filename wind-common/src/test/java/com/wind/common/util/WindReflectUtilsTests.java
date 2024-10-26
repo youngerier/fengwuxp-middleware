@@ -1,6 +1,5 @@
 package com.wind.common.util;
 
-import com.wind.common.locks.WindLock;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,12 +16,29 @@ public class WindReflectUtilsTests {
 
 
     @Test
-    void testResolveSuperInterfaceGenericType(){
-        Type[] types = WindReflectUtils.resolveSuperInterfaceGenericType(new Example());
-        Assertions.assertEquals(2,types.length);
+    void testResolveSuperGenericTypeV1() {
+        Type[] types = WindReflectUtils.resolveSuperGenericType(new Example());
+        Assertions.assertEquals(2, types.length);
     }
 
-    static class Example implements Function<String, List<String>>{
+    @Test
+    void testResolveSuperGenericTypeV2() {
+        Type[] types = WindReflectUtils.resolveSuperGenericType(new Example2());
+        Assertions.assertEquals(2, types.length);
+    }
+
+    static class Example implements Function<String, List<String>> {
+
+        @Override
+        public List<String> apply(String s) {
+            return Collections.emptyList();
+        }
+    }
+
+    static abstract class AbstractDemo<T, R> implements Function<T, R> {
+    }
+
+    static class Example2 extends AbstractDemo<String, List<String>> {
 
         @Override
         public List<String> apply(String s) {

@@ -133,20 +133,26 @@ public final class WindReflectUtils {
     }
 
     /**
-     * 解析对象实现的接口上设置的泛型
+     * 解析对象继承的超类或实现的接口上设置的泛型
      *
      * @param bean 对象
      * @return 接口上设置的泛型
      */
-    public static Type[] resolveSuperInterfaceGenericType(@NotNull Object bean) {
+    public static Type[] resolveSuperGenericType(@NotNull Object bean) {
         AssertUtils.notNull(bean, "argument bean must not null");
         Class<?> targetClass = AopUtils.getTargetClass(bean);
         ResolvableType resolvableType = ResolvableType.forClass(targetClass);
-        ResolvableType[] interfaces = resolvableType.getInterfaces();
-        if (ObjectUtils.isEmpty(interfaces)) {
-            return new Type[0];
+        ResolvableType superType = resolvableType.getSuperType();
+        ResolvableType[] generics = null;
+        if (superType.getRawClass() == Object.class) {
+            ResolvableType[] interfaces = resolvableType.getInterfaces();
+            if (ObjectUtils.isEmpty(interfaces)) {
+                return new Type[0];
+            }
+            generics = interfaces[0].getGenerics();
+        } else {
+            generics = superType.getGenerics();
         }
-        ResolvableType[] generics = interfaces[0].getGenerics();
         AssertUtils.notEmpty(generics, () -> targetClass.getName() + " 未设置泛型");
         return Arrays.stream(generics)
                 .map(ResolvableType::getType)
