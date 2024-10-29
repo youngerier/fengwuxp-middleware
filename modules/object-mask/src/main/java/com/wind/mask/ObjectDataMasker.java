@@ -110,7 +110,12 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
         if (objects.isEmpty()) {
             return objects;
         }
-        Class<?> elementType = objects.iterator().next().getClass();
+        Object first = objects.iterator().next();
+        if (first == null) {
+            // TODO 待优惠
+            return objects;
+        }
+        Class<?> elementType = first.getClass();
         if (registry.requireMask(elementType)) {
             Collection<Object> result = (Collection<Object>) objectCopyer.apply(objects);
             result.forEach(this::maskObject);
