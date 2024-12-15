@@ -1,4 +1,4 @@
-package com.wind.security.authority.rbac;
+package com.wind.security.authority;
 
 import com.wind.common.WindConstants;
 import com.wind.security.core.SecurityAccessOperations;

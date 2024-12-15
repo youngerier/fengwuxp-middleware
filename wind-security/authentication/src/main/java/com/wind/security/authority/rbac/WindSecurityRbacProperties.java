@@ -3,7 +3,7 @@ package com.wind.security.authority.rbac;
 import lombok.Data;
 
 /**
- * rbac 相关配置
+ * wind security 相关配置
  *
  * @author wuxp
  * @date 2023-09-26 13:00
