@@ -11,6 +11,7 @@ import java.util.Set;
  * @author wuxp
  * @date 2023-10-23 09:47
  **/
+@Deprecated
 public interface RbacResourceSupplier {
 
     /**

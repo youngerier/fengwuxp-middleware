@@ -6,9 +6,9 @@ import com.wind.security.authentication.WindAuthenticationProperties;
 import com.wind.security.authentication.jwt.JwtProperties;
 import com.wind.security.authentication.jwt.JwtTokenCodec;
 import com.wind.security.authority.SimpleSecurityAccessOperations;
+import com.wind.security.authority.WebRequestAuthorityLoader;
 import com.wind.security.authority.WebRequestAuthorizationManager;
 import com.wind.security.authority.rbac.WindRbacUserResourceService;
-import com.wind.security.authority.rbac.WindSecurityRbacProperties;
 import com.wind.security.core.SecurityAccessOperations;
 import com.wind.security.core.rbac.RbacResourceSupplier;
 import com.wind.security.core.rbac.RbacUserResourceService;
@@ -64,12 +64,6 @@ public class WindSecurityAutoConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties(prefix = RBAC_PREFIX)
-    public WindSecurityRbacProperties windSecurityRbacProperties() {
-        return new WindSecurityRbacProperties();
-    }
-
-    @Bean
     @ConfigurationProperties(prefix = AUTHENTICATION_PREFIX)
     public WindAuthenticationProperties windAuthenticationProperties() {
         return new WindAuthenticationProperties();
@@ -89,8 +83,8 @@ public class WindSecurityAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean({SecurityAccessOperations.class})
-    public SecurityAccessOperations securityAccessOperations(WindSecurityRbacProperties properties) {
-        return new SimpleSecurityAccessOperations(properties.getRolePrefix());
+    public SecurityAccessOperations securityAccessOperations() {
+        return new SimpleSecurityAccessOperations("ROLE_");
     }
 
     @Bean
@@ -100,12 +94,11 @@ public class WindSecurityAutoConfiguration {
         return new WindRbacUserResourceService(rbacResourceSupplier);
     }
 
+    // TODO 待删除
     @Bean
-    @ConditionalOnBean({WindSecurityRbacProperties.class, RbacResourceSupplier.class})
-    public WebRequestAuthorizationManager webRequestAuthorizationManager(RbacResourceSupplier rbacResourceSupplier,
-                                                                         SecurityAccessOperations securityAccessOperations,
-                                                                         WindSecurityRbacProperties properties) {
-        return new WebRequestAuthorizationManager(request -> {
+    @ConditionalOnBean({RbacResourceSupplier.class})
+    public WebRequestAuthorityLoader webRequestAuthorityLoader(RbacResourceSupplier rbacResourceSupplier) {
+        return request -> {
             // 匹配当前请求需要的权限
             Map<String, Set<RequestMatcher>> matches = new HashMap<>();
             rbacResourceSupplier.getPermissions().stream()
@@ -116,16 +109,19 @@ public class WindSecurityAutoConfiguration {
                 if (RequestMatcherUtils.matches(entry.getValue(), request)) {
                     // 权限匹配
                     result.add(entry.getKey());
-                    if (!properties.isMatchesRequestAllPermission()) {
-                        //非匹配所有权限模式， 匹配到了则返回
-                        break;
-                    }
+                    // TODO 非匹配所有权限模式， 匹配到了则返回
                 }
             }
             return result;
-        }, securityAccessOperations);
+        };
     }
 
+    @Bean
+    @ConditionalOnBean({WebRequestAuthorityLoader.class})
+    public WebRequestAuthorizationManager webRequestAuthorizationManager(WebRequestAuthorityLoader webRequestAuthorityLoader,
+                                                                         SecurityAccessOperations securityAccessOperations) {
+        return new WebRequestAuthorizationManager(webRequestAuthorityLoader, securityAccessOperations);
+    }
 }
 
 

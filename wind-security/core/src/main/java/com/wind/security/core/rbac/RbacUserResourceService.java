@@ -9,6 +9,7 @@ import java.util.Set;
  * @author wuxp
  * @date 2023-09-25 15:41
  **/
+@Deprecated
 public interface RbacUserResourceService {
 
     /**

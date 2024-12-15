@@ -1,13 +1,13 @@
 package com.wind.security.core.rbac;
 
 import com.wind.common.util.StringJoinSplitUtils;
-import com.wind.core.resources.WindResources;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Nullable;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
 
@@ -17,7 +17,17 @@ import java.util.Set;
  * @author wuxp
  * @date 2023-09-26 07:41
  **/
-public interface RbacResource extends WindResources<String> {
+public interface RbacResource extends Serializable {
+
+    /**
+     * @return 唯一标识
+     */
+    String getId();
+
+    /**
+     * @return 用于展示的名称
+     */
+    String getName();
 
     /**
      * rbac 权限资源
