@@ -26,7 +26,6 @@
         <module>wind-tracer</module>
         <module>context-variable</module>
         <module>logback-kafka-appender</module>
-        <module>modules/transaction</module>
         <module>wind-elasticjob</module>
         <module>wind-dependencies</module>
         <module>wind-sentinel</module>
