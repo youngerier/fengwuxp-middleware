@@ -16,7 +16,7 @@ public final class WindHttpConstants {
     public static final String HTTP_REQUEST_IP_ATTRIBUTE_NAME = "requestSourceIp";
 
     /**
-     *  http request 来源 host
+     * http request 来源 host
      */
     public static final String HTTP_REQUEST_HOST_ATTRIBUTE_NAME = "requestSourceHost";
 

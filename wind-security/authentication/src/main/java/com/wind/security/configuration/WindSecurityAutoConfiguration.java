@@ -37,7 +37,8 @@ import static com.wind.common.WindConstants.TRUE;
  **/
 @Configuration
 @EnableConfigurationProperties(value = {com.wind.security.configuration.WindSecurityProperties.class})
-@ConditionalOnProperty(prefix = com.wind.security.configuration.WindSecurityProperties.PREFIX, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
+@ConditionalOnProperty(prefix = com.wind.security.configuration.WindSecurityProperties.PREFIX, name = ENABLED_NAME, havingValue = TRUE,
+        matchIfMissing = true)
 public class WindSecurityAutoConfiguration {
 
     /**

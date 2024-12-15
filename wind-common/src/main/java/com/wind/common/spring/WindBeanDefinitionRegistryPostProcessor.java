@@ -24,7 +24,8 @@ import java.util.function.Supplier;
  * @date 2023-11-15 08:24
  **/
 @Slf4j
-public class WindBeanDefinitionRegistryPostProcessor implements ApplicationContextInitializer<ConfigurableApplicationContext>, BeanDefinitionRegistryPostProcessor {
+public class WindBeanDefinitionRegistryPostProcessor implements ApplicationContextInitializer<ConfigurableApplicationContext>,
+        BeanDefinitionRegistryPostProcessor {
 
     /**
      * @key bean name

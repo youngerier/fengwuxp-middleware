@@ -43,7 +43,8 @@ public class ObjectMaskingResponseBodyAdvice implements ResponseBodyAdvice<Objec
     }
 
     @Override
-    public Object beforeBodyWrite(Object body, @NotNull MethodParameter returnType, @NotNull MediaType selectedContentType, @NotNull Class<? extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
+    public Object beforeBodyWrite(Object body, @NotNull MethodParameter returnType, @NotNull MediaType selectedContentType, @NotNull Class<?
+            extends HttpMessageConverter<?>> selectedConverterType, ServerHttpRequest request, ServerHttpResponse response) {
         // TODO 待优化
         if (body instanceof ApiResp) {
             sanitizeReturnValue(((ApiResp<?>) body).getData());

@@ -2,10 +2,7 @@ package com.wind.common.exception;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.wind.common.message.MessageFormatter;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -27,7 +24,8 @@ class AssertUtilsTest {
         AssertUtils.isAssignable(Map.class, ImmutableMap.class, "isAssignable error");
         AssertUtils.isInstanceOf(Map.class, ImmutableMap.of("1", "2"), "isInstanceOf error");
         AssertUtils.noNullElements(ImmutableSet.of("1", "2"), "noNullElements error");
-        BaseException exception = Assertions.assertThrows(BaseException.class, () -> AssertUtils.state(false, () -> BaseException.unAuthorized("stateException")));
+        BaseException exception = Assertions.assertThrows(BaseException.class, () -> AssertUtils.state(false, () -> BaseException.unAuthorized(
+                "stateException")));
         Assertions.assertEquals("stateException", exception.getMessage());
     }
 

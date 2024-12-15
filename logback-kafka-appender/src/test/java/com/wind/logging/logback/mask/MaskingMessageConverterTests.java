@@ -32,7 +32,7 @@ class MaskingMessageConverterTests {
     }
 
     @AfterEach
-    void after(){
+    void after() {
         WindThreadTracer.TRACER.clear();
     }
 

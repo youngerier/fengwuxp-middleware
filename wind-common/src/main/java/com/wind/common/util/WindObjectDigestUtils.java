@@ -172,7 +172,8 @@ public final class WindObjectDigestUtils {
             return String.format("%s%s%s", WindConstants.DELIM_START, getMapText(((Map<?, ?>) val)), WindConstants.DELIM_END);
         } else {
             // 对象使用 {}
-            return String.format("%s%s%s", WindConstants.DELIM_START, genSha256Text(val, getObjectFieldNames(val), null, WindConstants.AND), WindConstants.DELIM_END);
+            return String.format("%s%s%s", WindConstants.DELIM_START, genSha256Text(val, getObjectFieldNames(val), null, WindConstants.AND),
+                    WindConstants.DELIM_END);
         }
     }
 

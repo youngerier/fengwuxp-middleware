@@ -21,7 +21,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public final class RestfulApiRespFactory {
 
-    private static final AtomicReference<FriendlyExceptionMessageConverter> CONVERTER = new AtomicReference<>(FriendlyExceptionMessageConverter.none());
+    private static final AtomicReference<FriendlyExceptionMessageConverter> CONVERTER =
+            new AtomicReference<>(FriendlyExceptionMessageConverter.none());
 
     private RestfulApiRespFactory() {
         throw new AssertionError();

@@ -40,7 +40,8 @@ class WindDeepCopyUtilsTests {
     @Test
     void testDeepCopyMap() {
         KryoException exception = Assertions.assertThrows(KryoException.class, () -> WindDeepCopyUtils.copy(ImmutableMap.of("a", "2")));
-        Assertions.assertEquals("Class cannot be created (missing no-arg constructor): com.google.common.collect.SingletonImmutableBiMap", exception.getMessage());
+        Assertions.assertEquals("Class cannot be created (missing no-arg constructor): com.google.common.collect.SingletonImmutableBiMap",
+                exception.getMessage());
     }
 
     @Test

@@ -25,7 +25,7 @@ public interface FriendlyExceptionMessageConverter {
         return result == null ? defaultMessage : result;
     }
 
-    static FriendlyExceptionMessageConverter none(){
+    static FriendlyExceptionMessageConverter none() {
         return Throwable::getMessage;
     }
 

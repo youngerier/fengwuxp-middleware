@@ -58,7 +58,8 @@ public final class SpringExpressionOperators {
             // 原子类型数组
             return containsWithPrimitiveArray(right, left);
         }
-        throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "不支持的类型: left class = " + left.getClass().getName() + " ,right class " + right.getClass().getName());
+        throw new BaseException(DefaultExceptionCode.COMMON_ERROR,
+                "不支持的类型: left class = " + left.getClass().getName() + " ,right class " + right.getClass().getName());
     }
 
     private static boolean containsWithPrimitiveArray(Object array, Object val) {
@@ -107,7 +108,8 @@ public final class SpringExpressionOperators {
             // 原子类型数组
             return inRangeWithPrimitiveArray(range, element);
         }
-        throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "不支持的类型: left class = " + element.getClass().getName() + " ,range class " + range.getClass().getName());
+        throw new BaseException(DefaultExceptionCode.COMMON_ERROR,
+                "不支持的类型: left class = " + element.getClass().getName() + " ,range class " + range.getClass().getName());
     }
 
     private static boolean inRangeWithPrimitiveArray(Object array, Object val) {

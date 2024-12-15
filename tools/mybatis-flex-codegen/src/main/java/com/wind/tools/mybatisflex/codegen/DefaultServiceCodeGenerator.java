@@ -2,14 +2,14 @@ package com.wind.tools.mybatisflex.codegen;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
-import com.wind.tools.mybatisflex.codegen.model.GenCodeInfo;
-import com.wind.tools.mybatisflex.codegen.model.CodegenOutPutType;
-import com.wind.tools.mybatisflex.codegen.parser.JavaEntityParser;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.tools.mybatisflex.codegen.model.CodegenOutPutType;
+import com.wind.tools.mybatisflex.codegen.model.GenCodeInfo;
+import com.wind.tools.mybatisflex.codegen.parser.JavaEntityParser;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.DefaultObjectWrapperBuilder;
@@ -89,29 +89,38 @@ public class DefaultServiceCodeGenerator {
 
     private void genModel(GenCodeInfo entity) throws TemplateException, IOException {
         String templateName = "dto.ftl";
-        render(templateName, String.format("%s/services/model/dto", configuration.getOutDir()), entity.reJavaClassName("%sDTO").setCodegenOutPutType(CodegenOutPutType.DTO));
-        render(templateName, String.format("%s/services/model/request", configuration.getOutDir()), rebuildEntityByCreateRequest(entity.reJavaClassName("Create%sRequest").setCodegenOutPutType(CodegenOutPutType.REQUEST)));
-        render(templateName, String.format("%s/services/model/request", configuration.getOutDir()), rebuildEntityByUpdateRequest(entity.reJavaClassName("Update%sRequest").setCodegenOutPutType(CodegenOutPutType.REQUEST)));
-        render(templateName, String.format("%s/services/model/query", configuration.getOutDir()), rebuildEntityByQuery(entity.reJavaClassName("%sQuery").setCodegenOutPutType(CodegenOutPutType.QUERY)));
+        render(templateName, String.format("%s/services/model/dto", configuration.getOutDir()),
+                entity.reJavaClassName("%sDTO").setCodegenOutPutType(CodegenOutPutType.DTO));
+        render(templateName, String.format("%s/services/model/request", configuration.getOutDir()),
+                rebuildEntityByCreateRequest(entity.reJavaClassName("Create%sRequest").setCodegenOutPutType(CodegenOutPutType.REQUEST)));
+        render(templateName, String.format("%s/services/model/request", configuration.getOutDir()),
+                rebuildEntityByUpdateRequest(entity.reJavaClassName("Update%sRequest").setCodegenOutPutType(CodegenOutPutType.REQUEST)));
+        render(templateName, String.format("%s/services/model/query", configuration.getOutDir()), rebuildEntityByQuery(entity.reJavaClassName(
+                "%sQuery").setCodegenOutPutType(CodegenOutPutType.QUERY)));
     }
 
     private void genMapper(GenCodeInfo entity) throws TemplateException, IOException {
-        render("mapper.ftl", String.format("%s/dal/mapper", configuration.getOutDir()), entity.reJavaClassName("%sMapper").setCodegenOutPutType(CodegenOutPutType.MAPPER));
+        render("mapper.ftl", String.format("%s/dal/mapper", configuration.getOutDir()),
+                entity.reJavaClassName("%sMapper").setCodegenOutPutType(CodegenOutPutType.MAPPER));
     }
 
     private void genConverter(GenCodeInfo entity) throws TemplateException, IOException {
-        render("mapstruct.ftl", String.format("%s/services/mapstruct", configuration.getOutDir()), entity.reJavaClassName("%sConverter").setCodegenOutPutType(CodegenOutPutType.CONVERTER));
+        render("mapstruct.ftl", String.format("%s/services/mapstruct", configuration.getOutDir()),
+                entity.reJavaClassName("%sConverter").setCodegenOutPutType(CodegenOutPutType.CONVERTER));
     }
 
     private void genService(GenCodeInfo entity) throws TemplateException, IOException {
-        render("service.ftl", String.format("%s/services/", configuration.getOutDir()), entity.reJavaClassName("%sService").setCodegenOutPutType(CodegenOutPutType.SERVICE));
+        render("service.ftl", String.format("%s/services/", configuration.getOutDir()),
+                entity.reJavaClassName("%sService").setCodegenOutPutType(CodegenOutPutType.SERVICE));
         GenCodeInfo serviceImpl = entity.reJavaClassName("%sServiceImpl").setCodegenOutPutType(CodegenOutPutType.SERVICE_IMPL);
-        serviceImpl.setExtraProps(ImmutableMap.of("query", rebuildEntityByQuery(entity.reJavaClassName("%sQuery").setCodegenOutPutType(CodegenOutPutType.QUERY))));
+        serviceImpl.setExtraProps(ImmutableMap.of("query",
+                rebuildEntityByQuery(entity.reJavaClassName("%sQuery").setCodegenOutPutType(CodegenOutPutType.QUERY))));
         render("service_impl.ftl", String.format("%s/services/impl", configuration.getOutDir()), serviceImpl);
     }
 
     private void genController(GenCodeInfo entity) throws TemplateException, IOException {
-        render("controller.ftl", String.format("%s/controller", configuration.getOutDir()), entity.reJavaClassName("%sController").setCodegenOutPutType(CodegenOutPutType.CONTROLLER));
+        render("controller.ftl", String.format("%s/controller", configuration.getOutDir()),
+                entity.reJavaClassName("%sController").setCodegenOutPutType(CodegenOutPutType.CONTROLLER));
     }
 
     private void render(String templateName, String dir, GenCodeInfo entity) throws IOException, TemplateException {

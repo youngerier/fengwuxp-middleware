@@ -93,7 +93,8 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
                 }
             } else if (parameterType.isArray()) {
                 // 数组
-                ObjectArrayParameterInjectionDescriptor descriptor = new ObjectArrayParameterInjectionDescriptor(parameterType.getComponentType(), parameter, i);
+                ObjectArrayParameterInjectionDescriptor descriptor = new ObjectArrayParameterInjectionDescriptor(parameterType.getComponentType(),
+                        parameter, i);
                 if (!descriptor.getFieldAnnotations().isEmpty()) {
                     result.add(descriptor);
                 }
@@ -103,14 +104,17 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
                 Type genericType = parameter.getParameterizedType();
                 if (genericType instanceof ParameterizedType) {
                     Type[] actualTypeArguments = ((ParameterizedType) genericType).getActualTypeArguments();
-                    AssertUtils.isTrue(actualTypeArguments.length >= 1, String.format("method = %s, parameter = %s actualTypeArguments size le 1", method.getName(), parameter.getName()));
+                    AssertUtils.isTrue(actualTypeArguments.length >= 1, String.format("method = %s, parameter = %s actualTypeArguments size le 1",
+                            method.getName(), parameter.getName()));
                     Class<?> actualTypeArgument = (Class<?>) actualTypeArguments[0];
-                    ObjectCollectionParameterInjectionDescriptor descriptor = new ObjectCollectionParameterInjectionDescriptor(actualTypeArgument, parameter, i);
+                    ObjectCollectionParameterInjectionDescriptor descriptor = new ObjectCollectionParameterInjectionDescriptor(actualTypeArgument,
+                            parameter, i);
                     if (!descriptor.getFieldAnnotations().isEmpty()) {
                         result.add(descriptor);
                     }
                 } else {
-                    throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("find method = %s, parameter = %s parameterizedType error", method.getName(), parameter.getName()));
+                    throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("find method = %s, parameter = %s parameterizedType " +
+                            "error", method.getName(), parameter.getName()));
                 }
             } else {
                 if (isAllowInject(parameterType)) {

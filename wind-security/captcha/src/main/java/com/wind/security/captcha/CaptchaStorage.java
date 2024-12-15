@@ -2,9 +2,6 @@ package com.wind.security.captcha;
 
 import org.springframework.lang.Nullable;
 
-import javax.validation.constraints.NotEmpty;
-import java.util.Collection;
-
 /**
  * 验证码存储器
  *

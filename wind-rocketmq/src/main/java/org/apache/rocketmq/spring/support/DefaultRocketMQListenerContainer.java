@@ -260,7 +260,8 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
                 try {
                     handleMessage(message);
                 } catch (Exception e) {
-                    log.warn("consume message failed. messageId:{}, topic:{}, reconsumeTimes:{}", message.getMsgId(), message.getTopic(), message.getReconsumeTimes(), e);
+                    log.warn("consume message failed. messageId:{}, topic:{}, reconsumeTimes:{}", message.getMsgId(), message.getTopic(),
+                            message.getReconsumeTimes(), e);
                     context.setDelayLevelWhenNextConsume(delayLevelWhenNextConsume);
                     return ConsumeConcurrentlyStatus.RECONSUME_LATER;
                 }
@@ -277,7 +278,8 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
                 try {
                     handleMessage(messageExt);
                 } catch (Exception e) {
-                    log.warn("consume message failed. messageId:{}, topic:{}, reconsumeTimes:{}", messageExt.getMsgId(), messageExt.getTopic(), messageExt.getReconsumeTimes(), e);
+                    log.warn("consume message failed. messageId:{}, topic:{}, reconsumeTimes:{}", messageExt.getMsgId(), messageExt.getTopic(),
+                            messageExt.getReconsumeTimes(), e);
                     context.setSuspendCurrentQueueTimeMillis(suspendCurrentQueueTimeMillis);
                     return ConsumeOrderlyStatus.SUSPEND_CURRENT_QUEUE_A_MOMENT;
                 }
@@ -421,7 +423,8 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
                     } else {
                         //if the messageType has Generic Parameter, then use SmartMessageConverter#fromMessage with third parameter "conversionHint".
                         //we have validate the MessageConverter is SmartMessageConverter in this#getMethodParameter.
-                        return ((SmartMessageConverter) this.getMessageConverter()).fromMessage(MessageBuilder.withPayload(str).build(), (Class<?>) ((ParameterizedType) messageType).getRawType(), methodParameter);
+                        return ((SmartMessageConverter) this.getMessageConverter()).fromMessage(MessageBuilder.withPayload(str).build(),
+                                (Class<?>) ((ParameterizedType) messageType).getRawType(), methodParameter);
                     }
                 } catch (Exception e) {
                     log.info("convert failed. str:{}, msgType:{}", str, messageType);

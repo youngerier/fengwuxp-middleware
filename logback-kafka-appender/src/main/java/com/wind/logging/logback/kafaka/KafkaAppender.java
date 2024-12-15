@@ -176,7 +176,8 @@ public class KafkaAppender<E> extends KafkaAppenderConfig<E> {
     /**
      * Lazy initializer for producer, patterned after commons-lang.
      *
-     * @see <a href="https://commons.apache.org/proper/commons-lang/javadocs/api-3.4/org/apache/commons/lang3/concurrent/LazyInitializer.html">LazyInitializer</a>
+     * @see
+     * <a href="https://commons.apache.org/proper/commons-lang/javadocs/api-3.4/org/apache/commons/lang3/concurrent/LazyInitializer.html">LazyInitializer</a>
      */
     private class LazyProducer {
 

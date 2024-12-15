@@ -47,7 +47,8 @@ public class WindSystemConfigRepository implements SystemConfigRepository {
         this.cache = (duration == null || duration.isZero()) ? null : Caffeine.newBuilder()
                 .refreshAfterWrite(duration)
                 .maximumSize(500)
-                .scheduler(Scheduler.forScheduledExecutorService(new ScheduledThreadPoolExecutor(1, new CustomizableThreadFactory("system-config-refresh"))))
+                .scheduler(Scheduler.forScheduledExecutorService(new ScheduledThreadPoolExecutor(1, new CustomizableThreadFactory("system-config" +
+                        "-refresh"))))
                 .build(this.delegate::getConfig);
     }
 

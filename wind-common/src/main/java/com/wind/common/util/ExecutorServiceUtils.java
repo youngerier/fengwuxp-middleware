@@ -54,6 +54,7 @@ public final class ExecutorServiceUtils {
     }
 
     private static ThreadPoolExecutor newExecutor(String threadNamePrefix, int corePoolSize, int maximumPoolSize, BlockingQueue<Runnable> workQueue) {
-        return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, 90, TimeUnit.SECONDS, workQueue, new CustomizableThreadFactory(threadNamePrefix));
+        return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, 90, TimeUnit.SECONDS, workQueue,
+                new CustomizableThreadFactory(threadNamePrefix));
     }
 }

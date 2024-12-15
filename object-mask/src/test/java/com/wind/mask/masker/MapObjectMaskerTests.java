@@ -15,15 +15,15 @@ import java.util.Map;
  * @author wuxp
  * @date 2024-08-09 11:19
  **/
- class MapObjectMaskerTests {
+class MapObjectMaskerTests {
 
-     private final MapObjectMasker masker = new MapObjectMasker();
+    private final MapObjectMasker masker = new MapObjectMasker();
 
     @Test
     void testMask() {
         Map<String, Object> maps = buildMaps();
         Object mask = masker.mask(maps, Arrays.asList("$.data.values[0].ak", "$.ak"));
-        Assertions.assertEquals(maps,mask);
+        Assertions.assertEquals(maps, mask);
         Assertions.assertTrue(maps.toString().contains("***"));
         Assertions.assertTrue(mask.toString().contains("***"));
     }

@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.wind.common.WindConstants.HTTP_REQUEST_UR_TRACE_NAME;
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;

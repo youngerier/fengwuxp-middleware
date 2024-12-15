@@ -27,7 +27,8 @@ public class GracefulShutdownHealthIndicator implements HealthIndicator, Disposa
 
     private final AtomicBoolean health = new AtomicBoolean(true);
 
-    private final ScheduledThreadPoolExecutor scheduled = new ScheduledThreadPoolExecutor(1, new CustomizableThreadFactory("graceful-shutdown-health"));
+    private final ScheduledThreadPoolExecutor scheduled = new ScheduledThreadPoolExecutor(1, new CustomizableThreadFactory("graceful-shutdown" +
+            "-health"));
 
     public GracefulShutdownHealthIndicator() {
         monitor();

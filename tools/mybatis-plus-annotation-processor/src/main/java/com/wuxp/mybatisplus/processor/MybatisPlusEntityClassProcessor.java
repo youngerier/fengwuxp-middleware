@@ -48,7 +48,8 @@ public class MybatisPlusEntityClassProcessor extends AbstractProcessor {
             try {
                 entityAnnotationType = (Class<? extends Annotation>) Class.forName(typeName);
             } catch (ClassNotFoundException e) {
-                this.processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("%s  can't found class %s", getClass().getSimpleName(), typeName));
+                this.processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, String.format("%s  can't found class %s",
+                        getClass().getSimpleName(), typeName));
             }
             if (entityAnnotationType == null) {
                 continue;

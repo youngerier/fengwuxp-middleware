@@ -1,8 +1,8 @@
 package com.wind.server.jdbc;
 
+import com.wind.AbstractJdbcTest;
 import com.wind.sequence.SequenceGenerator;
 import com.wind.sequence.SequenceRepository;
-import com.wind.AbstractJdbcTest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Assertions;

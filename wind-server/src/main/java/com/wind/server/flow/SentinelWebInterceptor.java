@@ -78,7 +78,8 @@ public class SentinelWebInterceptor implements HandlerInterceptor {
         }
         ContextUtil.enter(resource.getContextName(), resource.getOrigin());
         try {
-            Entry entry = SphU.entry(resource.getName(), resource.getResourceType(), resource.getEntryType(), new Object[]{Tags.of(resource.getMetricsTags())});
+            Entry entry = SphU.entry(resource.getName(), resource.getResourceType(), resource.getEntryType(),
+                    new Object[]{Tags.of(resource.getMetricsTags())});
             request.setAttribute(entryAttributeName, entry);
         } catch (BlockException exception) {
             try {
@@ -92,7 +93,8 @@ public class SentinelWebInterceptor implements HandlerInterceptor {
     }
 
     @Override
-    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler, Exception exception) {
+    public void afterCompletion(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler,
+                                Exception exception) {
         Entry entry = HttpServletRequestUtils.getRequestAttribute(entryAttributeName, request);
         if (entry == null) {
             // should not happen

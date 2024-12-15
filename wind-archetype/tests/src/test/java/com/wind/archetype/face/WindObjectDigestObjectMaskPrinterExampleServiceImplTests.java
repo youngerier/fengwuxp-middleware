@@ -14,19 +14,19 @@ import org.springframework.test.context.ContextConfiguration;
  **/
 @ContextConfiguration(classes = WindObjectDigestObjectMaskPrinterExampleServiceImplTests.TestConfig.class)
 @Slf4j
- class WindObjectDigestObjectMaskPrinterExampleServiceImplTests extends AbstractServiceTest {
+class WindObjectDigestObjectMaskPrinterExampleServiceImplTests extends AbstractServiceTest {
 
     @Autowired
     private ExampleService exampleService;
 
     @Test
-    void testSayHello(){
+    void testSayHello() {
         Assertions.assertNotNull(exampleService.sayHello());
     }
 
 
     @Import(ExampleServiceImpl.class)
-    static class TestConfig{
+    static class TestConfig {
 
     }
 

@@ -11,7 +11,7 @@ import java.util.Map;
  * @author wuxp
  * @date 2024-02-21 16:05
  **/
- class HttpQueryUtilsTests {
+class HttpQueryUtilsTests {
 
     @Test
     void testParseQueryParams() {
@@ -23,7 +23,8 @@ import java.util.Map;
 
     @Test
     void testParseQueryParamsByEncoding() {
-        Map<String, String[]> queryParams = HttpQueryUtils.parseQueryParamsAsMap("current=1&pageSize=10&nickname=%E6%B5%8B%E8%AF%95&orderFields=GMT_MODIFIED&orderTypes=DESC&loadRoles=true");
+        Map<String, String[]> queryParams = HttpQueryUtils.parseQueryParamsAsMap("current=1&pageSize=10&nickname=%E6%B5%8B%E8%AF%95&orderFields" +
+                "=GMT_MODIFIED&orderTypes=DESC&loadRoles=true");
         Assertions.assertNotNull(queryParams);
         Assertions.assertEquals("测试", queryParams.get("nickname")[0]);
     }

@@ -25,7 +25,7 @@ public final class MaskerFactory {
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static WindMasker<Object, Object> getMasker(Class<? extends WindMasker> maskerType) {
         return MASKERS.computeIfAbsent(maskerType, key -> {
-            if (maskerType==WindMasker.class){
+            if (maskerType == WindMasker.class) {
                 return WindMasker.NONE;
             }
             try {

@@ -3,7 +3,6 @@ package com.wind.security.crypto;
 import com.wind.common.exception.BaseException;
 import org.springframework.util.StringUtils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
 /**

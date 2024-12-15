@@ -75,7 +75,8 @@ class JavaScriptExecutorTests {
         map.put("age", 22);
         Map<String, Object> result = JavaScriptExecutor.executeFunctionUseClosure(functionCode, map, 22);
         Assertions.assertNotNull(result);
-        JavaScriptExecutorTests.UserDemo userDemo = JavaScriptExecutor.executeFunctionUseClosure(functionCode, JavaScriptExecutorTests.UserDemo.class, map, 22);
+        JavaScriptExecutorTests.UserDemo userDemo = JavaScriptExecutor.executeFunctionUseClosure(functionCode,
+                JavaScriptExecutorTests.UserDemo.class, map, 22);
         Assertions.assertNotNull(userDemo);
         Assertions.assertEquals("测试_张三_22", userDemo.name);
         userDemo = JavaScriptExecutor.executeFunctionUseClosure(functionCode, new ParameterizedTypeReference<JavaScriptExecutorTests.UserDemo>() {

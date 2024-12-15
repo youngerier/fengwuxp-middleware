@@ -62,7 +62,8 @@ public final class WindDynamicTpConfigDescriptorDetector {
         return Stream.of(webServerType, mqType, commonName, appExecutorName)
                 .filter(StringUtils::hasText)
                 .map(name -> {
-                    SimpleConfigDescriptor result = SimpleConfigDescriptor.of(String.format("%s-dynamictp-%s", appName, name), WindMiddlewareType.DYNAMIC_TP.name(), ConfigFileType.YAML);
+                    SimpleConfigDescriptor result = SimpleConfigDescriptor.of(String.format("%s-dynamictp-%s", appName, name),
+                            WindMiddlewareType.DYNAMIC_TP.name(), ConfigFileType.YAML);
                     // 支持动态监听
                     result.setRefreshable(true);
                     return result;
@@ -82,7 +83,7 @@ public final class WindDynamicTpConfigDescriptorDetector {
         if (ClassDetectionUtils.isPresent("io.undertow.Undertow")) {
             return "undertow";
         }
-        if (ClassDetectionUtils.isPresent("org.eclipse.jetty.server")){
+        if (ClassDetectionUtils.isPresent("org.eclipse.jetty.server")) {
             return "jetty";
         }
         return WindConstants.EMPTY;

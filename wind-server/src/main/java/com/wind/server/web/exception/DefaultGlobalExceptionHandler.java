@@ -144,7 +144,8 @@ public class DefaultGlobalExceptionHandler {
         log.error("捕获到异常: {}，errorMessage: {}", exception.getClass().getName(), exception.getMessage(), exception);
         if (throwable instanceof UndeclaredThrowableException) {
             // 获取真正的异常
-            InvocationTargetException invocationTargetException = (InvocationTargetException) ((UndeclaredThrowableException) throwable).getUndeclaredThrowable();
+            InvocationTargetException invocationTargetException =
+                    (InvocationTargetException) ((UndeclaredThrowableException) throwable).getUndeclaredThrowable();
             throwable = invocationTargetException.getTargetException();
         }
         return RestfulApiRespFactory.error(throwable.getMessage());

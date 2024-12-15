@@ -104,7 +104,8 @@ public class ScriptAuditLogRecorder {
                 .args(arguments)
                 .resultValue(methodReturnValue)
                 .log(evalLog(auditLog.value(), evaluationContext, throwable))
-                .remark(StringUtils.hasLength(remark) ? evalLog(remark, evaluationContext, throwable) : (String) variables.get(AUDIT_LOG_REMARK_ATTRIBUTE_NAME))
+                .remark(StringUtils.hasLength(remark) ? evalLog(remark, evaluationContext, throwable) :
+                        (String) variables.get(AUDIT_LOG_REMARK_ATTRIBUTE_NAME))
                 .group(auditLog.group())
                 .type(auditLog.resourceType())
                 .operation(auditLog.operation())

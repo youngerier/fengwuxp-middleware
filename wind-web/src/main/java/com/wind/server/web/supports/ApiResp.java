@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import java.beans.Transient;
 
 /**
-
  * api 统一响应
  * TODO rename WebApiResponse
  *

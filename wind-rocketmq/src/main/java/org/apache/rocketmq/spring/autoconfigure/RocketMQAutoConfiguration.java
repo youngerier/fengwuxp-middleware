@@ -59,7 +59,7 @@ public class RocketMQAutoConfiguration implements ApplicationContextAware {
     private static final Logger log = LoggerFactory.getLogger(RocketMQAutoConfiguration.class);
 
     public static final String ROCKETMQ_TEMPLATE_DEFAULT_GLOBAL_NAME =
-        "rocketMQTemplate";
+            "rocketMQTemplate";
     public static final String PRODUCER_BEAN_NAME = "defaultMQProducer";
     public static final String CONSUMER_BEAN_NAME = "defaultLitePullConsumer";
 
@@ -87,7 +87,7 @@ public class RocketMQAutoConfiguration implements ApplicationContextAware {
 
     @Bean(PRODUCER_BEAN_NAME)
     @ConditionalOnMissingBean(DefaultMQProducer.class)
-    @ConditionalOnProperty(prefix =RocketMQProperties.PREFIX, value = {"name-server", "producer.group"})
+    @ConditionalOnProperty(prefix = RocketMQProperties.PREFIX, value = {"name-server", "producer.group"})
     public DefaultMQProducer defaultMQProducer(RocketMQProperties rocketMQProperties) {
         RocketMQProperties.Producer producerConfig = rocketMQProperties.getProducer();
         String nameServer = rocketMQProperties.getNameServer();
@@ -122,7 +122,7 @@ public class RocketMQAutoConfiguration implements ApplicationContextAware {
             producer.setNamespaceV2(producerConfig.getNamespaceV2());
         }
         producer.setInstanceName(producerConfig.getInstanceName());
-        log.info("a producer ({}) init on namesrv {}",  groupName, nameServer);
+        log.info("a producer ({}) init on namesrv {}", groupName, nameServer);
         return producer;
     }
 
@@ -159,7 +159,7 @@ public class RocketMQAutoConfiguration implements ApplicationContextAware {
             litePullConsumer.setNamespaceV2(consumerConfig.getNamespaceV2());
         }
         litePullConsumer.setInstanceName(consumerConfig.getInstanceName());
-        log.info("a pull consumer({} sub {}) init on namesrv {}",  groupName, topicName, nameServer);
+        log.info("a pull consumer({} sub {}) init on namesrv {}", groupName, topicName, nameServer);
         return litePullConsumer;
     }
 

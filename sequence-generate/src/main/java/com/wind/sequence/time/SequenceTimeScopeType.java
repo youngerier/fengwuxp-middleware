@@ -6,6 +6,7 @@ import lombok.Getter;
 
 /**
  * Seq 时间范围类型
+ *
  * @author wuxp
  * @date 2023-10-17 13:52
  **/

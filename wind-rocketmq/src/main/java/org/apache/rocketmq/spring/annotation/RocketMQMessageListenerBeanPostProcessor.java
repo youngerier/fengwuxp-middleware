@@ -42,7 +42,8 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-public class RocketMQMessageListenerBeanPostProcessor implements ApplicationContextAware, BeanPostProcessor, InitializingBean, SmartLifecycle, ApplicationListener<ApplicationStartedEvent> {
+public class RocketMQMessageListenerBeanPostProcessor implements ApplicationContextAware, BeanPostProcessor, InitializingBean, SmartLifecycle,
+        ApplicationListener<ApplicationStartedEvent> {
 
     private static final Logger log = LoggerFactory.getLogger(RocketMQMessageListenerBeanPostProcessor.class);
     private ApplicationContext applicationContext;

@@ -55,7 +55,8 @@ public class WindServerAutoConfiguration {
 
     @Bean
     @ConditionalOnProperty(prefix = CONTROLLER_METHOD_ASPECT_NAME, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
-    public WindControllerMethodInterceptor windControllerMethodInterceptor(ApplicationContext context, Collection<MethodParameterInjector> injectors) {
+    public WindControllerMethodInterceptor windControllerMethodInterceptor(ApplicationContext context,
+                                                                           Collection<MethodParameterInjector> injectors) {
         ScriptAuditLogRecorder recorder = null;
         try {
             recorder = context.getBean(ScriptAuditLogRecorder.class);
@@ -68,7 +69,8 @@ public class WindServerAutoConfiguration {
     @Bean
     @ConditionalOnBean(WindControllerMethodInterceptor.class)
     @ConditionalOnExpression("#{environment['wind.server.controller-method-aspect.expression']!=null}")
-    public DefaultBeanFactoryPointcutAdvisor windControllerMethodAspectPointcutAdvisor(WindControllerMethodInterceptor advice, WindServerProperties properties) {
+    public DefaultBeanFactoryPointcutAdvisor windControllerMethodAspectPointcutAdvisor(WindControllerMethodInterceptor advice,
+                                                                                       WindServerProperties properties) {
         String expression = properties.getControllerMethodAspect().getExpression();
         AssertUtils.hasLength(expression, String.format("%s 未配置", CONTROLLER_METHOD_ASPECT_NAME));
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
@@ -82,7 +84,8 @@ public class WindServerAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX + ".health.graceful-shutdown", name = "enabled", havingValue = "true", matchIfMissing = true)
+    @ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX + ".health.graceful-shutdown", name = "enabled", havingValue = "true",
+            matchIfMissing = true)
     public GracefulShutdownHealthIndicator gracefulShutdownHealthIndicator() {
         return new GracefulShutdownHealthIndicator();
     }

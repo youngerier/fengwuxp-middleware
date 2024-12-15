@@ -84,7 +84,8 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
         STATIC_RESOURCES.put(".ttc", "font/ttc");
     }
 
-    private static final Cache<String, HttpHeaders> HEADER_CACHES = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
+    private static final Cache<String, HttpHeaders> HEADER_CACHES =
+            Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
 
     /**
      * 前端路由前缀，仅支持 browser 模式下的路由
@@ -110,7 +111,8 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
                 chain.doFilter(request, response);
                 return;
             }
-            boolean requestIndexHtml = matchesMediaType(request.getHeader(HttpHeaders.ACCEPT)) && (INDEX_HTML_PATHS.contains(requestUri) || requestUri.startsWith(routePrefix));
+            boolean requestIndexHtml =
+                    matchesMediaType(request.getHeader(HttpHeaders.ACCEPT)) && (INDEX_HTML_PATHS.contains(requestUri) || requestUri.startsWith(routePrefix));
             if (requestIndexHtml) {
                 // 写回 index.html
                 response.getOutputStream().write(resourceLoader.apply(INDEX_HTML_NAME));

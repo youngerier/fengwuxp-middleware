@@ -110,7 +110,8 @@ public final class JwtTokenCodec {
      * @return refresh token
      */
     public JwtToken encodingRefreshToken(Long userId) {
-        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, newJwtBuilder(String.valueOf(userId), properties.getRefreshEffectiveTime()).build()));
+        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, newJwtBuilder(String.valueOf(userId),
+                properties.getRefreshEffectiveTime()).build()));
         return new JwtToken(jwt.getTokenValue(), jwt.getSubject(), null, jwt.getExpiresAt().toEpochMilli());
     }
 

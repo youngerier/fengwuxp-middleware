@@ -20,7 +20,8 @@ public class DefaultCaptchaManager implements CaptchaManager {
     /**
      * 生成时允许使用之前的值的验证码类型
      */
-    private static final Set<Captcha.CaptchaType> ALLOW_USE_PREVIOUS_CAPTCHA_TYPES = ImmutableSet.of(SimpleCaptchaType.EMAIL, SimpleCaptchaType.MOBILE_PHONE);
+    private static final Set<Captcha.CaptchaType> ALLOW_USE_PREVIOUS_CAPTCHA_TYPES = ImmutableSet.of(SimpleCaptchaType.EMAIL,
+            SimpleCaptchaType.MOBILE_PHONE);
 
     private final Collection<CaptchaContentProvider> delegates;
 
@@ -40,7 +41,8 @@ public class DefaultCaptchaManager implements CaptchaManager {
         }, verificationIgnoreCase);
     }
 
-    public DefaultCaptchaManager(Collection<CaptchaContentProvider> delegates, CaptchaStorage captchaStorage, CaptchaGenerateChecker generateChecker) {
+    public DefaultCaptchaManager(Collection<CaptchaContentProvider> delegates, CaptchaStorage captchaStorage,
+                                 CaptchaGenerateChecker generateChecker) {
         this(delegates, captchaStorage, generateChecker, true);
     }
 

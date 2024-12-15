@@ -30,11 +30,11 @@ import ${basePackage}.services.model.request.Create${name}Request;
 import ${basePackage}.services.model.request.Update${name}Request;
 
 /**
- * ${comment}控制器
- *
- * @author ${author}
- * @since ${.now?string("yyyy-MM-dd")}
- */
+* ${comment}控制器
+*
+* @author ${author}
+* @since ${.now?string("yyyy-MM-dd")}
+*/
 @AllArgsConstructor
 @RestController
 @RequestMapping(${requestBaseMapping})
@@ -42,39 +42,45 @@ import ${basePackage}.services.model.request.Update${name}Request;
 @Slf4j
 public class ${name}Controller {
 
-    private final ${name}Service ${firstLowName}Service;
+private final ${name}Service ${firstLowName}Service;
 
-    @PostMapping()
-    @Operation(summary = "创建")
-    public ApiResp<Void> create${name}(@Validated @RequestBody Create${name}Request request) {
-        ${firstLowName}Service.create${name}(request);
-        return RestfulApiRespFactory.ok();
+@PostMapping()
+@Operation(summary = "创建")
+public ApiResp
+<Void> create${name}(@Validated @RequestBody Create${name}Request request) {
+    ${firstLowName}Service.create${name}(request);
+    return RestfulApiRespFactory.ok();
     }
 
     @PutMapping()
     @Operation(summary = "更新")
-    public ApiResp<Void> update${name}(@Validated @RequestBody  Update${name}Request request) {
+    public ApiResp
+    <Void> update${name}(@Validated @RequestBody Update${name}Request request) {
         ${firstLowName}Service.update${name}(request);
         return RestfulApiRespFactory.ok();
-    }
+        }
 
-    @DeleteMapping()
-    @Operation(summary = "删除")
-    public ApiResp<Void> delete${name}ByIds(@RequestParam("ids") Long[] ids) {
-        ${firstLowName}Service.delete${name}ByIds(ids);
-        return RestfulApiRespFactory.ok();
-    }
+        @DeleteMapping()
+        @Operation(summary = "删除")
+        public ApiResp
+        <Void> delete${name}ByIds(@RequestParam("ids") Long[] ids) {
+            ${firstLowName}Service.delete${name}ByIds(ids);
+            return RestfulApiRespFactory.ok();
+            }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "获取详情")
-    public ApiResp<${name}DTO> query${name}ById(@PathVariable("id") Long id) {
-        return RestfulApiRespFactory.ok(${firstLowName}Service.query${name}ById(id));
-    }
+            @GetMapping("/{id}")
+            @Operation(summary = "获取详情")
+            public ApiResp
+            <${name}DTO> query${name}ById(@PathVariable("id") Long id) {
+                return RestfulApiRespFactory.ok(${firstLowName}Service.query${name}ById(id));
+                }
 
-    @GetMapping()
-    @Operation(summary = "查询分页数据")
-    public ApiResp<Pagination<${name}DTO>> query${name}s(${name}Query query) {
-        return RestfulApiRespFactory.ok(${firstLowName}Service.query${name}s(query));
-    }
+                @GetMapping()
+                @Operation(summary = "查询分页数据")
+                public ApiResp
+                <Pagination
+                <${name}DTO>> query${name}s(${name}Query query) {
+                    return RestfulApiRespFactory.ok(${firstLowName}Service.query${name}s(query));
+                    }
 
-}
+                    }

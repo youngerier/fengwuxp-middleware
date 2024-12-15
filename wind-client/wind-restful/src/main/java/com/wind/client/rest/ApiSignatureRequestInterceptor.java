@@ -83,6 +83,6 @@ public class ApiSignatureRequestInterceptor implements ClientHttpRequestIntercep
         if (contentType == null) {
             return false;
         }
-       return ApiSignatureRequest.signRequireRequestBody(contentType.toString());
+        return ApiSignatureRequest.signRequireRequestBody(contentType.toString());
     }
 }
