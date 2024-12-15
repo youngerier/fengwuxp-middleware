@@ -33,7 +33,6 @@
         <module>wind-client</module>
         <module>wind-archetype</module>
         <module>tools</module>
-        <module>modules/office</module>
         <module>modules/object-mask</module>
         <module>modules/script</module>
         <module>modules/sequence-generate</module>
@@ -88,7 +87,6 @@
         <logback-encoder.version>7.4</logback-encoder.version>
         <retrofit.version>2.9.0</retrofit.version>
 
-        <easyexcel.version>3.3.2</easyexcel.version>
         <swagger-openapiv3.version>2.2.9</swagger-openapiv3.version>
         <springdoc-openapi-ui.version>1.7.0</springdoc-openapi-ui.version>
         <googleauth.version>1.5.0</googleauth.version>
@@ -219,31 +217,6 @@
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-script</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.office</groupId>
-                <artifactId>wind-office-core</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.office</groupId>
-                <artifactId>wind-office-excel</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.payment</groupId>
-                <artifactId>wind-payment-plugin-core</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.payment</groupId>
-                <artifactId>wind-payment-plugin-alipay</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.payment</groupId>
-                <artifactId>wind-payment-plugin-wechat</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
