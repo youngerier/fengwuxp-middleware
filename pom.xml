@@ -32,12 +32,11 @@
         <module>wind-client</module>
         <module>wind-archetype</module>
         <module>tools</module>
-        <module>modules/object-mask</module>
-        <module>modules/script</module>
-        <module>modules/sequence-generate</module>
+        <module>object-mask</module>
+        <module>script</module>
+        <module>sequence-generate</module>
         <module>tests</module>
         <module>wind-rocketmq</module>
-        <module>modules/mybatis-flex-extends</module>
     </modules>
 
     <properties>
@@ -186,11 +185,6 @@
             <dependency>
                 <groupId>com.wind.tools</groupId>
                 <artifactId>h2-functions-for-mysql</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.middleware</groupId>
-                <artifactId>mybatis-flex-extends</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
