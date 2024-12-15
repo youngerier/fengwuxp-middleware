@@ -1,6 +1,6 @@
 package com.wind.security.core.rbac;
 
-import com.wind.common.resources.WindResources;
+import com.wind.core.resources.WindResources;
 import com.wind.common.util.StringJoinSplitUtils;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
