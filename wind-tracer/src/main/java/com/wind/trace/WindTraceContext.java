@@ -37,5 +37,5 @@ public interface WindTraceContext {
      * @return 上下文变量值
      */
     @Nullable
-    <T> T getContextVariable(String variableName);
+    <T> T getContextVariable(@NotBlank String variableName);
 }

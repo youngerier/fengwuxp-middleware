@@ -60,7 +60,8 @@ public interface SystemConfigRepository extends SystemConfigStorage {
      * @param targetType 类类型
      * @return 配置值
      */
-    @NotEmpty <T> Set<T> getConfigs(String name, Class<T> targetType);
+    @NotEmpty
+    <T> Set<T> getConfigs(String name, Class<T> targetType);
 
     /**
      * 获取集合类型配置

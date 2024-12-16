@@ -90,7 +90,8 @@ public class WindPropertySourceLoader {
                 loadRedissonConfig(name, result);
             } else if (Objects.equals(type, WindMiddlewareType.DYNAMIC_TP)) {
                 // dynamic-tp 使用 yaml
-                WindDynamicTpConfigDescriptorDetector.getConfigDescriptors(middlewareShareName).forEach(descriptor -> loadConfigs(descriptor, result));
+                WindDynamicTpConfigDescriptorDetector.getConfigDescriptors(middlewareShareName).forEach(descriptor -> loadConfigs(descriptor,
+                        result));
             } else {
                 SimpleConfigDescriptor descriptor = buildDescriptor(name + WindConstants.DASHED + type.name().toLowerCase(), type.name());
                 loadConfigs(descriptor, result);
@@ -131,7 +132,8 @@ public class WindPropertySourceLoader {
 
     private void loadConfigs(ConfigDescriptor descriptor, CompositePropertySource result) {
         if (log.isDebugEnabled()) {
-            log.debug("load config，id = {}, group = {}, refreshable = {}", descriptor.getConfigId(), descriptor.getGroup(), descriptor.isRefreshable());
+            log.debug("load config，id = {}, group = {}, refreshable = {}", descriptor.getConfigId(), descriptor.getGroup(),
+                    descriptor.isRefreshable());
         }
         List<PropertySource<?>> configs = repository.getConfigs(descriptor);
         configs.forEach(result::addFirstPropertySource);

@@ -27,7 +27,8 @@ public final class SentinelFlowLimitUtils {
      */
     public static Consumer<Exception> flowControl(SentinelResource resource) throws BlockException {
         ContextUtil.enter(resource.getContextName(), resource.getOrigin());
-        final Entry entry = SphU.entry(resource.getName(), resource.getResourceType(), resource.getEntryType(), new Object[]{Tags.of(resource.getMetricsTags())});
+        final Entry entry = SphU.entry(resource.getName(), resource.getResourceType(), resource.getEntryType(),
+                new Object[]{Tags.of(resource.getMetricsTags())});
         return exception -> {
             entry.exit();
             if (exception != null) {

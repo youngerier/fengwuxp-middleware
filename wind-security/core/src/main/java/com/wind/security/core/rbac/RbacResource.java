@@ -107,7 +107,7 @@ public interface RbacResource extends Serializable {
             this("", null);
         }
 
-       public static UserRole immutable(String roleId, Long expireTime) {
+        public static UserRole immutable(String roleId, Long expireTime) {
             return new UserRole(roleId, expireTime);
         }
 

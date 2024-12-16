@@ -3,7 +3,6 @@ package com.wind.security.captcha.storage;
 import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
 import com.wind.security.captcha.Captcha;
-import com.wind.security.captcha.CaptchaStorage;
 import com.wind.security.captcha.CaptchaConstants;
 import com.wind.security.captcha.CaptchaStorage;
 import lombok.AllArgsConstructor;

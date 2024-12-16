@@ -14,22 +14,7 @@ public final class WebSecurityConstants {
     /**
      * 保存在请求上线文中，当前请求需要的权限
      */
-    public static final String REQUEST_REQUIRED_PERMISSIONS_ATTRIBUTE_NAME = "REQUEST_REQUIRED_PERMISSIONS";
-
-    /**
-     * rbac 权限缓存名称
-     */
-    public static final String RBAC_PERMISSION_CACHE_NAME = "RBAC_PERMISSION_CACHE";
-
-    /**
-     * rbac 角色缓存名称
-     */
-    public static final String RBAC_ROLE_CACHE_NAME = "RBAC_ROLE_CACHE";
-
-    /**
-     * rbac 用户角色缓存名称
-     */
-    public static final String RBAC_USER_ROLE_CACHE_NAME = "RBAC_USER_ROLE_CACHE";
+    public static final String REQUEST_REQUIRED_AUTHORITIES_ATTRIBUTE_NAME = "REQUEST_REQUIRED_AUTHORITIES";
 
     /**
      * 登录已失效

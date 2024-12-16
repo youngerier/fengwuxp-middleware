@@ -1,12 +1,16 @@
 package com.wind.common.util;
 
 import com.wind.common.exception.AssertUtils;
+import org.springframework.aop.support.AopUtils;
+import org.springframework.core.ResolvableType;
 import org.springframework.util.ConcurrentReferenceHashMap;
+import org.springframework.util.ObjectUtils;
 
 import javax.validation.constraints.NotNull;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,6 +29,8 @@ import java.util.stream.Collectors;
  **/
 public final class WindReflectUtils {
 
+    private static final Field[] EMPTY = new Field[0];
+
     private static final Map<Class<?>, List<Field>> FIELDS = new ConcurrentReferenceHashMap<>();
 
     /**
@@ -36,8 +42,8 @@ public final class WindReflectUtils {
      */
     @NotNull
     public static Field[] findFields(Class<?> clazz, Class<? extends Annotation> annotationClass) {
-        AssertUtils.notNull(clazz, "argument clazz  must not null");
-        AssertUtils.notNull(annotationClass, "argument annotationClass  must not null");
+        AssertUtils.notNull(clazz, "argument clazz must not null");
+        AssertUtils.notNull(annotationClass, "argument annotationClass must not null");
         Field[] result = getMemberFields(clazz)
                 .stream()
                 .filter(field -> field.isAnnotationPresent(annotationClass))
@@ -55,8 +61,10 @@ public final class WindReflectUtils {
      */
     @NotNull
     public static Field[] findFields(Class<?> clazz, Collection<String> fieldNames) {
-        AssertUtils.notNull(clazz, "argument clazz  must not null");
-        AssertUtils.notEmpty(fieldNames, "argument fieldNames  must not empty");
+        if (fieldNames == null || fieldNames.isEmpty()) {
+            return EMPTY;
+        }
+        AssertUtils.notNull(clazz, "argument clazz must not null");
         Set<String> names = new HashSet<>(fieldNames);
         Field[] result = getMemberFields(clazz)
                 .stream()
@@ -93,7 +101,7 @@ public final class WindReflectUtils {
      * @return 字段名称列表
      */
     public static List<String> getFieldNames(Class<?> clazz) {
-        AssertUtils.notNull(clazz, "argument clazz  must not null");
+        AssertUtils.notNull(clazz, "argument clazz must not null");
         return getMemberFields(clazz)
                 .stream()
                 .map(Field::getName)
@@ -122,5 +130,32 @@ public final class WindReflectUtils {
         List<Field> result = new ArrayList<>(Arrays.asList(fields));
         result.addAll(getClazzFields(clazz.getSuperclass()));
         return result;
+    }
+
+    /**
+     * 解析对象继承的超类或实现的接口上设置的泛型
+     *
+     * @param bean 对象
+     * @return 父类或者接口上设置的泛型
+     */
+    public static Type[] resolveSuperGenericType(@NotNull Object bean) {
+        AssertUtils.notNull(bean, "argument bean must not null");
+        Class<?> targetClass = AopUtils.getTargetClass(bean);
+        ResolvableType resolvableType = ResolvableType.forClass(targetClass);
+        ResolvableType superType = resolvableType.getSuperType();
+        ResolvableType[] generics = null;
+        if (superType.getRawClass() == Object.class) {
+            ResolvableType[] interfaces = resolvableType.getInterfaces();
+            if (ObjectUtils.isEmpty(interfaces)) {
+                return new Type[0];
+            }
+            generics = interfaces[0].getGenerics();
+        } else {
+            generics = superType.getGenerics();
+        }
+        AssertUtils.notEmpty(generics, () -> targetClass.getName() + " 未设置泛型");
+        return Arrays.stream(generics)
+                .map(ResolvableType::getType)
+                .toArray(Type[]::new);
     }
 }

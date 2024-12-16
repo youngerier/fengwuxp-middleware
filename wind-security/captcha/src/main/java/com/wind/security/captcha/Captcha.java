@@ -64,7 +64,7 @@ public interface Captcha extends CaptchaValue {
         }
         // 验证次数小于允许验证次数 且 未过期
         return getVerificationCount() < getAllowVerificationTimes() &&
-               getExpireTime() > System.currentTimeMillis();
+                getExpireTime() > System.currentTimeMillis();
     }
 
     /**

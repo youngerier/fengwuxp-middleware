@@ -1,0 +1,70 @@
+{
+  "left": {
+    "type": "VARIABLE",
+    "value": "name"
+  },
+  "op": "EQ",
+  "right": {
+    "type": "EXPRESSION",
+    "value": "'张三'"
+  },
+  "conjunctions": "AND",
+  "children": [
+    {
+      "right": {
+        "type": "VARIABLE",
+        "value": "env"
+      },
+      "op": "CONTAINS",
+      "left": {
+        "type": "CONSTANT",
+        "value": [
+          "dev",
+          "sit"
+        ]
+      }
+    },
+    {
+      "left": {
+        "type": "VARIABLE",
+        "value": "age"
+      },
+      "op": "IN_RANG",
+      "right": {
+        "type": "CONSTANT",
+        "value": [
+          16,
+          45
+        ]
+      },
+      "conjunctions": "OR",
+      "children": [
+        {
+          "right": {
+            "type": "VARIABLE",
+            "value": "city"
+          },
+          "op": "CONTAINS",
+          "left": {
+            "type": "CONSTANT",
+            "value": [
+              "杭州",
+              "上海"
+            ]
+          }
+        },
+        {
+          "left": {
+            "type": "VARIABLE",
+            "value": "tags['example']"
+          },
+          "op": "NOT_EQ",
+          "right": {
+            "type": "CONSTANT",
+            "value": "demo"
+          }
+        }
+      ]
+    }
+  ]
+}

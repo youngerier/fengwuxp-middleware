@@ -19,6 +19,10 @@
             <artifactId>wind-core</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.wind.middleware</groupId>
+            <artifactId>wind-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.freemarker</groupId>
             <artifactId>freemarker</artifactId>
         </dependency>

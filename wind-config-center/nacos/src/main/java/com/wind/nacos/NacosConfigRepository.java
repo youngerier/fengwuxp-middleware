@@ -98,7 +98,8 @@ public class NacosConfigRepository implements ConfigRepository {
 
     private List<PropertySource<?>> getPropertySources(ConfigDescriptor descriptor, String content) {
         try {
-            return NacosDataParserHandler.getInstance().parseNacosData(descriptor.getConfigId(), content, descriptor.getFileType().getFileExtension());
+            return NacosDataParserHandler.getInstance().parseNacosData(descriptor.getConfigId(), content,
+                    descriptor.getFileType().getFileExtension());
         } catch (IOException exception) {
             throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("parse config：%s error", descriptor.getConfigId()), exception);
         }

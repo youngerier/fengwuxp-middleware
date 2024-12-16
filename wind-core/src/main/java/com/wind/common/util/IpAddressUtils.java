@@ -21,6 +21,9 @@ import java.util.Enumeration;
 @Slf4j
 public final class IpAddressUtils {
 
+    // ip 缓存
+    private static final String HOST_IP_V4 = IpAddressUtils.getLocalIpv4();
+
     private IpAddressUtils() {
         throw new AssertionError();
     }
@@ -49,7 +52,8 @@ public final class IpAddressUtils {
      * 　　0:0:0:0:0:0:0:1 → ::1
      * 　　0:0:0:0:0:0:0:0 → ::
      * 三、内嵌IPv4地址表示法
-     * 　　为了实现IPv4-IPv6互通，IPv4地址会嵌入IPv6地址中，此时地址常表示为：X:X:X:X:X:X:d.d.d.d，前96b采用冒分十六进制表示，而最后32b地址则使用IPv4的点分十进制表示，例如::192.168.0.1与::FFFF:192.168.0.1就是两个典型的例子，注意在前96b中，压缩0位的方法依旧适用
+     * 　　为了实现IPv4-IPv6互通，IPv4地址会嵌入IPv6地址中，此时地址常表示为：X:X:X:X:X:X:d.d.d.d，前96b采用冒分十六进制表示，而最后32b地址则使用IPv4的点分十进制表示，例如::192.168.0.1与::FFFF:192.168.0
+     * .1就是两个典型的例子，注意在前96b中，压缩0位的方法依旧适用
      * <p>
      * {@link java.net.InterfaceAddress#getAddress()}
      *
@@ -152,6 +156,15 @@ public final class IpAddressUtils {
             return WindConstants.UNKNOWN;
         }
         return address.getHostAddress();
+    }
+
+    /**
+     * 从缓存中获取 本机 ip 地址
+     *
+     * @return 本机 host
+     */
+    public static String getLocalIpv4WithCache() {
+        return HOST_IP_V4;
     }
 
     /**

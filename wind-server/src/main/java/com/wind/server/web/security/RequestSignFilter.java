@@ -62,7 +62,8 @@ public class RequestSignFilter implements Filter, Ordered {
         this(new SignatureHttpHeaderNames(), accountProvider, ignoreRequestMatchers, enable);
     }
 
-    public RequestSignFilter(String headerPrefix, ApiSecretAccountProvider accountProvider, Collection<RequestMatcher> ignoreRequestMatchers, boolean enable) {
+    public RequestSignFilter(String headerPrefix, ApiSecretAccountProvider accountProvider, Collection<RequestMatcher> ignoreRequestMatchers,
+                             boolean enable) {
         this(new SignatureHttpHeaderNames(headerPrefix), accountProvider, ignoreRequestMatchers, enable);
     }
 

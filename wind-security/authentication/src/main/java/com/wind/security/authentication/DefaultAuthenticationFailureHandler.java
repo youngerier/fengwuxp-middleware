@@ -41,7 +41,8 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
     }
 
     @Override
-    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException,
+            ServletException {
         log.error("commence authentication error", exception);
         onAuthenticationFailure(request, response, exception);
     }

@@ -116,6 +116,16 @@ public final class RetrofitClientFactory {
          */
         private Locale language;
 
+        /**
+         * 读写超时时间，单位：秒
+         */
+        private int readWriteTimeoutSeconds = 20;
+
+        /**
+         * 连接超时时间，单位：秒
+         */
+        private int connectTimeoutSeconds = 5;
+
         public RetrofitClientFactoryBuilder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
             return this;
@@ -152,6 +162,16 @@ public final class RetrofitClientFactory {
             return this;
         }
 
+        public RetrofitClientFactoryBuilder readWriteTimeoutSeconds(int readWriteTimeoutSeconds) {
+            this.readWriteTimeoutSeconds = readWriteTimeoutSeconds;
+            return this;
+        }
+
+        public RetrofitClientFactoryBuilder connectTimeoutSeconds(int connectTimeoutSeconds) {
+            this.connectTimeoutSeconds = connectTimeoutSeconds;
+            return this;
+        }
+
         /**
          * 创建默认风格 API RetrofitClientFactory
          *
@@ -178,8 +198,10 @@ public final class RetrofitClientFactory {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .client(httpClient)
-                    .addCallAdapterFactory(new JacksonResponseCallAdapterFactory(objectMapper, ImmutableApiResponse.class, RetrofitClientFactoryBuilder::defaultResponseExtractor))
-                    .addConverterFactory(new JacksonConverterFactory(objectMapper, ImmutableApiResponse.class, RetrofitClientFactoryBuilder::defaultResponseExtractor))
+                    .addCallAdapterFactory(new JacksonResponseCallAdapterFactory(objectMapper, ImmutableApiResponse.class,
+                            RetrofitClientFactoryBuilder::defaultResponseExtractor))
+                    .addConverterFactory(new JacksonConverterFactory(objectMapper, ImmutableApiResponse.class,
+                            RetrofitClientFactoryBuilder::defaultResponseExtractor))
                     .build();
 
             return new RetrofitClientFactory(retrofit);
@@ -219,9 +241,9 @@ public final class RetrofitClientFactory {
         private OkHttpClient.Builder detaultClientBuilder() {
             // 设置超时时间，这里以秒为单位
             return new OkHttpClient.Builder()
-                    .readTimeout(15, TimeUnit.SECONDS)
-                    .writeTimeout(15, TimeUnit.SECONDS)
-                    .connectTimeout(5, TimeUnit.SECONDS)
+                    .readTimeout(readWriteTimeoutSeconds, TimeUnit.SECONDS)
+                    .writeTimeout(readWriteTimeoutSeconds, TimeUnit.SECONDS)
+                    .connectTimeout(connectTimeoutSeconds, TimeUnit.SECONDS)
                     .retryOnConnectionFailure(true);
         }
 

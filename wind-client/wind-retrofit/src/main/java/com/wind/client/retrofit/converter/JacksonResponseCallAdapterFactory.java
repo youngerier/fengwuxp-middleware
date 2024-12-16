@@ -64,10 +64,11 @@ public class JacksonResponseCallAdapterFactory extends CallAdapter.Factory {
                 Response<R> response = call.execute();
                 return response.isSuccessful() ? response.body() : parseErrorResp(response.errorBody());
             } catch (IOException exception) {
-                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "convert resp body error", exception);
+                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "convert resp body error, case by: " + exception.getMessage(), exception);
             }
         }
 
+        @SuppressWarnings("unchecked")
         private Object parseErrorResp(ResponseBody errorBody) throws IOException {
             JavaType javaType = objectMapper.getTypeFactory().constructType(responseType);
             ObjectReader reader = objectMapper.readerFor(javaType);
@@ -79,6 +80,5 @@ public class JacksonResponseCallAdapterFactory extends CallAdapter.Factory {
             }
         }
     }
-
 
 }

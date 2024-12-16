@@ -40,7 +40,7 @@ public class JdkLockFactory implements LockFactory {
 
         @Override
         public boolean tryLock(long waitTime, long leaseTime, TimeUnit unit) throws InterruptedException {
-          return tryLock(waitTime,unit);
+            return tryLock(waitTime, unit);
         }
 
         @Override

@@ -2,7 +2,6 @@ package com.wind.web.trace;
 
 import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
-import com.wind.common.WindHttpConstants;
 import com.wind.common.util.IpAddressUtils;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
@@ -64,7 +63,7 @@ public class TraceFilter extends OncePerRequestFilter {
         try {
             if (!ServiceInfoUtils.isOnline()) {
                 // 线下环境增加服务端 ip 返回
-                response.setHeader(REAL_SERVER_IP, IpAddressUtils.getLocalIpv4());
+                response.setHeader(REAL_SERVER_IP, IpAddressUtils.getLocalIpv4WithCache());
             }
             // 提前写入 traceId 到响应头，避免 response committed 后无法写回
             response.setHeader(WIND_TRANCE_ID_HEADER_NAME, trace(request));
@@ -85,10 +84,10 @@ public class TraceFilter extends OncePerRequestFilter {
         String requestSourceIp = getRequestSourceIp(request);
         request.setAttribute(HTTP_REQUEST_IP_ATTRIBUTE_NAME, requestSourceIp);
         contextVariables.put(HTTP_REQUEST_IP_ATTRIBUTE_NAME, requestSourceIp);
-        contextVariables.put(HTTP_REQUEST_HOST_ATTRIBUTE_NAME, getReqeustSourceHost(request));
+        contextVariables.put(HTTP_REQUEST_HOST_ATTRIBUTE_NAME, getRequestSourceHost(request));
         contextVariables.put(HTTP_REQUEST_UR_TRACE_NAME, request.getRequestURI());
         contextVariables.put(HTTP_USER_AGENT_HEADER_NAME, request.getHeader(HttpHeaders.USER_AGENT));
-        contextVariables.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4());
+        contextVariables.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
         WindTracer.TRACER.trace(traceId, contextVariables);
         return WindTracer.TRACER.getTraceId();
     }
@@ -117,7 +116,7 @@ public class TraceFilter extends OncePerRequestFilter {
         return request.getRemoteAddr();
     }
 
-    private String getReqeustSourceHost(HttpServletRequest request) {
+    private String getRequestSourceHost(HttpServletRequest request) {
         try {
             String host = request.getHeader("Host");
             return host == null ? URI.create(request.getRequestURI()).getHost() : host;
@@ -126,4 +125,11 @@ public class TraceFilter extends OncePerRequestFilter {
             return WindConstants.UNKNOWN;
         }
     }
+
+    // TODO 待删除
+    @Deprecated
+    public static void addTraceAttributeName(String httAttributeName, String traceContextVariableName) {
+
+    }
+
 }

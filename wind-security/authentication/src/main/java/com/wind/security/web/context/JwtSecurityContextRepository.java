@@ -84,7 +84,8 @@ public class JwtSecurityContextRepository implements SecurityContextRepository {
             return EMPTY;
         }
         // 加载用户权限
-        Set<SimpleGrantedAuthority> authorities = authoritySupplier.apply(payload.getUser()).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
+        Set<SimpleGrantedAuthority> authorities =
+                authoritySupplier.apply(payload.getUser()).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
         Authentication authentication = new JwtAuthenticationToken(payload.getUser(), jwtToken, authorities);
         return new SecurityContextImpl(authentication);
     }

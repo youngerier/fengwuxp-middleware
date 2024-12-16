@@ -26,25 +26,21 @@
         <module>wind-tracer</module>
         <module>context-variable</module>
         <module>logback-kafka-appender</module>
-        <module>modules/transaction</module>
         <module>wind-elasticjob</module>
         <module>wind-dependencies</module>
         <module>wind-sentinel</module>
         <module>wind-client</module>
         <module>wind-archetype</module>
         <module>tools</module>
-        <module>modules/office</module>
-        <module>modules/object-mask</module>
-        <module>modules/payment</module>
-        <module>modules/script</module>
-        <module>modules/sequence-generate</module>
+        <module>object-mask</module>
+        <module>script</module>
+        <module>sequence-generate</module>
         <module>tests</module>
         <module>wind-rocketmq</module>
-        <module>modules/mybatis-flex-extends</module>
     </modules>
 
     <properties>
-        <revision>1.0.14-SNAPSHOT</revision>
+        <revision>1.0.20-SNAPSHOT</revision>
         <!--   占位使用     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
@@ -76,9 +72,9 @@
         <commons-io.version>2.13.0</commons-io.version>
         <commons-lang3.version>3.10</commons-lang3.version>
         <commons-text.version>1.10.0</commons-text.version>
-        <mapstruct.version>1.5.5.Final</mapstruct.version>
-        <redisson.version>3.18.0</redisson.version>
-        <kryo.version>5.3.0</kryo.version>
+        <mapstruct.version>1.6.2</mapstruct.version>
+        <redisson.version>3.36.0</redisson.version>
+        <kryo.version>5.6.0</kryo.version>
         <elasticjob.version>3.0.2</elasticjob.version>
         <dynamic-tp.version>1.1.7</dynamic-tp.version>
         <guava.version>32.0.1-jre</guava.version>
@@ -89,9 +85,6 @@
         <logback-encoder.version>7.4</logback-encoder.version>
         <retrofit.version>2.9.0</retrofit.version>
 
-        <alipay-sdk.version>4.38.90.ALL</alipay-sdk.version>
-        <weixin-java-pay.version>4.5.0</weixin-java-pay.version>
-        <easyexcel.version>3.3.2</easyexcel.version>
         <swagger-openapiv3.version>2.2.9</swagger-openapiv3.version>
         <springdoc-openapi-ui.version>1.7.0</springdoc-openapi-ui.version>
         <googleauth.version>1.5.0</googleauth.version>
@@ -196,11 +189,6 @@
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
-                <artifactId>mybatis-flex-extends</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.middleware</groupId>
                 <artifactId>logback-kafka-appender</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -222,31 +210,6 @@
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-script</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.office</groupId>
-                <artifactId>wind-office-core</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.office</groupId>
-                <artifactId>wind-office-excel</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.payment</groupId>
-                <artifactId>wind-payment-plugin-core</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.payment</groupId>
-                <artifactId>wind-payment-plugin-alipay</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.payment</groupId>
-                <artifactId>wind-payment-plugin-wechat</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -354,9 +317,25 @@
                 <artifactId>redisson</artifactId>
                 <version>${redisson.version}</version>
             </dependency>
+            <!--   https://redisson.org/docs/integration-with-spring/#spring-boot-starter -->
             <dependency>
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.redisson</groupId>
+                        <artifactId>redisson</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.redisson</groupId>
+                        <artifactId>redisson-spring-data-33</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-data-27</artifactId>
                 <version>${redisson.version}</version>
             </dependency>
             <dependency>
@@ -425,18 +404,6 @@
                 <version>${javet.version}</version>
                 <optional>true</optional>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/com.alipay.sdk/alipay-sdk-java -->
-            <dependency>
-                <groupId>com.alipay.sdk</groupId>
-                <artifactId>alipay-sdk-java</artifactId>
-                <version>${alipay-sdk.version}</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/com.github.binarywang/weixin-java-pay -->
-            <dependency>
-                <groupId>com.github.binarywang</groupId>
-                <artifactId>weixin-java-pay</artifactId>
-                <version>${weixin-java-pay.version}</version>
-            </dependency>
             <!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
             <dependency>
                 <groupId>org.freemarker</groupId>
@@ -447,11 +414,6 @@
                 <groupId>net.logstash.logback</groupId>
                 <artifactId>logstash-logback-encoder</artifactId>
                 <version>${logback-encoder.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>easyexcel</artifactId>
-                <version>${easyexcel.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.shardingsphere.elasticjob</groupId>
@@ -466,6 +428,21 @@
             <dependency>
                 <groupId>org.apache.shardingsphere.elasticjob</groupId>
                 <artifactId>elasticjob-infra-common</artifactId>
+                <version>${elasticjob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere.elasticjob</groupId>
+                <artifactId>elasticjob-simple-executor</artifactId>
+                <version>${elasticjob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere.elasticjob</groupId>
+                <artifactId>elasticjob-registry-center-api</artifactId>
+                <version>${elasticjob.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.shardingsphere.elasticjob</groupId>
+                <artifactId>elasticjob-lite-core</artifactId>
                 <version>${elasticjob.version}</version>
             </dependency>
             <dependency>

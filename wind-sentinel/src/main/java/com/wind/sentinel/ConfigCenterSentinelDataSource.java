@@ -33,7 +33,8 @@ public class ConfigCenterSentinelDataSource<T> extends AbstractDataSource<String
         this(configRepository, Collections.singletonList(descriptor), configType);
     }
 
-    public ConfigCenterSentinelDataSource(ConfigRepository configRepository, List<ConfigRepository.ConfigDescriptor> descriptors, Class<T> configType) {
+    public ConfigCenterSentinelDataSource(ConfigRepository configRepository, List<ConfigRepository.ConfigDescriptor> descriptors,
+                                          Class<T> configType) {
         super(source -> JSON.parseArray(source, configType));
         this.configRepository = configRepository;
         this.configType = configType;

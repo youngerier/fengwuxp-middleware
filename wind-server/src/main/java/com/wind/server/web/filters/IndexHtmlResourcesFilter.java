@@ -33,7 +33,7 @@ import java.util.function.Function;
 
 /**
  * 前后端分离模式下用于返回前端的 index.html 页面
- * 仅支持 browser 路由模式 https://juejin.cn/post/6844903648804208654
+ * 仅支持 browser 路由模式，参见： https://juejin.cn/post/6844903648804208654
  *
  * @author wuxp
  * @date 2023-10-21 20:18
@@ -44,9 +44,9 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
     public static final String INDEX_HTML_NAME = "/index.html";
 
     /**
-     * 默认缓存 180 天
+     * 默认缓存 60 天
      */
-    private static final int CACHE_TIMES = 24 * 3600 * 180;
+    private static final int CACHE_TIMES = 24 * 3600 * 60;
 
     /**
      * 请求 index.html 页面的请求路径
@@ -84,7 +84,8 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
         STATIC_RESOURCES.put(".ttc", "font/ttc");
     }
 
-    private static final Cache<String, HttpHeaders> HEADER_CACHES = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
+    private static final Cache<String, HttpHeaders> HEADER_CACHES =
+            Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
 
     /**
      * 前端路由前缀，仅支持 browser 模式下的路由
@@ -110,7 +111,8 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
                 chain.doFilter(request, response);
                 return;
             }
-            boolean requestIndexHtml = matchesMediaType(request.getHeader(HttpHeaders.ACCEPT)) && (INDEX_HTML_PATHS.contains(requestUri) || requestUri.startsWith(routePrefix));
+            boolean requestIndexHtml =
+                    matchesMediaType(request.getHeader(HttpHeaders.ACCEPT)) && (INDEX_HTML_PATHS.contains(requestUri) || requestUri.startsWith(routePrefix));
             if (requestIndexHtml) {
                 // 写回 index.html
                 response.getOutputStream().write(resourceLoader.apply(INDEX_HTML_NAME));
@@ -173,7 +175,7 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
                 HEADER_CACHES.put(key, resp.getHeaders());
                 AssertUtils.isTrue(resp.hasBody(), () -> String.format("load resource： %s failure", key));
                 ByteArrayResource result = resp.getBody();
-                AssertUtils.notNull(result, "load html resource is null");
+                AssertUtils.notNull(result, "load html resource must not null");
                 return result.getByteArray();
             });
         }

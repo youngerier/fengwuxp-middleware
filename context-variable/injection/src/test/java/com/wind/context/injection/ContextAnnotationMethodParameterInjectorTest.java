@@ -60,7 +60,7 @@ class ContextAnnotationMethodParameterInjectorTest {
         Method method = ReflectionUtils.findMethod(Example.class, "examplePrimitiveArray", long[].class);
         Object[] arguments = {null};
         injector.inject(method, arguments);
-        Assertions.assertEquals("[1, 2]",Arrays.toString((long[]) arguments[0]));
+        Assertions.assertEquals("[1, 2]", Arrays.toString((long[]) arguments[0]));
     }
 
 

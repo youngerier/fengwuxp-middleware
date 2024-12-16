@@ -8,7 +8,7 @@
         <artifactId>wind-middleware</artifactId>
         <version>${revision}</version>
     </parent>
-    
+
     <artifactId>logback-kafka-appender</artifactId>
 
     <dependencies>

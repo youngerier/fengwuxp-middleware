@@ -11,7 +11,6 @@ import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -25,6 +24,11 @@ import static com.wind.common.WindConstants.TRACE_ID_NAME;
  * @date 2023-12-29 09:57
  **/
 public final class WindThreadTracer implements WindTracer {
+
+    static {
+        // 默认填充本机 ip
+        MDC.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
+    }
 
     /**
      * 生成 traceId
@@ -45,7 +49,7 @@ public final class WindThreadTracer implements WindTracer {
     public void trace(String traceId, @NotNull Map<String, Object> contextVariables) {
         //  使用 MDC 保存
         MDC.put(TRACE_ID_NAME, StringUtils.hasText(traceId) ? traceId : TRACE_ID.next());
-        MDC.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4());
+        MDC.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
         Objects.requireNonNull(contextVariables, "argument contextVariables must not null")
                 .forEach((key, val) -> {
                     if (val instanceof String) {
@@ -58,6 +62,7 @@ public final class WindThreadTracer implements WindTracer {
     @Override
     public WindTraceContext getTraceContext() {
         Map<String, Object> mdcContext = getMdcContext();
+        // TODO 待优化
         return new WindTraceContext() {
             @Override
             public String getTraceId() {
@@ -84,6 +89,11 @@ public final class WindThreadTracer implements WindTracer {
         };
     }
 
+    @Override
+    public void putContextVariable(String variableName, String variable) {
+        MDC.put(variableName, variable);
+    }
+
     @NonNull
     private static Map<String, Object> getMdcContext() {
         Map<String, String> context = MDC.getCopyOfContextMap();
@@ -91,12 +101,14 @@ public final class WindThreadTracer implements WindTracer {
             context = Collections.singletonMap(TRACE_ID_NAME, TRACE_ID.next());
             context.forEach(MDC::put);
         }
-        return Collections.unmodifiableMap(new HashMap<>(context));
+        return Collections.unmodifiableMap(context);
     }
 
     @Override
     public void clear() {
         MDC.clear();
+        // 保证 MDC 中一直存在 本机 ip 的属性 TODO 待优化
+        MDC.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
     }
 
 }

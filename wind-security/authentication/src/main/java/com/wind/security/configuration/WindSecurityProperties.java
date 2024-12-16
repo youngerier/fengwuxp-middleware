@@ -21,4 +21,11 @@ public class WindSecurityProperties {
      */
     private boolean enabled = true;
 
+    /**
+     * 默认的角色值前缀
+     *
+     * @see org.springframework.security.access.vote.RoleVoter#getRolePrefix
+     */
+    private String rolePrefix = "ROLE_";
+
 }

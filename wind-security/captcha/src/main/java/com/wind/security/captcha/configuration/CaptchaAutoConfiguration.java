@@ -79,7 +79,8 @@ public class CaptchaAutoConfiguration {
     @Bean
     @ConditionalOnBean(LockFactory.class)
     @ConditionalOnMissingBean({CaptchaGenerateChecker.class})
-    public SimpleCaptchaGenerateChecker simpleCaptchaGenerateChecker(CacheManager cacheManager, CaptchaProperties properties, LockFactory lockFactory) {
+    public SimpleCaptchaGenerateChecker simpleCaptchaGenerateChecker(CacheManager cacheManager, CaptchaProperties properties,
+                                                                     LockFactory lockFactory) {
         return new SimpleCaptchaGenerateChecker(cacheManager, properties, lockFactory);
     }
 

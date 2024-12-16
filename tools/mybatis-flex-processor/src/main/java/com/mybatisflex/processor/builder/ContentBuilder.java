@@ -79,7 +79,8 @@ public class ContentBuilder {
                         .append("     * ").append(entityComment.trim()).append("\n")
                         .append("     */\n");
             }
-            tableDefPropertyName = StrUtil.buildFieldName(tableInfo.getEntitySimpleName().concat(tableDefInstanceSuffix != null ? tableDefInstanceSuffix.trim() : ""), tableDefPropertiesNameStyle);
+            tableDefPropertyName = StrUtil.buildFieldName(tableInfo.getEntitySimpleName().concat(tableDefInstanceSuffix != null ?
+                    tableDefInstanceSuffix.trim() : ""), tableDefPropertiesNameStyle);
             content.append("    public static final ").append(tableDefClassName).append(' ').append(tableDefPropertyName)
                     .append(" = new ").append(tableDefClassName).append("();\n\n");
         }
@@ -113,7 +114,8 @@ public class ContentBuilder {
         content.append("    /**\n")
                 .append("     * 所有字段。\n")
                 .append("     */\n");
-        content.append("    public final QueryColumn ").append(StrUtil.buildFieldName("allColumns", tableDefPropertiesNameStyle)).append(" = new QueryColumn(this, \"*\");\n");
+        content.append("    public final QueryColumn ").append(StrUtil.buildFieldName("allColumns", tableDefPropertiesNameStyle)).append(" = new " +
+                "QueryColumn(this, \"*\");\n");
         StringJoiner defaultColumnJoiner = new StringJoiner(", ");
         columnInfos.forEach(columnInfo -> {
             if (defaultColumns.contains(columnInfo.getColumn())) {
@@ -127,7 +129,8 @@ public class ContentBuilder {
         content.append("\n    /**\n")
                 .append("     * 默认字段，不包含逻辑删除或者 large 等字段。\n")
                 .append("     */\n");
-        content.append("    public final QueryColumn[] ").append(StrUtil.buildFieldName("defaultColumns", tableDefPropertiesNameStyle)).append(" = new QueryColumn[]{").append(defaultColumnJoiner).append("};\n\n");
+        content.append("    public final QueryColumn[] ").append(StrUtil.buildFieldName("defaultColumns", tableDefPropertiesNameStyle)).append(" = " +
+                "new QueryColumn[]{").append(defaultColumnJoiner).append("};\n\n");
         String schema = !StrUtil.isBlank(tableInfo.getSchema())
                 ? tableInfo.getSchema()
                 : "";
@@ -170,7 +173,8 @@ public class ContentBuilder {
                     .append("    */\n");
         }
         fieldBuilder.append("    public static final ").append(tableDefClassName).append(' ')
-                .append(StrUtil.buildFieldName(tableInfo.getEntitySimpleName().concat(tableDefInstanceSuffix != null ? tableDefInstanceSuffix.trim() : ""), tableDefPropertiesNameStyle))
+                .append(StrUtil.buildFieldName(tableInfo.getEntitySimpleName().concat(tableDefInstanceSuffix != null ?
+                        tableDefInstanceSuffix.trim() : ""), tableDefPropertiesNameStyle))
                 .append(" = new ").append(tableDefClassName).append("();\n");
     }
 

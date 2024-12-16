@@ -14,6 +14,11 @@ import lombok.Getter;
 public enum DefaultOrderField implements QueryOrderField {
 
     /**
+     * ID
+     */
+    ID("id"),
+
+    /**
      * 创建日期
      */
     GMT_CREATE("gmt_create"),
@@ -26,7 +31,17 @@ public enum DefaultOrderField implements QueryOrderField {
     /**
      * 排序
      */
-    ORDER_INDEX("order_index");
+    ORDER_INDEX("order_index"),
+
+    /**
+     * 状态
+     */
+    STATE("state"),
+
+    /**
+     * 是否启用
+     */
+    ENABLED("is_enabled");
 
     /**
      * 排序字段

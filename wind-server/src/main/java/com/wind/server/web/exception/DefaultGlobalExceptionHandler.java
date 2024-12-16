@@ -5,6 +5,7 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.server.web.supports.ApiResp;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataAccessException;
@@ -38,6 +39,7 @@ import static com.wind.common.WindConstants.WIND_SERVER_PROPERTIES_PREFIX;
 @Slf4j
 @ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX, name = "enabled-global-exception", havingValue = "true", matchIfMissing = true)
 @RestControllerAdvice()
+@AllArgsConstructor
 public class DefaultGlobalExceptionHandler {
 
     /**
@@ -142,7 +144,8 @@ public class DefaultGlobalExceptionHandler {
         log.error("捕获到异常: {}，errorMessage: {}", exception.getClass().getName(), exception.getMessage(), exception);
         if (throwable instanceof UndeclaredThrowableException) {
             // 获取真正的异常
-            InvocationTargetException invocationTargetException = (InvocationTargetException) ((UndeclaredThrowableException) throwable).getUndeclaredThrowable();
+            InvocationTargetException invocationTargetException =
+                    (InvocationTargetException) ((UndeclaredThrowableException) throwable).getUndeclaredThrowable();
             throwable = invocationTargetException.getTargetException();
         }
         return RestfulApiRespFactory.error(throwable.getMessage());

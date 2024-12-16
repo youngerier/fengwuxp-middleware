@@ -27,7 +27,8 @@ import java.util.Collections;
  **/
 class RequestSignFilterTests {
 
-    private final ApiSecretAccount secretAccount = ApiSecretAccount.hmacSha256(RandomStringUtils.randomAlphabetic(12), RandomStringUtils.randomAlphabetic(32));
+    private final ApiSecretAccount secretAccount = ApiSecretAccount.hmacSha256(RandomStringUtils.randomAlphabetic(12),
+            RandomStringUtils.randomAlphabetic(32));
 
     private RequestSignFilter signFilter;
 

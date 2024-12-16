@@ -38,7 +38,8 @@ class SentinelWebInterceptorTests {
                 mockDegradeRule("GET /example/5qps", 5),
                 mockDegradeRule("GET /example/10qps", 10)
         ));
-        interceptor = SentinelWebInterceptor.defaults(request -> createResource(String.format("%s %s", request.getMethod().toUpperCase(), request.getRequestURI())));
+        interceptor = SentinelWebInterceptor.defaults(request -> createResource(String.format("%s %s", request.getMethod().toUpperCase(),
+                request.getRequestURI())));
     }
 
     @Test

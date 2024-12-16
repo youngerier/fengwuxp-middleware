@@ -44,7 +44,8 @@ public class JdbcSequenceRepository implements SequenceRepository {
         this(sequenceSql, jdbcTemplate, transactionManager, PROPAGATION_REQUIRED);
     }
 
-    public JdbcSequenceRepository(SequenceSql sequenceSql, JdbcTemplate jdbcTemplate, PlatformTransactionManager transactionManager, int propagationBehavior) {
+    public JdbcSequenceRepository(SequenceSql sequenceSql, JdbcTemplate jdbcTemplate, PlatformTransactionManager transactionManager,
+                                  int propagationBehavior) {
         this.sequenceSql = sequenceSql;
         this.jdbcTemplate = jdbcTemplate;
         this.transactionTemplate = new TransactionTemplate(transactionManager, new DefaultTransactionDefinition(propagationBehavior));
@@ -116,9 +117,11 @@ public class JdbcSequenceRepository implements SequenceRepository {
         @Override
         public String next() {
             Integer next = transactionTemplate.execute(transactionStatus -> {
-                SequenceValue current = jdbcTemplate.queryForObject(sequenceSql.querySequenceValue, new BeanPropertyRowMapper<>(SequenceValue.class), sequenceId);
+                SequenceValue current = jdbcTemplate.queryForObject(sequenceSql.querySequenceValue,
+                        new BeanPropertyRowMapper<>(SequenceValue.class), sequenceId);
                 AssertUtils.notNull(current, () -> "not found current sequence value");
-                AssertUtils.isTrue(jdbcTemplate.update(sequenceSql.next, sequenceId, current.sequenceValue) > 0, () -> String.format("update sequence name = %s error", sequenceName));
+                AssertUtils.isTrue(jdbcTemplate.update(sequenceSql.next, sequenceId, current.sequenceValue) > 0, () -> String.format("update " +
+                        "sequence name = %s error", sequenceName));
                 return current.sequenceValue + current.stepValue;
             });
             AssertUtils.notNull(next, () -> String.format("get sequence name = %s error", sequenceName));

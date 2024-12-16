@@ -29,14 +29,14 @@ public class AcceptI18nHeaderLocaleResolver implements LocaleResolver {
     private final List<String> headerNames;
 
     public AcceptI18nHeaderLocaleResolver(List<String> headerNames, Locale defaultLocale) {
-        AssertUtils.notNull(defaultLocale,"argument defaultLocale must not null");
-        AssertUtils.notEmpty(headerNames,"argument headerNames must not empty");
+        AssertUtils.notNull(defaultLocale, "argument defaultLocale must not null");
+        AssertUtils.notEmpty(headerNames, "argument headerNames must not empty");
         this.headerNames = headerNames;
         this.defaultLocale = defaultLocale;
     }
 
     public AcceptI18nHeaderLocaleResolver(List<String> headerNames) {
-       this(headerNames,Locale.SIMPLIFIED_CHINESE);
+        this(headerNames, Locale.SIMPLIFIED_CHINESE);
     }
 
     public AcceptI18nHeaderLocaleResolver() {

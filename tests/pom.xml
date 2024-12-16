@@ -47,26 +47,6 @@
             <artifactId>wind-script</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.wind.office</groupId>
-            <artifactId>wind-office-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.wind.office</groupId>
-            <artifactId>wind-office-excel</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.wind.payment</groupId>
-            <artifactId>wind-payment-plugin-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.wind.payment</groupId>
-            <artifactId>wind-payment-plugin-alipay</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.wind.payment</groupId>
-            <artifactId>wind-payment-plugin-wechat</artifactId>
-        </dependency>
-        <dependency>
             <groupId>com.wind.middleware</groupId>
             <artifactId>wind-core</artifactId>
         </dependency>
