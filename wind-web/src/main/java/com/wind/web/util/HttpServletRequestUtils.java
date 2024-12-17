@@ -43,10 +43,16 @@ public final class HttpServletRequestUtils {
         return requireRequestAttribute(name, requireContextRequest());
     }
 
+
     public static <T> T requireRequestAttribute(@NotBlank String name, @NotNull HttpServletRequest request) {
         T result = getRequestAttribute(name, request);
         AssertUtils.notNull(result, () -> String.format("attribute = %s must not null", name));
         return result;
+    }
+
+    @Nullable
+    public static <T> T getRequestAttribute(@NotBlank String name) {
+        return getRequestAttribute(name, requireContextRequest());
     }
 
     @Nullable

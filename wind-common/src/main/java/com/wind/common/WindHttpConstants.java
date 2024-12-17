@@ -25,6 +25,7 @@ public final class WindHttpConstants {
      */
     public static final String API_SECRET_ACCOUNT_ATTRIBUTE_NAME = "Wind-Attribute-Api-Secret-Account";
 
+
     /**
      * http request User-Agent header name
      */
@@ -35,4 +36,10 @@ public final class WindHttpConstants {
      */
     public static final String ALL_PATH_ANT_PATTERN = "/**";
 
+    /**
+     * 请求异常日志输出标记
+     */
+    public static String getRequestExceptionLogOutputMarkerAttributeName(Throwable throwable) {
+        return String.format("%s-Log-Output-Marker", throwable.getClass().getName());
+    }
 }

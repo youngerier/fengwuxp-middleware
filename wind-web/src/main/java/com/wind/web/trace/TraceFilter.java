@@ -2,6 +2,7 @@ package com.wind.web.trace;
 
 import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
+import com.wind.common.WindHttpConstants;
 import com.wind.common.util.IpAddressUtils;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
@@ -70,7 +71,10 @@ public class TraceFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
         } catch (Throwable throwable) {
             // 统一错误捕获
-            log.error("request error, cause by = {}", throwable.getMessage(), throwable);
+            if (request.getAttribute(WindHttpConstants.getRequestExceptionLogOutputMarkerAttributeName(throwable)) == null) {
+                // 表明该异常未输出过 error 日志
+                log.error("request error, cause by = {}", throwable.getMessage(), throwable);
+            }
             HttpResponseMessageUtils.writeApiResp(response, RestfulApiRespFactory.withThrowable(throwable));
         } finally {
             WindTracer.TRACER.clear();
