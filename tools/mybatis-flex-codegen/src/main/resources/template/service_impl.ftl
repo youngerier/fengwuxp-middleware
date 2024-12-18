@@ -1,6 +1,6 @@
 package ${basePackage}.services.impl;
 
-import com.capte.nobe.infrastructure.dal.MybatisQueryHelper;
+import com.wind.mybatis.flex.MybatisQueryHelper;
 import ${basePackage}.dal.entities.table.${name}NameRefs;
 import ${basePackage}.dal.entities.${name};
 import ${basePackage}.dal.mapper.${name}Mapper;

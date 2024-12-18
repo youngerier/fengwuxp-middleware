@@ -1,6 +1,5 @@
 package ${basePackage}.controller;
 
-import com.capte.nobe.web.common.NobeWebConstants;
 import com.wind.common.exception.BaseException;
 import com.wind.common.query.supports.AbstractPageQuery;
 import com.wind.common.query.supports.Pagination;
