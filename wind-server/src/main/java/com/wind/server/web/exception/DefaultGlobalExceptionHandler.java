@@ -1,6 +1,7 @@
 package com.wind.server.web.exception;
 
 
+import com.wind.common.WindConstants;
 import com.wind.common.WindHttpConstants;
 import com.wind.common.exception.BaseException;
 import com.wind.common.i18n.SpringI18nMessageUtils;
@@ -39,7 +40,7 @@ import static com.wind.common.WindConstants.WIND_SERVER_PROPERTIES_PREFIX;
  * @author wxup
  */
 @Slf4j
-@ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX, name = "enabled-global-exception", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX, name = "enabled-global-exception", havingValue = WindConstants.TRUE, matchIfMissing = true)
 @RestControllerAdvice()
 @AllArgsConstructor
 public class DefaultGlobalExceptionHandler {
@@ -141,7 +142,6 @@ public class DefaultGlobalExceptionHandler {
         return RestfulApiRespFactory.withThrowable(exception);
     }
 
-
     /**
      * 统一兜底异常处理，如果前面都没有捕获到，将进入该方法
      */
@@ -149,7 +149,7 @@ public class DefaultGlobalExceptionHandler {
     @ResponseBody
     public ApiResp<Void> handleException(Exception exception) {
         Throwable throwable = exception;
-        if (HttpServletRequestUtils.getRequestAttribute(WindHttpConstants.getRequestExceptionLogOutputMarkerAttributeName(exception)) == null) {
+        if (requireOutputErrorLog(exception)) {
             log.error("捕获到异常: {}，errorMessage: {}", exception.getClass().getName(), exception.getMessage(), exception);
         }
         if (throwable instanceof UndeclaredThrowableException) {
@@ -159,5 +159,9 @@ public class DefaultGlobalExceptionHandler {
             throwable = invocationTargetException.getTargetException();
         }
         return RestfulApiRespFactory.error(throwable.getMessage());
+    }
+
+    private boolean requireOutputErrorLog(Throwable throwable) {
+        return HttpServletRequestUtils.getRequestAttribute(WindHttpConstants.getRequestExceptionLogOutputMarkerAttributeName(throwable)) == null;
     }
 }
