@@ -67,7 +67,7 @@
         <rocketmq-spring-boot-starter.version>2.3.0</rocketmq-spring-boot-starter.version>
         <sentinel.version>1.8.7</sentinel.version>
         <mysql.version>8.0.33</mysql.version>
-        <mybatis-flex.version>1.9.3</mybatis-flex.version>
+        <mybatis-flex.version>1.10.2</mybatis-flex.version>
         <mybatis.version>3.5.15</mybatis.version>
         <commons-io.version>2.13.0</commons-io.version>
         <commons-lang3.version>3.10</commons-lang3.version>
