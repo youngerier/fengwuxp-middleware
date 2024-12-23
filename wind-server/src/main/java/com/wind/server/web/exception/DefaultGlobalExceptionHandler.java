@@ -7,6 +7,7 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.server.web.supports.ApiResp;
+import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import com.wind.web.util.HttpServletRequestUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -112,7 +113,7 @@ public class DefaultGlobalExceptionHandler {
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseBody
     public ApiResp<Void> duplicateKeyException(Exception exception) {
-        if (HttpServletRequestUtils.getRequestAttribute(WindHttpConstants.getRequestExceptionLogOutputMarkerAttributeName(exception)) == null) {
+        if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
             log.error("唯一键冲突", exception);
         }
         return RestfulApiRespFactory.error(SpringI18nMessageUtils.getMessage(DB_DUPLICATE_KEY_I18N_KEY, "数据已存在"));
@@ -124,7 +125,7 @@ public class DefaultGlobalExceptionHandler {
     @ExceptionHandler(DataAccessException.class)
     @ResponseBody
     public ApiResp<Void> dataAccessException(Exception exception) {
-        if (HttpServletRequestUtils.getRequestAttribute(WindHttpConstants.getRequestExceptionLogOutputMarkerAttributeName(exception)) == null) {
+        if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
             log.error("数据操作异常", exception);
         }
         return RestfulApiRespFactory.error(SpringI18nMessageUtils.getMessage(DB_ACCESS_DATA_I18N_KEY, "数据操作失败"));
@@ -136,7 +137,7 @@ public class DefaultGlobalExceptionHandler {
     @ExceptionHandler({BaseException.class})
     @ResponseBody
     public ApiResp<Integer> handleBusinessServiceException(BaseException exception) {
-        if (HttpServletRequestUtils.getRequestAttribute(WindHttpConstants.getRequestExceptionLogOutputMarkerAttributeName(exception)) == null) {
+        if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
             log.error("业务异常，code = {}，errorMessage: {}", exception.getTextCode(), exception.getMessage(), exception);
         }
         return RestfulApiRespFactory.withThrowable(exception);
@@ -149,7 +150,7 @@ public class DefaultGlobalExceptionHandler {
     @ResponseBody
     public ApiResp<Void> handleException(Exception exception) {
         Throwable throwable = exception;
-        if (requireOutputErrorLog(exception)) {
+        if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
             log.error("捕获到异常: {}，errorMessage: {}", exception.getClass().getName(), exception.getMessage(), exception);
         }
         if (throwable instanceof UndeclaredThrowableException) {
@@ -161,7 +162,4 @@ public class DefaultGlobalExceptionHandler {
         return RestfulApiRespFactory.error(throwable.getMessage());
     }
 
-    private boolean requireOutputErrorLog(Throwable throwable) {
-        return HttpServletRequestUtils.getRequestAttribute(WindHttpConstants.getRequestExceptionLogOutputMarkerAttributeName(throwable)) == null;
-    }
 }

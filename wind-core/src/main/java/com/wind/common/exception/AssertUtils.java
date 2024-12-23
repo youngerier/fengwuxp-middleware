@@ -36,9 +36,9 @@ public final class AssertUtils {
      *
      * @param expression        a boolean expression
      * @param exceptionSupplier the exception message to use if the assertion fails
-     * @throws BaseException if {@code expression} is {@code false}
+     * @throws RuntimeException if {@code expression} is {@code false}
      */
-    public static void state(boolean expression, Supplier<BaseException> exceptionSupplier) {
+    public static void state(boolean expression, Supplier<RuntimeException> exceptionSupplier) {
         if (!expression) {
             throw Objects.requireNonNull(nullSafeGet(exceptionSupplier), "exception must not null");
         }

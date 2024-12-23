@@ -1,11 +1,11 @@
 package com.wind.security.web.context;
 
-import com.wind.common.exception.BaseException;
 import com.wind.security.authentication.jwt.JwtToken;
 import com.wind.security.authentication.jwt.JwtTokenCodec;
 import com.wind.security.authentication.jwt.JwtUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -78,7 +78,7 @@ public class JwtSecurityContextRepository implements SecurityContextRepository {
         try {
             payload = jwtTokenCodec.parse(jwtToken);
         } catch (Exception e) {
-            throw BaseException.unAuthorized(LOGIN_JWT_TOKEN_INVALID);
+            throw new AuthenticationCredentialsNotFoundException(LOGIN_JWT_TOKEN_INVALID);
         }
         if (payload == null) {
             return EMPTY;

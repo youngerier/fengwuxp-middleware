@@ -21,18 +21,22 @@ public class BaseException extends RuntimeException {
 
     private final MessagePlaceholder messagePlaceholder;
 
+    private final ExceptionLogLevel logLevel;
+
     public BaseException(String message) {
-        this(DefaultExceptionCode.COMMON_ERROR, message);
+        this(DefaultExceptionCode.COMMON_ERROR, ExceptionLogLevel.ERROR, message);
+    }
+
+    public BaseException(ExceptionLogLevel level, String message) {
+        this(DefaultExceptionCode.COMMON_ERROR, level, message);
     }
 
     public BaseException(ExceptionCode code, String message) {
-        this(code, message, null);
+        this(code, ExceptionLogLevel.ERROR, message);
     }
 
-    public BaseException(ExceptionCode code, String message, Throwable cause) {
-        super(message, cause);
-        this.code = code;
-        this.messagePlaceholder = null;
+    public BaseException(ExceptionCode code, ExceptionLogLevel level, String message) {
+        this(code, level, message, null);
     }
 
     public BaseException(MessagePlaceholder placeholder) {
@@ -43,10 +47,23 @@ public class BaseException extends RuntimeException {
         this(code, placeholder, null);
     }
 
+    public BaseException(ExceptionCode code, String message, Throwable cause) {
+        this(code, ExceptionLogLevel.ERROR, message, cause);
+    }
+
+    public BaseException(ExceptionCode code, ExceptionLogLevel level, String message, Throwable cause) {
+        this(code, MessagePlaceholder.of(message), level, cause);
+    }
+
     public BaseException(ExceptionCode code, MessagePlaceholder placeholder, Throwable cause) {
+        this(code, placeholder, ExceptionLogLevel.ERROR, cause);
+    }
+
+    public BaseException(ExceptionCode code, MessagePlaceholder placeholder, ExceptionLogLevel level, Throwable cause) {
         super(MESSAGE_FORMATTER.format(placeholder.getPattern(), placeholder.getArgs()), cause);
         this.code = code;
         this.messagePlaceholder = placeholder;
+        this.logLevel = level;
     }
 
     public String getTextCode() {
@@ -61,8 +78,16 @@ public class BaseException extends RuntimeException {
         return new BaseException(DefaultExceptionCode.UNAUTHORIZED, message);
     }
 
+    public static BaseException unAuthorized(ExceptionLogLevel level, String message) {
+        return new BaseException(DefaultExceptionCode.UNAUTHORIZED, level, message);
+    }
+
     public static BaseException forbidden(String message) {
         return new BaseException(DefaultExceptionCode.FORBIDDEN, message);
+    }
+
+    public static BaseException forbidden(ExceptionLogLevel level, String message) {
+        return new BaseException(level, message);
     }
 
     public static BaseException notFound(String message) {
@@ -71,6 +96,10 @@ public class BaseException extends RuntimeException {
 
     public static BaseException common(String message) {
         return new BaseException(message);
+    }
+
+    public static BaseException common(ExceptionLogLevel level, String message) {
+        return new BaseException(level, message);
     }
 
     public static BaseException badRequest(MessagePlaceholder message) {

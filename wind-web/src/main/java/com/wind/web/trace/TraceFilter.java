@@ -2,11 +2,11 @@ package com.wind.web.trace;
 
 import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
-import com.wind.common.WindHttpConstants;
 import com.wind.common.util.IpAddressUtils;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.trace.WindTracer;
+import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import com.wind.web.util.HttpResponseMessageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -71,7 +71,7 @@ public class TraceFilter extends OncePerRequestFilter {
             chain.doFilter(request, response);
         } catch (Throwable throwable) {
             // 统一错误捕获
-            if (request.getAttribute(WindHttpConstants.getRequestExceptionLogOutputMarkerAttributeName(throwable)) == null) {
+            if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(throwable)) {
                 // 表明该异常未输出过 error 日志
                 log.error("request error, cause by = {}", throwable.getMessage(), throwable);
             }
