@@ -8,7 +8,7 @@
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies -->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.7.16</version>
+        <version>2.7.18</version>
     </parent>
 
     <groupId>com.wind.middleware</groupId>
@@ -40,7 +40,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.20-SNAPSHOT</revision>
+        <revision>1.0.21-SNAPSHOT</revision>
         <!--   占位使用     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
@@ -82,7 +82,7 @@
         <javet.version>3.1.2</javet.version>
         <google-zxing.version>3.5.2</google-zxing.version>
         <freemarker.version>2.3.32</freemarker.version>
-        <logback-encoder.version>7.4</logback-encoder.version>
+        <logback-encoder.version>8.0</logback-encoder.version>
         <retrofit.version>2.9.0</retrofit.version>
 
         <swagger-openapiv3.version>2.2.9</swagger-openapiv3.version>
