@@ -82,7 +82,7 @@
         <javet.version>3.1.2</javet.version>
         <google-zxing.version>3.5.2</google-zxing.version>
         <freemarker.version>2.3.32</freemarker.version>
-        <logback-encoder.version>8.0</logback-encoder.version>
+        <logback-encoder.version>7.4</logback-encoder.version>
         <retrofit.version>2.9.0</retrofit.version>
 
         <swagger-openapiv3.version>2.2.9</swagger-openapiv3.version>
