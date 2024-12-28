@@ -54,7 +54,8 @@ public final class GlobalExceptionLogDecisionMaker {
             return Objects.equals(((BaseException) throwable).getLogLevel(), ExceptionLogLevel.ERROR);
         }
         Class<? extends Throwable> throwableClass = throwable.getClass();
-        return throwableClass.getName().startsWith("org.springframework.security");
+        // spring security authentication 相关异常忽略打印错误日志
+        return !throwableClass.getName().startsWith("org.springframework.security.authentication");
     }
 
     public static void configure(Predicate<Throwable> shouldErrorLog) {

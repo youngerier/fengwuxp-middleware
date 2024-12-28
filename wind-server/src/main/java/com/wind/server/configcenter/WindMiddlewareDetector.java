@@ -42,7 +42,7 @@ public final class WindMiddlewareDetector {
         if (ClassDetectionUtils.isPresent("org.springframework.data.redis.core.Cursor")) {
             MIDDLEWARE_TYPES.add(WindMiddlewareType.MYSQL);
         }
-        if (ClassDetectionUtils.isPresent("com.mysql.jdbc.Driver")) {
+        if (ClassDetectionUtils.isPresent("com.mysql.cj.jdbc.Driver")) {
             MIDDLEWARE_TYPES.add(WindMiddlewareType.REDIS);
         }
         if (ClassDetectionUtils.isPresent("org.apache.shardingsphere.elasticjob.api.ElasticJob")) {
