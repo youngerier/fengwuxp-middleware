@@ -8,6 +8,7 @@ import com.wind.common.query.supports.Pagination;
 import com.wind.server.web.supports.ApiResp;
 import com.wind.server.web.supports.ImmutableWebApiResponse;
 import com.wind.trace.WindTracer;
+import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 
@@ -123,6 +124,10 @@ public final class RestfulApiRespFactory {
 
     public static <T> ApiResp<T> withThrowable(Throwable throwable) {
         String errorMessage = StringUtils.hasText(throwable.getMessage()) ? throwable.getMessage() : "unknown error";
+        if (GlobalExceptionLogDecisionMaker.isSpringSecurityAuthenticationException(throwable)) {
+            // 401
+            return unAuthorized(errorMessage);
+        }
         if (throwable instanceof BaseException) {
             ExceptionCode code = ((BaseException) throwable).getCode();
             if (code instanceof DefaultExceptionCode) {

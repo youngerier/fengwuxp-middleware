@@ -18,7 +18,8 @@ import java.util.function.Predicate;
 public final class GlobalExceptionLogDecisionMaker {
 
     private static final AtomicReference<Predicate<Throwable>> SHOULD_ERROR_LOG =
-            new AtomicReference<>(GlobalExceptionLogDecisionMaker::ignoreSpringSecurityException);
+            // spring security authentication 相关异常忽略打印错误日志
+            new AtomicReference<>(throwable -> !isSpringSecurityAuthenticationException(throwable));
 
     /**
      * 该异常是否需要输出错误日志
@@ -27,7 +28,13 @@ public final class GlobalExceptionLogDecisionMaker {
      * @return if true 需要打印 error 日志
      */
     public static boolean requiresPrintErrorLog(Throwable throwable) {
-        return isNonePrintErrorLog(throwable) || SHOULD_ERROR_LOG.get().test(throwable);
+        if (isNonePrintErrorLog(throwable)) {
+            if (throwable instanceof BaseException) {
+                return Objects.equals(((BaseException) throwable).getLogLevel(), ExceptionLogLevel.ERROR);
+            }
+            return SHOULD_ERROR_LOG.get().test(throwable);
+        }
+        return true;
     }
 
     /**
@@ -40,25 +47,15 @@ public final class GlobalExceptionLogDecisionMaker {
         return HttpServletRequestUtils.getRequestAttribute(WindHttpConstants.getRequestExceptionLogOutputMarkerAttributeName(throwable)) == null;
     }
 
-    /**
-     * spring security 相关异常不打印 error 日志
-     *
-     * @param throwable 异常
-     * @return if true 需要打印 error 日志
-     */
-    private static boolean ignoreSpringSecurityException(Throwable throwable) {
+    public static void configure(Predicate<Throwable> shouldErrorLog) {
+        SHOULD_ERROR_LOG.set(shouldErrorLog);
+    }
+
+    public static boolean isSpringSecurityAuthenticationException(Throwable throwable) {
         if (throwable == null) {
             return false;
         }
-        if (throwable instanceof BaseException) {
-            return Objects.equals(((BaseException) throwable).getLogLevel(), ExceptionLogLevel.ERROR);
-        }
         Class<? extends Throwable> throwableClass = throwable.getClass();
-        // spring security authentication 相关异常忽略打印错误日志
-        return !throwableClass.getName().startsWith("org.springframework.security.authentication");
-    }
-
-    public static void configure(Predicate<Throwable> shouldErrorLog) {
-        SHOULD_ERROR_LOG.set(shouldErrorLog);
+        return throwableClass.getName().startsWith("org.springframework.security.authentication");
     }
 }
