@@ -22,6 +22,8 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public final class RestfulApiRespFactory {
 
+    private static final String UNKNOWN_ERROR ="unknown error";
+
     private static final AtomicReference<FriendlyExceptionMessageConverter> CONVERTER =
             new AtomicReference<>(FriendlyExceptionMessageConverter.none());
 
@@ -107,7 +109,7 @@ public final class RestfulApiRespFactory {
     /*-------------------- business handle error 5xx -------------------*/
 
     public static <T> ApiResp<T> error() {
-        return error("请求处理出现错误");
+        return error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
     }
 
     public static <T> ApiResp<T> error(String errorMessage) {
@@ -119,11 +121,12 @@ public final class RestfulApiRespFactory {
     }
 
     public static <T> ApiResp<T> error(T data, ExceptionCode code, String errorMessage) {
-        return of(HttpStatus.INTERNAL_SERVER_ERROR, data, code, errorMessage);
+        return of(HttpStatus.INTERNAL_SERVER_ERROR, data, code, errorMessage == null ? UNKNOWN_ERROR : errorMessage);
     }
 
     public static <T> ApiResp<T> withThrowable(Throwable throwable) {
-        String errorMessage = StringUtils.hasText(throwable.getMessage()) ? throwable.getMessage() : "unknown error";
+        String defaultMessage = StringUtils.hasText(throwable.getMessage()) ? throwable.getMessage() : UNKNOWN_ERROR;
+        String errorMessage = CONVERTER.get().convert(throwable, defaultMessage);
         if (GlobalExceptionLogDecisionMaker.isSpringSecurityAuthenticationException(throwable)) {
             // 401
             return unAuthorized(errorMessage);
@@ -132,9 +135,9 @@ public final class RestfulApiRespFactory {
             ExceptionCode code = ((BaseException) throwable).getCode();
             if (code instanceof DefaultExceptionCode) {
                 HttpStatus status = HttpStatus.resolve(Integer.parseInt(code.getCode()));
-                return of(status == null ? HttpStatus.INTERNAL_SERVER_ERROR : status, null, code, CONVERTER.get().convert(throwable, errorMessage));
+                return of(status == null ? HttpStatus.INTERNAL_SERVER_ERROR : status, null, code, errorMessage);
             }
-            return error(code, CONVERTER.get().convert(throwable, errorMessage));
+            return error(code, errorMessage);
         }
         return error(errorMessage);
     }

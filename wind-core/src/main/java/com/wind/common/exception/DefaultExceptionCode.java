@@ -18,7 +18,7 @@ public enum DefaultExceptionCode implements ExceptionCode {
 
     UNAUTHORIZED("401", "未认证"),
 
-    FORBIDDEN("403", "无权限"),
+    FORBIDDEN("403", "无权限访问该资源"),
 
     TO_MANY_REQUESTS("429", "请求过于频繁"),
 
