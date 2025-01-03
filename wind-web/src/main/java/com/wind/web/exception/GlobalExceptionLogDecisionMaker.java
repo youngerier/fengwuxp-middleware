@@ -34,7 +34,7 @@ public final class GlobalExceptionLogDecisionMaker {
             }
             return SHOULD_ERROR_LOG.get().test(throwable);
         }
-        return true;
+        return false;
     }
 
     /**
