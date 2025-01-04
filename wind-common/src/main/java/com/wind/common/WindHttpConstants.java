@@ -25,6 +25,10 @@ public final class WindHttpConstants {
      */
     public static final String API_SECRET_ACCOUNT_ATTRIBUTE_NAME = "Wind-Attribute-Api-Secret-Account";
 
+    /**
+     * http request Host header name
+     */
+    public static final String HTTP_HOST_HEADER_NAME = "Host";
 
     /**
      * http request User-Agent header name

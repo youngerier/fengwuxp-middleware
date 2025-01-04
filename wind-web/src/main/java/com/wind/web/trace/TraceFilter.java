@@ -26,6 +26,7 @@ import java.util.Map;
 import static com.wind.common.WindConstants.HTTP_REQUEST_UR_TRACE_NAME;
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
 import static com.wind.common.WindConstants.WIND_TRANCE_ID_HEADER_NAME;
+import static com.wind.common.WindHttpConstants.HTTP_HOST_HEADER_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_HOST_ATTRIBUTE_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IP_ATTRIBUTE_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_USER_AGENT_HEADER_NAME;
@@ -116,7 +117,7 @@ public class TraceFilter extends OncePerRequestFilter {
 
     private String getRequestSourceHost(HttpServletRequest request) {
         try {
-            String host = request.getHeader("Host");
+            String host = request.getHeader(HTTP_HOST_HEADER_NAME);
             return host == null ? URI.create(request.getRequestURI()).getHost() : host;
         } catch (Exception exception) {
             log.error("get request host error, request url = {}", request.getRequestURL());

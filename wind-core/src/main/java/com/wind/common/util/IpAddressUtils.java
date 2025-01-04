@@ -6,12 +6,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 
 import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.function.Predicate;
 
 /**
  * 获取 http 请求的 来源 ip ip 地址
@@ -23,6 +25,8 @@ public final class IpAddressUtils {
 
     // ip 缓存
     private static final String HOST_IP_V4 = IpAddressUtils.getLocalIpv4();
+
+    private static final String HOST_IP_V6 = IpAddressUtils.getLocalIpv6();
 
     private IpAddressUtils() {
         throw new AssertionError();
@@ -151,11 +155,18 @@ public final class IpAddressUtils {
      * @return 本机 host
      */
     public static String getLocalIpv4() {
-        InetAddress address = findFirstNonLoopbackAddress();
-        if (address == null) {
-            return WindConstants.UNKNOWN;
-        }
-        return address.getHostAddress();
+        InetAddress address = findFirstNonLoopbackAddress(i -> i instanceof Inet4Address);
+        return address == null ? WindConstants.UNKNOWN : address.getHostAddress();
+    }
+
+    /**
+     * 直接根据第一个网卡地址作为其内网 ipv6 地址
+     *
+     * @return 本机 host
+     */
+    public static String getLocalIpv6() {
+        InetAddress address = findFirstNonLoopbackAddress(i -> i instanceof Inet6Address);
+        return address == null ? WindConstants.UNKNOWN : address.getHostAddress();
     }
 
     /**
@@ -168,12 +179,22 @@ public final class IpAddressUtils {
     }
 
     /**
-     * 获取本机第一个非回环地址
+     * 从缓存中获取 本机 ip 地址
      *
      * @return 本机 host
      */
+    public static String getLocalIpv6WithCache() {
+        return HOST_IP_V6;
+    }
+
+    /**
+     * 获取本机第一个非回环地址
+     *
+     * @param predicate 判断地址是否为所需的
+     * @return 本机 host
+     */
     @Nullable
-    public static InetAddress findFirstNonLoopbackAddress() {
+    private static InetAddress findFirstNonLoopbackAddress(Predicate<InetAddress> predicate) {
         try {
             for (Enumeration<NetworkInterface> network = NetworkInterface.getNetworkInterfaces(); network.hasMoreElements(); ) {
                 NetworkInterface item = network.nextElement();
@@ -182,7 +203,7 @@ public final class IpAddressUtils {
                 }
                 for (InterfaceAddress address : item.getInterfaceAddresses()) {
                     InetAddress inetAddress = address.getAddress();
-                    if (inetAddress instanceof Inet4Address && !inetAddress.isLoopbackAddress()) {
+                    if (predicate.test(inetAddress) && !inetAddress.isLoopbackAddress()) {
                         return inetAddress;
                     }
                 }
@@ -193,5 +214,4 @@ public final class IpAddressUtils {
         }
         return null;
     }
-
 }
