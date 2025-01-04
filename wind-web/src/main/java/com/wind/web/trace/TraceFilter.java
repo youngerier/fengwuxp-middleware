@@ -13,10 +13,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.annotation.Nonnull;
 import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -59,7 +57,7 @@ public class TraceFilter extends OncePerRequestFilter {
     );
 
     @Override
-    protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain chain) throws ServletException, IOException {
+    protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain chain) {
         try {
             if (!ServiceInfoUtils.isOnline()) {
                 // 线下环境增加服务端 ip 返回
