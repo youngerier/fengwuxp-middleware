@@ -1,6 +1,5 @@
 package com.wind.web.trace;
 
-import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
 import com.wind.common.util.IpAddressUtils;
 import com.wind.common.util.ServiceInfoUtils;
@@ -21,8 +20,8 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.wind.common.WindConstants.HTTP_REQUEST_UR_TRACE_NAME;
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
@@ -46,17 +45,16 @@ public class TraceFilter extends OncePerRequestFilter {
     private static final String REAL_SERVER_IP = "Real-Server-Ip";
 
     /**
-     * ip 头名称
+     * client 真实 ip 头名称
      */
-    private static final Set<String> IP_HEAD_NAMES = ImmutableSet.copyOf(
-            Arrays.asList(
-                    "X-Real-IP",
-                    "X-Forwarded-For",
-                    "Proxy-Client-IP",
-                    "WL-Proxy-Client-IP",
-                    "REMOTE-HOST",
-                    "HTTP_CLIENT_IP",
-                    "HTTP_X_FORWARDED_FOR")
+    private static final List<String> CLIENT_IP_HEAD_NAMES = Arrays.asList(
+            "X-Forwarded-For",
+            "Proxy-Client-IP",
+            "WL-Proxy-Client-IP",
+            "X-Real-IP",
+            "REMOTE-HOST",
+            "HTTP_CLIENT_IP",
+            "HTTP_X_FORWARDED_FOR"
     );
 
     @Override
@@ -103,19 +101,15 @@ public class TraceFilter extends OncePerRequestFilter {
      * @return 真实 ip
      */
     private String getRequestSourceIp(HttpServletRequest request) {
-        for (String headName : IP_HEAD_NAMES) {
+        for (String headName : CLIENT_IP_HEAD_NAMES) {
             String ip = request.getHeader(headName);
             if (ip == null || ip.trim().isEmpty()) {
                 continue;
             }
             ip = ip.trim();
             // 对于通过多个代理的情况， 第一个 ip 为客户端真实IP,多个IP按照 ',' 分隔
-            String[] sections = ip.split(WindConstants.COMMA);
-            for (String section : sections) {
-                if (IpAddressUtils.isValidIp(section)) {
-                    return section;
-                }
-            }
+            String[] sections = ip.split(WindConstants.COMMA, 2);
+            return sections[0];
         }
         return request.getRemoteAddr();
     }
@@ -129,11 +123,4 @@ public class TraceFilter extends OncePerRequestFilter {
             return WindConstants.UNKNOWN;
         }
     }
-
-    // TODO 待删除
-    @Deprecated
-    public static void addTraceAttributeName(String httAttributeName, String traceContextVariableName) {
-
-    }
-
 }

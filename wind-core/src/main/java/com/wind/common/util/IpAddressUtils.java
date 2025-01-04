@@ -36,7 +36,7 @@ public final class IpAddressUtils {
      * @return if <code>true</code> 是
      */
     public static boolean isValidIp(String ip) {
-        return isIpV6(ip) || isIpV4(ip);
+        return isIpV4(ip) || isIpV6(ip);
     }
 
     /**
