@@ -227,7 +227,7 @@ public final class WindConstants {
     /**
      * http 请求 url 变量
      */
-    public static final String HTTP_REQUEST_UR_TRACE_NAME = "requestUrl";
+    public static final String HTTP_REQUEST_URL_TRACE_NAME = "requestUrl";
 
     /**
      * 本机 ipv4 地址
