@@ -40,7 +40,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.21-SNAPSHOT</revision>
+        <revision>1.0.22-SNAPSHOT</revision>
         <!--   占位使用     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
@@ -62,10 +62,10 @@
         <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
 
         <spring-boot.version>2.7.16</spring-boot.version>
-        <spring-cloud-commons.version>3.1.6</spring-cloud-commons.version>
-        <spring-cloud-albaba.version>2021.0.5.0</spring-cloud-albaba.version>
+        <spring-cloud-commons.version>3.1.9</spring-cloud-commons.version>
+        <spring-cloud-albaba.version>2021.0.6.2</spring-cloud-albaba.version>
         <rocketmq-spring-boot-starter.version>2.3.0</rocketmq-spring-boot-starter.version>
-        <sentinel.version>1.8.7</sentinel.version>
+        <sentinel.version>1.8.8</sentinel.version>
         <mysql.version>8.0.33</mysql.version>
         <mybatis-flex.version>1.10.2</mybatis-flex.version>
         <mybatis.version>3.5.15</mybatis.version>
@@ -135,19 +135,19 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/com.mybatis-flex/mybatis-flex-dependencies -->
-            <dependency>
-                <groupId>com.mybatis-flex</groupId>
-                <artifactId>mybatis-flex-dependencies</artifactId>
-                <version>${mybatis-flex.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <!-- https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-alibaba-dependencies -->
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
                 <version>${spring-cloud-albaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.mybatis-flex/mybatis-flex-dependencies -->
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-dependencies</artifactId>
+                <version>${mybatis-flex.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
