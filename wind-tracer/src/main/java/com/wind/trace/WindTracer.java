@@ -23,7 +23,7 @@ public interface WindTracer {
     WindTracer TRACER = new WindThreadTracer();
 
     /**
-     * 自动生成 traceId 并设置到上下文中
+     * 如果上下文中不存在 traceId 则生成
      *
      * @see #trace(String)
      */
@@ -52,7 +52,7 @@ public interface WindTracer {
     void clear();
 
     /**
-     * 获取线程上下文中的 traceId
+     * 获取线程上下文中的 traceId，若不存在则创建
      *
      * @return trace id
      */

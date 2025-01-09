@@ -33,11 +33,11 @@ public final class WindThreadTracer implements WindTracer {
     /**
      * 生成 traceId
      */
-    private static final SequenceGenerator TRACE_ID = () -> SequenceGenerator.randomAlphanumeric(32);
+    private static final SequenceGenerator TRACE_GENERATOR = () -> SequenceGenerator.randomAlphanumeric(32);
 
     @Override
     public void trace() {
-        trace(TRACE_ID.next());
+        trace(getTraceId());
     }
 
     @Override
@@ -48,7 +48,7 @@ public final class WindThreadTracer implements WindTracer {
     @Override
     public void trace(String traceId, @NotNull Map<String, Object> contextVariables) {
         //  使用 MDC 保存
-        MDC.put(TRACE_ID_NAME, StringUtils.hasText(traceId) ? traceId : TRACE_ID.next());
+        MDC.put(TRACE_ID_NAME, StringUtils.hasText(traceId) ? traceId : TRACE_GENERATOR.next());
         MDC.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
         Objects.requireNonNull(contextVariables, "argument contextVariables must not null")
                 .forEach((key, val) -> {
@@ -56,7 +56,6 @@ public final class WindThreadTracer implements WindTracer {
                         MDC.put(key, (String) val);
                     }
                 });
-
     }
 
     @Override
@@ -69,7 +68,7 @@ public final class WindThreadTracer implements WindTracer {
                 String traceId = getContextVariable(TRACE_ID_NAME);
                 if (traceId == null) {
                     // 没有则生成
-                    traceId = TRACE_ID.next();
+                    traceId = TRACE_GENERATOR.next();
                     MDC.put(TRACE_ID_NAME, traceId);
                 }
                 return traceId;
@@ -98,7 +97,7 @@ public final class WindThreadTracer implements WindTracer {
     private static Map<String, Object> getMdcContext() {
         Map<String, String> context = MDC.getCopyOfContextMap();
         if (context == null) {
-            context = Collections.singletonMap(TRACE_ID_NAME, TRACE_ID.next());
+            context = Collections.singletonMap(TRACE_ID_NAME, TRACE_GENERATOR.next());
             context.forEach(MDC::put);
         }
         return Collections.unmodifiableMap(context);
