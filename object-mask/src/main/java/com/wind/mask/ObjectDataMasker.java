@@ -10,7 +10,9 @@ import org.springframework.util.ClassUtils;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
 /**
@@ -126,15 +128,18 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
 
     @SuppressWarnings({"unchecked"})
     private Map<Object, Object> maskMap(Map<Object, Object> map) {
-        // TODO 优化为增对 json path 支持
-        MaskRuleGroup group = registry.getRuleGroup(Map.class);
-        map.replaceAll((key, value) -> {
-            if (key instanceof String && value instanceof String) {
-                MaskRule rule = group.matchesWithKey((String) key);
-                return rule == null ? value : rule.getMasker().mask(value);
-            }
-            return maskAs(value);
-        });
+        if (map instanceof HashMap || map instanceof ConcurrentMap) {
+            // TODO 优化改用 json path ？
+            MaskRuleGroup group = registry.getRuleGroup(Map.class);
+            map.replaceAll((key, value) -> {
+                if (key instanceof String && value instanceof String) {
+                    MaskRule rule = group.matchesWithKey((String) key);
+                    return rule == null ? value : rule.getMasker().mask(value);
+                }
+                return maskAs(value);
+            });
+            return map;
+        }
         return map;
     }
 }
