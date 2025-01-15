@@ -38,4 +38,14 @@ class SpringExpressionEvaluatorTest {
         Assertions.assertEquals("2", SpringExpressionEvaluator.DEFAULT.eval("#id", variables));
         Assertions.assertNull(SpringExpressionEvaluator.TEMPLATE.eval("{#name}", variables));
     }
+
+    @Test
+    void testStringMatch() {
+        Boolean result = SpringExpressionEvaluator.DEFAULT.eval("T(com.wind.common.util.StringMatchUtils).containsAny('测试1', {'测试', " +
+                "'测试1', '测试2'})");
+        Assertions.assertEquals(Boolean.TRUE, result);
+        result = SpringExpressionEvaluator.DEFAULT.eval("T(com.wind.common.util.StringMatchUtils).containsAny('test1', {'测试', " +
+                "'测试1', '测试2'})");
+        Assertions.assertNotEquals(Boolean.TRUE, result);
+    }
 }
