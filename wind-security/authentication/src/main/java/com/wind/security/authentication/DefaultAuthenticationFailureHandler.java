@@ -28,14 +28,14 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) {
-        log.error("authentication error", exception);
+        log.warn("authentication error", exception);
         response.setStatus(HttpStatus.UNAUTHORIZED.value());
         HttpResponseMessageUtils.writeJson(response, RestfulApiRespFactory.unAuthorized(SpringI18nMessageUtils.getMessage("未登录或登录已失效")));
     }
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException exception) {
-        log.error("access denied exception", exception);
+        log.warn("access denied exception", exception);
         response.setStatus(HttpStatus.FORBIDDEN.value());
         HttpResponseMessageUtils.writeJson(response, RestfulApiRespFactory.unAuthorized(SpringI18nMessageUtils.getMessage("您没有访问该资源的权限")));
     }
@@ -43,7 +43,7 @@ public class DefaultAuthenticationFailureHandler implements AuthenticationFailur
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException,
             ServletException {
-        log.error("commence authentication error", exception);
+        log.warn("commence authentication error", exception);
         onAuthenticationFailure(request, response, exception);
     }
 
