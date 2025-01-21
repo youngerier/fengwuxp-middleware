@@ -4,6 +4,7 @@ import com.wind.common.exception.AssertUtils;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
@@ -43,5 +44,6 @@ public interface ReadonlyContextVariables {
     /**
      * @return 获取所有的只读上下文变量
      */
+    @Nullable
     Map<String, Object> getContextVariables();
 }

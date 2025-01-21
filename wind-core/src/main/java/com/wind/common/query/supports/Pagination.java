@@ -1,9 +1,11 @@
 package com.wind.common.query.supports;
 
 
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
+import javax.validation.constraints.NotNull;
 import java.beans.Transient;
 import java.io.Serializable;
 import java.util.Collections;
@@ -24,6 +26,7 @@ public interface Pagination<T> extends Serializable {
     /**
      * @return 数据集合列表
      */
+    @NotNull
     List<T> getRecords();
 
     /**
@@ -39,6 +42,7 @@ public interface Pagination<T> extends Serializable {
     /**
      * @return 当前查询类型
      */
+    @NotNull
     QueryType getQueryType();
 
     /**
