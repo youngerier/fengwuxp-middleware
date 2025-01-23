@@ -2,11 +2,10 @@ package com.wind.script.spring;
 
 import com.google.common.collect.ImmutableSet;
 import com.wind.common.exception.AssertUtils;
-import com.wind.common.util.ServiceInfoUtils;
-import com.wind.common.util.StringJoinSplitUtils;
 import org.springframework.expression.spel.support.ReflectiveMethodResolver;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,9 +17,14 @@ import java.util.Set;
  **/
 public final class WindSecurityReflectiveMethodResolver extends ReflectiveMethodResolver {
 
-    private static final String ALL_PACKAGE_NAMES_PROPERTY_NAME = "spring.expression.allow.packages";
+    private static final Set<String> DEFAULT_CLASSNAMES = ImmutableSet.of(
+            "java.lang.Class",
+            "com.wind.common.util.StringMatchUtils",
+            "com.wind.common.util.StringJoinSplitUtils",
+            "com.wind.script.spring.SpringExpressionOperators"
+    );
 
-    private static final Set<String> DEFAULT_PACKAGES = ImmutableSet.of("java.lang.Class", "com.wind");
+    private static final Set<String> SAFE_CLASSNAMES = new HashSet<>();
 
     private final Set<String> packages;
 
@@ -45,12 +49,16 @@ public final class WindSecurityReflectiveMethodResolver extends ReflectiveMethod
     }
 
     private static Set<String> loadPackages() {
-        String packages = ServiceInfoUtils.getSystemProperty(ALL_PACKAGE_NAMES_PROPERTY_NAME);
-        if (packages == null) {
-            return DEFAULT_PACKAGES;
-        }
-        Set<String> result = new HashSet<>(DEFAULT_PACKAGES);
-        result.addAll(StringJoinSplitUtils.split(packages));
+        Set<String> result = new HashSet<>(DEFAULT_CLASSNAMES);
+        result.addAll(SAFE_CLASSNAMES);
         return result;
+    }
+
+    public static void addSafeClassNames(String... classNames) {
+        SAFE_CLASSNAMES.addAll(Arrays.asList(classNames));
+    }
+
+    public static void removeSafeClassNames(String... classNames) {
+        Arrays.asList(classNames).forEach(SAFE_CLASSNAMES::remove);
     }
 }
