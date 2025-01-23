@@ -1,7 +1,8 @@
 package com.wind.common.query.supports;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+
+import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
 /**
  * 通用的分页查询对象
@@ -14,26 +15,26 @@ public interface WindPageQuery<OrderField> {
     /**
      * @return 查询页码
      */
-    @NotNull
+    @NonNull
     Integer getQueryPage();
 
-    void setQueryPage(@NotNull Integer queryPage);
+    void setQueryPage(@NonNull Integer queryPage);
 
     /**
      * @return 查询大小
      */
-    @NotNull
+    @NonNull
     Integer getQuerySize();
 
-    void setQuerySize(@NotNull Integer querySize);
+    void setQuerySize(@NonNull Integer querySize);
 
     /**
      * @return 查询类型
      */
-    @NotNull
+    @NonNull
     QueryType getQueryType();
 
-    void setQueryType(@NotNull QueryType queryType);
+    void setQueryType(@NonNull QueryType queryType);
 
     /**
      * 排序字段和排序类型安装数组顺序一一对应
@@ -47,8 +48,8 @@ public interface WindPageQuery<OrderField> {
     /**
      * @return 排序类型
      */
-    @Null
+    @Nullable
     QueryOrderType[] getOrderTypes();
 
-    void setOrderTypes(@NotNull QueryOrderType[] orderTypes);
+    void setOrderTypes(@NonNull QueryOrderType[] orderTypes);
 }

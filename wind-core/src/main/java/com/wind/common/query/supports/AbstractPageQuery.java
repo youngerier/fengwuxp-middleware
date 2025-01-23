@@ -3,6 +3,7 @@ package com.wind.common.query.supports;
 
 import com.wind.common.exception.AssertUtils;
 import lombok.Data;
+import org.springframework.lang.NonNull;
 
 import javax.validation.constraints.NotNull;
 import java.beans.Transient;
@@ -36,6 +37,7 @@ public abstract class AbstractPageQuery<OrderField extends QueryOrderField> impl
     /**
      * 查询类型
      */
+    @NotNull
     private QueryType queryType = QueryType.QUERY_BOTH;
 
     /**
@@ -49,7 +51,7 @@ public abstract class AbstractPageQuery<OrderField extends QueryOrderField> impl
     private QueryOrderType[] orderTypes;
 
     @Override
-    public void setQuerySize(Integer querySize) {
+    public void setQuerySize(@NonNull Integer querySize) {
         AssertUtils.isTrue(querySize <= getMaxQuerySize(), () -> String.format("查询大小不能超过：%d", MAX_QUERY_SIZE.get()));
         this.querySize = querySize;
     }
