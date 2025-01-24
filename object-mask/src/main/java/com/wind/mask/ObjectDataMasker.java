@@ -114,7 +114,7 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
         }
         Object first = objects.iterator().next();
         if (first == null) {
-            // TODO 待优惠
+            // TODO 待优化
             return objects;
         }
         Class<?> elementType = first.getClass();
