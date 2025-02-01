@@ -85,6 +85,7 @@
         <freemarker.version>2.3.32</freemarker.version>
         <logback-encoder.version>7.4</logback-encoder.version>
         <retrofit.version>2.9.0</retrofit.version>
+        <kafka.version>3.5.0</kafka.version>
 
         <!-- fix -->
         <kafka.version>3.8.0</kafka.version>
