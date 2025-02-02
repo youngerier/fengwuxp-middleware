@@ -1,5 +1,6 @@
 package com.wind.mask;
 
+import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
 import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.util.WindReflectUtils;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +45,40 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
                     Date.class,
                     Temporal.class
             ));
+
+    public final static Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(ImmutableSet.of(
+            Date.class
+    ));
+
+    public final static Set<String> IGNORE_PACKAGES = new LinkedHashSet<>();
+
+    static {
+        IGNORE_PACKAGES.add("org.springframework.");
+        IGNORE_PACKAGES.add("org.slf4j.");
+        IGNORE_PACKAGES.add("org.apache.");
+        IGNORE_PACKAGES.add("org.freemarker.");
+        IGNORE_PACKAGES.add("org.hibernate.");
+        IGNORE_PACKAGES.add("org.jetbrains.");
+        IGNORE_PACKAGES.add("org.jodd.");
+        IGNORE_PACKAGES.add("lombok.");
+        IGNORE_PACKAGES.add("javax.persistence.");
+        IGNORE_PACKAGES.add("java.net.");
+        IGNORE_PACKAGES.add("javax.");
+        IGNORE_PACKAGES.add("java.security.");
+        IGNORE_PACKAGES.add("java.text.");
+        IGNORE_PACKAGES.add("java.io.");
+        IGNORE_PACKAGES.add("java.time.");
+        IGNORE_PACKAGES.add("java.lang.reflect");
+        IGNORE_PACKAGES.add("sun.");
+        IGNORE_PACKAGES.add("com.google.");
+        IGNORE_PACKAGES.add("com.alibaba.");
+        IGNORE_PACKAGES.add("com.alipay.");
+        IGNORE_PACKAGES.add("com.baidu.");
+        IGNORE_PACKAGES.add("com.github.");
+        IGNORE_PACKAGES.add("reactor.");
+        IGNORE_PACKAGES.add("org.reactivestreams");
+        IGNORE_PACKAGES.add("io.reactivex.");
+    }
 
     /**
      * 对象 toString 时，连接字段的字符
@@ -83,6 +119,12 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
      */
     public static void addIgnoreCycleRefClasses(Class<?>... classes) {
         IGNORE_CYCLE_REF_CLASSES.addAll(Arrays.asList(classes));
+    }
+
+    private static boolean isIgnoreMask(Object o) {
+        String name = o.getClass().getName();
+        return IGNORE_CLASSES.stream().anyMatch(c -> c.isInstance(o) ||
+                IGNORE_PACKAGES.stream().anyMatch(name::startsWith));
     }
 
     /**
@@ -129,6 +171,9 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
         private String checkCycleRefAndSanitize(Object value, @Nullable MaskRule maskRule, boolean countDeep) {
             if (value == null) {
                 return WindConstants.NULL;
+            }
+            if (isIgnoreMask(value)) {
+                return value.toString();
             }
             if (isCycleRef(value)) {
                 return printCycleRefClassHashCode(value);

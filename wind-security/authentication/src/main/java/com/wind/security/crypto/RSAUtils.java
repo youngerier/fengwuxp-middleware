@@ -12,6 +12,7 @@ import java.security.PublicKey;
  *
  * @author wuxp
  */
+@Deprecated
 final class RSAUtils {
 
     private static final String ALGORITHM = "RSA/ECB/PKCS1Padding";

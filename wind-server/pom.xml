@@ -118,6 +118,10 @@
             </exclusions>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.wind.security</groupId>
+            <artifactId>wind-security-crypto</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

