@@ -4,6 +4,7 @@ import com.wind.common.WindConstants;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.security.crypto.symmetric.AesTextEncryptor;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.boot.origin.OriginTrackedValue;
@@ -29,6 +30,7 @@ import static com.wind.configcenter.core.ConfigRepository.PROPERTY_SOURCE_LOADER
  * @author wuxp
  * @date 2025-02-02 10:51
  **/
+@Getter
 @AllArgsConstructor
 @Slf4j
 public final class SpringConfigEncryptor {

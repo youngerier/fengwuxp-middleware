@@ -20,6 +20,7 @@ Default logback configuration provided for import
                         "date": "%d{yyyy-MM-dd HH:mm:ss.SSS}",
                         "A-TraceId": "%X{traceId:-}",
                         "tenant": "%X{tenant:-}",
+                        "userId": "%X{userId:-}",
                         "appName": "${APP_NAME}",
                         "env": "${SPRING_PROFILES_ACTIVE}",
                         "requestUrl": "%X{requestUrl:-}",
