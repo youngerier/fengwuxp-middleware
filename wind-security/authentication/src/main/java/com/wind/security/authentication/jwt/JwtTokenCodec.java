@@ -9,9 +9,6 @@ import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import com.wind.common.exception.AssertUtils;
-import com.wind.common.exception.BaseException;
-import com.wind.common.exception.DefaultExceptionCode;
-import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -19,17 +16,18 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.util.StringUtils;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.security.KeyPair;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * jwt token 编码解码
@@ -41,7 +39,7 @@ public final class JwtTokenCodec {
 
     private static final String AUTHENTICATION_VARIABLE_NAME = "authentication";
 
-    private static final String JWT_AUTH_KEY_ID = "jwt-auth-codec-kind";
+    private static final String JWT_AUTH_KEY_ID = "Jwt-Auth-Codec-Wind";
 
     private final JwtProperties properties;
 
@@ -60,29 +58,20 @@ public final class JwtTokenCodec {
 
     /**
      * jwt parse token
+     * 注意：如果 token 过期了，将抛出 {@link JwtExpiredException} 异常
      *
      * @param jwtToken jwt token
      * @return jwt token payload
      */
-    @Nullable
-    public JwtToken parse(String jwtToken) {
-        if (StringUtils.hasLength(jwtToken)) {
-            Jwt jwt = parseJwt(jwtToken);
-            Map<String, Object> claims = jwt.getClaims();
-            JwtUser user = JSON.to(properties.getUserType(), claims.get(AUTHENTICATION_VARIABLE_NAME));
-            Instant expiresAt = jwt.getExpiresAt();
-            AssertUtils.notNull(expiresAt, "jwt token expire must not null");
-            return new JwtToken(jwtToken, jwt.getSubject(), user, expiresAt.toEpochMilli());
-        }
-        return null;
-    }
-
-    private Jwt parseJwt(String jwtToken) {
-        try {
-            return jwtDecoder.decode(jwtToken);
-        } catch (JwtException exception) {
-            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "登录令牌已失效，请重新登陆", exception);
-        }
+    @NotNull
+    public JwtToken parse(@NotBlank String jwtToken) {
+        AssertUtils.hasText(jwtToken, "argument token must not null");
+        Jwt jwt = jwtDecoder.decode(jwtToken);
+        Map<String, Object> claims = jwt.getClaims();
+        JwtUser user = JSON.to(properties.getUserType(), claims.get(AUTHENTICATION_VARIABLE_NAME));
+        Instant expiresAt = Objects.requireNonNull(jwt.getExpiresAt(), "token expire must not null");
+        AssertUtils.state(expiresAt.isAfter(Instant.now()), () -> new JwtExpiredException("token is expired"));
+        return new JwtToken(jwtToken, jwt.getSubject(), user, expiresAt.toEpochMilli());
     }
 
     /**
@@ -100,7 +89,7 @@ public final class JwtTokenCodec {
                                 .build()
                 )
         );
-        return new JwtToken(jwt.getTokenValue(), jwt.getSubject(), user, jwt.getExpiresAt().toEpochMilli());
+        return new JwtToken(jwt.getTokenValue(), jwt.getSubject(), user, Objects.requireNonNull(jwt.getExpiresAt()).toEpochMilli());
     }
 
     /**
@@ -112,24 +101,24 @@ public final class JwtTokenCodec {
     public JwtToken encodingRefreshToken(Long userId) {
         Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, newJwtBuilder(String.valueOf(userId),
                 properties.getRefreshEffectiveTime()).build()));
-        return new JwtToken(jwt.getTokenValue(), jwt.getSubject(), null, jwt.getExpiresAt().toEpochMilli());
+        return new JwtToken(jwt.getTokenValue(), jwt.getSubject(), null, Objects.requireNonNull(jwt.getExpiresAt()).toEpochMilli());
     }
 
     /**
      * 解析 验证 refresh token
+     * 注意：如果 token 过期了，将抛出 {@link JwtExpiredException} 异常
      *
      * @param refreshToken refresh token
      * @return 用户 id
      */
-    @Nullable
-    public JwtToken parseRefreshToken(String refreshToken) {
-        if (StringUtils.hasLength(refreshToken)) {
-            Jwt jwt = parseJwt(refreshToken);
-            Instant expiresAt = jwt.getExpiresAt();
-            AssertUtils.notNull(expiresAt, "jwt token expire must not null");
-            return new JwtToken(refreshToken, jwt.getSubject(), null, expiresAt.toEpochMilli());
-        }
-        return null;
+    @NotNull
+    public JwtToken parseRefreshToken(@NotBlank String refreshToken) {
+        AssertUtils.hasText(refreshToken, "argument token must not null");
+        Jwt jwt = jwtDecoder.decode(refreshToken);
+        Instant expiresAt = Objects.requireNonNull(jwt.getExpiresAt(), "refresh token expire must not null");
+        AssertUtils.notNull(expiresAt, "jwt token expireAt must not null");
+        AssertUtils.state(expiresAt.isAfter(Instant.now()), () -> new JwtExpiredException("refresh token is expired"));
+        return new JwtToken(refreshToken, jwt.getSubject(), null, expiresAt.toEpochMilli());
     }
 
     private JwtClaimsSet.Builder newJwtBuilder(String userId, Duration effectiveTime) {

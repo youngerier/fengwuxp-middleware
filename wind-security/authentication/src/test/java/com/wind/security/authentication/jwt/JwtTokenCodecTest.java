@@ -13,7 +13,7 @@ import java.util.Collections;
 
 class JwtTokenCodecTest {
 
-    private final JwtTokenCodec jwtTokenCodec = new JwtTokenCodec(jwtProperties(null));
+    private final JwtTokenCodec jwtTokenCodec = new JwtTokenCodec(jwtProperties(Duration.ofMillis(1000)));
 
     @Test
     void testCodecUserToken() {
@@ -24,19 +24,27 @@ class JwtTokenCodecTest {
     }
 
     @Test
-    void testCodecRefreshToken() {
-        JwtToken token = jwtTokenCodec.encodingRefreshToken(1L);
-        Assertions.assertEquals(1L, token.getUserId());
+    void testCodecUserTokenExpired() throws Exception {
+        JwtUser user = new JwtUser(1L, "", Collections.emptyMap());
+        JwtToken token = jwtTokenCodec.encoding(user);
+        Thread.sleep(1001);
+        JwtExpiredException exception = Assertions.assertThrows(JwtExpiredException.class, () -> jwtTokenCodec.parse(token.getTokenValue()));
+        Assertions.assertEquals("token is expired", exception.getMessage());
     }
 
     @Test
-    void testTokenExpire() throws Exception {
-        JwtTokenCodec codec = new JwtTokenCodec(jwtProperties(Duration.ofMillis(1)));
-        JwtToken token = codec.encodingRefreshToken(1L);
-        Thread.sleep(100);
+    void testCodecRefreshToken() {
+        JwtToken token = jwtTokenCodec.encodingRefreshToken(1L);
+        Assertions.assertEquals(1L, token.getSubjectAsLong());
+    }
+
+    @Test
+    void testRefreshTokenExpired() throws Exception {
+        JwtToken token = jwtTokenCodec.encodingRefreshToken(1L);
+        Thread.sleep(1001);
         String tokenValue = token.getTokenValue();
-        BaseException exception = Assertions.assertThrows(BaseException.class, () -> jwtTokenCodec.parseRefreshToken(tokenValue));
-        Assertions.assertEquals("登录令牌已失效，请重新登陆", exception.getMessage());
+        JwtExpiredException exception = Assertions.assertThrows(JwtExpiredException.class, () -> jwtTokenCodec.parseRefreshToken(tokenValue));
+        Assertions.assertEquals("refresh token is expired", exception.getMessage());
     }
 
 

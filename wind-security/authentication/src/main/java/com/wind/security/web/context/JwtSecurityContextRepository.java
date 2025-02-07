@@ -6,12 +6,12 @@ import com.wind.security.authentication.jwt.JwtUser;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.context.HttpRequestResponseHolder;
 import org.springframework.security.web.context.SecurityContextRepository;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Nonnull;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +31,7 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
  * @date 2023-10-22 19:10
  **/
 @AllArgsConstructor
+@Deprecated
 public class JwtSecurityContextRepository implements SecurityContextRepository {
 
     private static final SecurityContext EMPTY = new SecurityContextImpl();
@@ -74,19 +75,21 @@ public class JwtSecurityContextRepository implements SecurityContextRepository {
     @Nonnull
     private SecurityContext getSecurityContext(HttpServletRequest request) {
         String jwtToken = request.getHeader(headerName);
-        JwtToken payload;
-        try {
-            payload = jwtTokenCodec.parse(jwtToken);
-        } catch (Exception e) {
-            throw new AuthenticationCredentialsNotFoundException(LOGIN_JWT_TOKEN_INVALID);
-        }
-        if (payload == null) {
+        if (StringUtils.hasText(jwtToken)) {
+            JwtToken token;
+            try {
+                token = jwtTokenCodec.parse(jwtToken);
+            } catch (Exception exception) {
+                throw new AuthenticationCredentialsNotFoundException(LOGIN_JWT_TOKEN_INVALID, exception);
+            }
+            // 加载用户权限
+            Set<SimpleGrantedAuthority> authorities = authoritySupplier.apply(token.getUser())
+                    .stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toSet());
+            return new SecurityContextImpl(new JwtAuthenticationToken(token.getUser(), jwtToken, authorities));
+        } else {
             return EMPTY;
         }
-        // 加载用户权限
-        Set<SimpleGrantedAuthority> authorities =
-                authoritySupplier.apply(payload.getUser()).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
-        Authentication authentication = new JwtAuthenticationToken(payload.getUser(), jwtToken, authorities);
-        return new SecurityContextImpl(authentication);
     }
 }

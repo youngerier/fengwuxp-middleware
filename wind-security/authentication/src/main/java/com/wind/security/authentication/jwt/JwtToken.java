@@ -1,9 +1,12 @@
 package com.wind.security.authentication.jwt;
 
+import com.wind.common.exception.AssertUtils;
+import com.wind.common.exception.BaseException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.springframework.lang.Nullable;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -39,9 +42,30 @@ public final class JwtToken implements Serializable {
      */
     private final Long expireTime;
 
-
+    @Deprecated
     public Long getUserId() {
         return Long.parseLong(subject);
     }
 
+    /**
+     * 获取长整型的 subject
+     *
+     * @return subject
+     */
+    public Long getSubjectAsLong() {
+        return Long.parseLong(subject);
+    }
+
+    @NotNull
+    public JwtUser requireUser() {
+        AssertUtils.state(user != null, () -> BaseException.unAuthorized("user un authorized"));
+        return user;
+    }
+
+    /**
+     * @return 是否过期
+     */
+    public boolean isExpired() {
+        return expireTime < System.currentTimeMillis();
+    }
 }

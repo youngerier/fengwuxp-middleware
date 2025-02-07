@@ -26,14 +26,14 @@ public class JwtProperties extends AbstractRsaProperties {
 
     /**
      * jwt audience
-     * jwt的适用对象，其值应为大小写敏感的字符串或Uri。一般可以为特定的App、服务或模块
+     * jwt的适用对象，其值应为大小写敏感的字符串或 Uri。一般可以为特定的 App、服务或模块
      */
     private String audience;
 
     /**
      * Generate token to set expire time
      */
-    private Duration effectiveTime = Duration.ofHours(4);
+    private Duration effectiveTime = Duration.ofHours(2);
 
     /**
      * refresh jwt token 有效天数
