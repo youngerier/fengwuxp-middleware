@@ -36,6 +36,11 @@ public final class WindHttpConstants {
     public static final String HTTP_USER_AGENT_HEADER_NAME = "User-Agent";
 
     /**
+     * http request Device-Id  header name
+     */
+    public static final String HTTP_CLIENT_ID_HEADER_NAME = "Wind-Device-Id";
+
+    /**
      * 匹配所有路径的 Ant pattern
      */
     public static final String ALL_PATH_ANT_PATTERN = "/**";
