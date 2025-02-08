@@ -13,7 +13,8 @@ class AuthenticationParameterEncryptorTest {
 
     @Test
     void decrypt() {
-        AuthenticationParameterEncryptor.KEY_PAIR.set(genKeyPir());
+        KeyPair keyPair = genKeyPir();
+        AuthenticationParameterEncryptor.TEXT_ENCRYPTOR.set(RasTextEncryptor.ofPublicEncrypt(keyPair.getPublic(),keyPair.getPrivate()));
         String principal = RandomStringUtils.randomAlphabetic(16);
         String credentials = RandomStringUtils.randomAlphabetic(16);
         AuthenticationParameterEncryptor.AuthenticationParameter encrypt1 = AuthenticationParameterEncryptor.encrypt(principal, credentials);
@@ -48,7 +49,8 @@ class AuthenticationParameterEncryptorTest {
                 "+2gdk9R2LaQKAN7kWFpruqPkSx2IC/j0RnU/8muomyq9Y5X5xVOUPbCDfwGOgxfAIIS0HNlyxIZgVIAqFqbJaDiMTSVNveFOcLsRGM6SKnb1Zp/FSpt" +
                 "+PV52oLj7t7IrbxFbF1Y/KFl1mIlxAoGAfZTPT4UD5wYJgvues31TR6LKVowIcDAwgw0FgBlMoeLVOYMncY9sfFJPrPfyj1DqVaTjcPyAQBaa4SStFwrYJ" +
                 "/AUID8ibuw9q7fupUR+keO1myqYHspvQ9CeuwblFO9RNirursSW9ra6Kr5zeMKptvQSHA4YtXXBLIXr6q/8uRs=");
-        AuthenticationParameterEncryptor.KEY_PAIR.set(properties.getKeyPair());
+        KeyPair keyPair = properties.getKeyPair();
+        AuthenticationParameterEncryptor.TEXT_ENCRYPTOR.set(RasTextEncryptor.ofPublicEncrypt(keyPair.getPublic(), keyPair.getPrivate()));
         String content = "TGPerUamYrUFvSbSe3+QUfUgwDaVEQHq3IekyopWblZeEJBXWot261kwN4hX/1WduuVFilNMo9bOobuG7" +
                 "/1PrZGcO2q0STpvyof8H6H8VU3d1mhp1dUIQoF23ZJIPZHe+1/BBz/Raw9DyMvJczaI5yNrgnuPO0KHcn3LUST/ZxH9eLL1jAByOg56Gnjrw" +
                 "/d4Qt5KWrGZF5DdrVQjZ0IXiFA41GBPbXd6/yPIx6PXhtrmsEiSlPcinYKF95NVIYYJZPORKHjEnPPLAs2or7xXRLShswwD9TT6kI8ZZusxE8rH0lpxR5xm3C/hD9UnMKv" +

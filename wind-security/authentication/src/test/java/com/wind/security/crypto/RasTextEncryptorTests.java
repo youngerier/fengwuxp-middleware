@@ -15,23 +15,23 @@ import java.security.NoSuchAlgorithmException;
 class RasTextEncryptorTests {
 
     @Test
-    void testOfPrivate() {
+    void testOfPrivateEncrypt() {
         KeyPair keyPair = genKeyPir();
-        RasTextEncryptor encryptor = RasTextEncryptor.ofPrivate(keyPair.getPrivate(), keyPair.getPublic());
+        RasTextEncryptor encryptor = RasTextEncryptor.ofPrivateEncrypt(keyPair.getPrivate(), keyPair.getPublic());
         String text = RandomStringUtils.randomAlphabetic(32);
         String encrypt = encryptor.encrypt(text);
         Assertions.assertEquals(text, encryptor.decrypt(encrypt));
-        Assertions.assertEquals(text, RasTextEncryptor.ofPrivate(null, keyPair.getPublic()).decrypt(encrypt));
+        Assertions.assertEquals(text, RasTextEncryptor.ofPrivateEncrypt(null, keyPair.getPublic()).decrypt(encrypt));
     }
 
     @Test
     void testOfPublic() {
         KeyPair keyPair = genKeyPir();
-        RasTextEncryptor encryptor = RasTextEncryptor.ofPublic(keyPair.getPublic(), keyPair.getPrivate());
+        RasTextEncryptor encryptor = RasTextEncryptor.ofPublicEncrypt(keyPair.getPublic(), keyPair.getPrivate());
         String text = RandomStringUtils.randomAlphabetic(32);
         String encrypt = encryptor.encrypt(text);
         Assertions.assertEquals(text, encryptor.decrypt(encrypt));
-        Assertions.assertEquals(text, RasTextEncryptor.ofPublic(null, keyPair.getPrivate()).decrypt(encrypt));
+        Assertions.assertEquals(text, RasTextEncryptor.ofPublicEncrypt(null, keyPair.getPrivate()).decrypt(encrypt));
     }
 
     private KeyPair genKeyPir() {

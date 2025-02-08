@@ -25,11 +25,25 @@ public final class RasTextEncryptor implements TextEncryptor {
 
     private final BytesEncryptor delegate;
 
-    public static RasTextEncryptor ofPrivate(@Nullable PrivateKey privateKey, @Nullable PublicKey publicKey) {
+    /**
+     * 私钥加密，公钥解密
+     *
+     * @param publicKey  Rsa 公钥
+     * @param privateKey rsa 私钥
+     * @return RasTextEncryptor
+     */
+    public static RasTextEncryptor ofPrivateEncrypt(@Nullable PrivateKey privateKey, @Nullable PublicKey publicKey) {
         return new RasTextEncryptor(new RsaPrivateEncryptor(privateKey, publicKey));
     }
 
-    public static RasTextEncryptor ofPublic(@Nullable PublicKey publicKey, @Nullable PrivateKey privateKey) {
+    /**
+     * 公钥加密，私钥解密
+     *
+     * @param publicKey  Rsa 公钥
+     * @param privateKey rsa 私钥
+     * @return RasTextEncryptor
+     */
+    public static RasTextEncryptor ofPublicEncrypt(@Nullable PublicKey publicKey, @Nullable PrivateKey privateKey) {
         return new RasTextEncryptor(new RsaPublicEncryptor(publicKey, privateKey));
     }
 

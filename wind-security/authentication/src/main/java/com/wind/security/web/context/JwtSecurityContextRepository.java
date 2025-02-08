@@ -26,7 +26,7 @@ import static org.springframework.security.web.context.HttpSessionSecurityContex
 
 /**
  * 用于从请求中创建 {@link SecurityContext}
- *
+ * TODO 待移除
  * @author wuxp
  * @date 2023-10-22 19:10
  **/
