@@ -5,6 +5,7 @@ import com.wind.api.core.signature.ApiSecretAccount;
 import com.wind.api.core.signature.ApiSignatureRequest;
 import com.wind.api.core.signature.SignatureHttpHeaderNames;
 import com.wind.common.WindHttpConstants;
+import com.wind.common.exception.BaseException;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.server.servlet.RepeatableReadRequestWrapper;
@@ -31,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
 
 
@@ -43,6 +45,11 @@ import java.util.function.BiFunction;
 @Slf4j
 @AllArgsConstructor
 public class RequestSignFilter implements Filter, Ordered {
+
+    /**
+     * 签名时间戳 5 分钟内有效
+     */
+    public static final AtomicLong SIGN_TIMESTAMP_EXPIRED = new AtomicLong(5 * 60 * 1000);
 
     private final SignatureHttpHeaderNames headerNames;
 
@@ -128,18 +135,33 @@ public class RequestSignFilter implements Filter, Ordered {
     }
 
     private ApiSignatureRequest buildSignatureRequest(HttpServletRequest request, boolean requiredBody) throws IOException {
+        String timestamp = request.getHeader(headerNames.getTimestamp());
+        checkTimestamp(timestamp);
         ApiSignatureRequest.ApiSignatureRequestBuilder result = ApiSignatureRequest.builder()
                 // http 请求 path，不包含查询参数和域名
                 .requestPath(request.getRequestURI())
                 .queryString(request.getQueryString())
                 // 仅在存在查询字符串时才设置，避免获取到表单参数
                 .method(request.getMethod().toUpperCase())
+                // TODO 随机串的验证
                 .nonce(request.getHeader(headerNames.getNonce()))
-                .timestamp(request.getHeader(headerNames.getTimestamp()));
+                .timestamp(timestamp);
         if (requiredBody) {
             result.requestBody(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8));
         }
         return result.build();
+    }
+
+    private void checkTimestamp(String timestamp) {
+        long time;
+        try {
+            time = Long.parseLong(timestamp);
+        } catch (NumberFormatException exception) {
+            throw BaseException.common("sign timestamp is invalid");
+        }
+        if ((System.currentTimeMillis() - time) >= SIGN_TIMESTAMP_EXPIRED.get()) {
+            throw BaseException.common("sign verify error");
+        }
     }
 
     @Override

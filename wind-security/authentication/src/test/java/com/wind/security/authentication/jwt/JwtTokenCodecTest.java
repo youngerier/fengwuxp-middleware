@@ -13,7 +13,7 @@ import java.util.Collections;
 
 class JwtTokenCodecTest {
 
-    private final JwtTokenCodec jwtTokenCodec = new JwtTokenCodec(jwtProperties(Duration.ofMillis(1000)));
+    private final JwtTokenCodec jwtTokenCodec = new JwtTokenCodec(jwtProperties(Duration.ofMinutes(1)));
 
     @Test
     void testCodecUserToken() {
@@ -25,10 +25,11 @@ class JwtTokenCodecTest {
 
     @Test
     void testCodecUserTokenExpired() throws Exception {
+        JwtTokenCodec codec = new JwtTokenCodec(jwtProperties(Duration.ofMillis(100)));
         JwtUser user = new JwtUser(1L, "", Collections.emptyMap());
-        JwtToken token = jwtTokenCodec.encoding(user);
-        Thread.sleep(1001);
-        JwtExpiredException exception = Assertions.assertThrows(JwtExpiredException.class, () -> jwtTokenCodec.parse(token.getTokenValue()));
+        JwtToken token = codec.encoding(user);
+        Thread.sleep(101);
+        JwtExpiredException exception = Assertions.assertThrows(JwtExpiredException.class, () -> codec.parse(token.getTokenValue()));
         Assertions.assertEquals("token is expired", exception.getMessage());
     }
 
@@ -40,10 +41,11 @@ class JwtTokenCodecTest {
 
     @Test
     void testRefreshTokenExpired() throws Exception {
-        JwtToken token = jwtTokenCodec.encodingRefreshToken(1L);
-        Thread.sleep(1001);
+        JwtTokenCodec codec = new JwtTokenCodec(jwtProperties(Duration.ofMillis(100)));
+        JwtToken token = codec.encodingRefreshToken(1L);
+        Thread.sleep(101);
         String tokenValue = token.getTokenValue();
-        JwtExpiredException exception = Assertions.assertThrows(JwtExpiredException.class, () -> jwtTokenCodec.parseRefreshToken(tokenValue));
+        JwtExpiredException exception = Assertions.assertThrows(JwtExpiredException.class, () -> codec.parseRefreshToken(tokenValue));
         Assertions.assertEquals("refresh token is expired", exception.getMessage());
     }
 

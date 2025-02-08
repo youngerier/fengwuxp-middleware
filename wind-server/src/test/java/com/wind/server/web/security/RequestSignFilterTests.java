@@ -4,6 +4,7 @@ import com.wind.api.core.signature.ApiSecretAccount;
 import com.wind.client.rest.ApiSignatureRequestInterceptor;
 import com.wind.common.WindConstants;
 import com.wind.common.WindHttpConstants;
+import com.wind.common.exception.BaseException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+
+import static com.wind.server.web.security.RequestSignFilter.SIGN_TIMESTAMP_EXPIRED;
 
 /**
  * @author wuxp
@@ -69,5 +72,29 @@ class RequestSignFilterTests {
         MockHttpServletResponse response = new MockHttpServletResponse();
         signFilter.doFilter(request, response, new MockFilterChain());
         Assertions.assertNotNull(request.getAttribute(WindHttpConstants.API_SECRET_ACCOUNT_ATTRIBUTE_NAME));
+    }
+
+    @Test
+    void testSignExpire() throws Exception {
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString("https://www.example.com/api/v1/examples?a=2&b=20&name=张三").build();
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", uriComponents.getPath());
+        byte[] requestBody = RandomStringUtils.randomAlphabetic(1000).getBytes(StandardCharsets.UTF_8);
+        request.setContent(requestBody);
+        ApiSignatureRequestInterceptor interceptor = new ApiSignatureRequestInterceptor(httpRequest -> secretAccount);
+        interceptor.intercept(new ServletServerHttpRequest(request), requestBody, (r, body) -> {
+            r.getHeaders().forEach((name, values) -> {
+                if (name.contains("Timestamp")) {
+                    request.addHeader(name, System.currentTimeMillis() - SIGN_TIMESTAMP_EXPIRED.get());
+                } else {
+                    if (!ObjectUtils.isEmpty(values)) {
+                        request.addHeader(name, values.get(0));
+                    }
+                }
+            });
+            return new MockClientHttpResponse(new byte[0], 200);
+        });
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        BaseException exception = Assertions.assertThrows(BaseException.class, () -> signFilter.doFilter(request, response, new MockFilterChain()));
+        Assertions.assertEquals("sign verify error", exception.getMessage());
     }
 }
