@@ -8,6 +8,7 @@ import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Collections;
+import java.util.Objects;
 
 /**
  * @author wuxp
@@ -38,6 +39,6 @@ public class SimpleSecurityAccessOperations implements SecurityAccessOperations 
     }
 
     private boolean isGranted(AuthorizationManager<Object> manager) {
-        return manager.check(SecurityContextHolder.getContext()::getAuthentication, Collections.emptyList()).isGranted();
+        return Objects.requireNonNull(manager.check(SecurityContextHolder.getContext()::getAuthentication, Collections.emptyList())).isGranted();
     }
 }

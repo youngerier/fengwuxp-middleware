@@ -36,23 +36,19 @@ public class WindSecurityAutoConfiguration {
     private static final String JWT_PREFIX = com.wind.security.configuration.WindSecurityProperties.PREFIX + ".jwt";
 
     /**
-     * rbac 配置 prefix
-     */
-    public static final String RBAC_PREFIX = com.wind.security.configuration.WindSecurityProperties.PREFIX + ".rbac";
-
-
-    /**
      * Authentication 配置 prefix
      */
     public static final String AUTHENTICATION_PREFIX = com.wind.security.configuration.WindSecurityProperties.PREFIX + ".authentication.crypto";
 
     @Bean
+    @ConditionalOnProperty(prefix = JWT_PREFIX, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
     @ConfigurationProperties(prefix = JWT_PREFIX)
     public JwtProperties jwtProperties() {
         return new JwtProperties();
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = AUTHENTICATION_PREFIX, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
     @ConfigurationProperties(prefix = AUTHENTICATION_PREFIX)
     public WindAuthenticationProperties windAuthenticationProperties() {
         return new WindAuthenticationProperties();
