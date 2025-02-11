@@ -4,6 +4,7 @@ import com.wind.trace.WindTracer;
 
 import javax.annotation.Nullable;
 
+import static com.wind.common.WindHttpConstants.HTTP_CLIENT_ID_HEADER_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IP_ATTRIBUTE_NAME;
 
 /**
@@ -21,5 +22,9 @@ public final class HttpTraceVariableUtils {
     @Nullable
     public static String getRequestSourceIp() {
         return WindTracer.TRACER.getTraceContext().getContextVariable(HTTP_REQUEST_IP_ATTRIBUTE_NAME);
+    }
+
+    public static String getDeviceId() {
+        return WindTracer.TRACER.getTraceContext().getContextVariable(HTTP_CLIENT_ID_HEADER_NAME);
     }
 }

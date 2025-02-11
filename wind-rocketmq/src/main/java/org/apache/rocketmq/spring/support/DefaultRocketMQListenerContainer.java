@@ -321,7 +321,7 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
                     .topic(topic)
                     .tag(messageExt.getTags())
                     .build();
-            Consumer<Exception> exceptionConsumer = SentinelFlowLimitUtils.flowControl(resource);
+            Consumer<Throwable> throwableConsumer = SentinelFlowLimitUtils.limit(resource);
             Exception exception = null;
             try {
                 dispatchMessage(messageExt);
@@ -329,7 +329,7 @@ public class DefaultRocketMQListenerContainer implements InitializingBean,
                 exception = e;
                 throw e;
             } finally {
-                exceptionConsumer.accept(exception);
+                throwableConsumer.accept(exception);
             }
         } else {
             dispatchMessage(messageExt);
