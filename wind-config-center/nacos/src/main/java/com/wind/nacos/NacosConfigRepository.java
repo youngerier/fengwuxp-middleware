@@ -59,19 +59,33 @@ public class NacosConfigRepository implements ConfigRepository {
     }
 
     @Override
-    public ConfigSubscription onChange(ConfigDescriptor descriptor, ConfigListener listener) {
+    public ConfigSubscription onChange(ConfigDescriptor descriptor, TextConfigListener listener) {
+        final AbstractListener wrapperListener = new AbstractListener() {
+            @Override
+            public void receiveConfigInfo(String content) {
+                listener.change(content);
+            }
+        };
+        return addListener(descriptor, wrapperListener);
+    }
+
+    @Override
+    public ConfigSubscription onChange(ConfigDescriptor descriptor, PropertyConfigListener listener) {
+        final AbstractListener wrapperListener = new AbstractListener() {
+            @Override
+            public void receiveConfigInfo(String content) {
+                listener.change(getPropertySources(descriptor, content));
+            }
+        };
+        return addListener(descriptor, wrapperListener);
+    }
+
+    private ConfigSubscription addListener(ConfigDescriptor descriptor, AbstractListener wrapperListener) {
         if (!descriptor.isRefreshable()) {
             log.warn("config unsupported refresh, dataId = {}，group = {}", descriptor.getConfigId(), descriptor.getGroup());
             return ConfigSubscription.empty(descriptor);
 
         }
-        final AbstractListener wrapperListener = new AbstractListener() {
-            @Override
-            public void receiveConfigInfo(String content) {
-                listener.change(content);
-                listener.change(getPropertySources(descriptor, content));
-            }
-        };
         try {
             configService.addListener(descriptor.getConfigId(), descriptor.getGroup(), wrapperListener);
         } catch (NacosException exception) {

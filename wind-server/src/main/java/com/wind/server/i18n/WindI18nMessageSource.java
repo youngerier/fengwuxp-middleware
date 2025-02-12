@@ -58,7 +58,7 @@ public class WindI18nMessageSource extends AbstractResourceBasedMessageSource {
             ConfigRepository.ConfigDescriptor descriptor = ConfigRepository.ConfigDescriptor.immutable(name, I18N_GROUP, properties.getFileType());
             result.put(locale, buildPropertyResolver(repository.getConfigs(descriptor)));
             // 监听配置变化
-            repository.onChange(descriptor, configs -> {
+            repository.onChange(descriptor, (ConfigRepository.PropertyConfigListener) configs -> {
                 log.info("i18n message refresh dataId = {}", descriptor.getConfigId());
                 result.put(locale, buildPropertyResolver(configs));
             });

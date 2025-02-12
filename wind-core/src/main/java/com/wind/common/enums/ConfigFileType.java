@@ -7,6 +7,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * 配置文件扩展名称
@@ -43,6 +44,6 @@ public enum ConfigFileType implements DescriptiveEnum {
         if (parts.size() < 2) {
             return null;
         }
-        return ConfigFileType.valueOf(CollectionUtils.lastElement(parts).toUpperCase());
+        return ConfigFileType.valueOf(Objects.requireNonNull(CollectionUtils.lastElement(parts)).toUpperCase());
     }
 }

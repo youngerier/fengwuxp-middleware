@@ -121,7 +121,9 @@ public class WindPropertySourceLoader {
 
     private SimpleConfigDescriptor buildDescriptor(String name, String group, ConfigFileType fileType) {
         SimpleConfigDescriptor result = SimpleConfigDescriptor.of(name, group);
-        result.setFileType(fileType);
+        if (result.getFileType() == null) {
+            result.setFileType(fileType);
+        }
         // 开启 RefreshScope 支持
         result.setRefreshable(true);
         return result;

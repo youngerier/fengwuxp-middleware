@@ -4,7 +4,6 @@ import com.alibaba.csp.sentinel.datasource.AbstractDataSource;
 import com.alibaba.fastjson2.JSON;
 import com.wind.configcenter.core.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.PropertySource;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,17 +39,9 @@ public class ConfigCenterSentinelDataSource<T> extends AbstractDataSource<String
         this.configType = configType;
         this.descriptors = descriptors;
         for (ConfigRepository.ConfigDescriptor descriptor : descriptors) {
-            ConfigRepository.ConfigSubscription subscription = configRepository.onChange(descriptor, new ConfigRepository.ConfigListener() {
-                @Override
-                public void change(String config) {
-                    // 有配置发生变更，重新加载所有的配置
-                    loadAllConfig();
-                }
-
-                @Override
-                public void change(List<PropertySource<?>> configs) {
-                    log.debug("unsupported update, please see change(String config) method");
-                }
+            ConfigRepository.ConfigSubscription subscription = configRepository.onChange(descriptor, (ConfigRepository.TextConfigListener) config -> {
+                // 有配置发生变更，重新加载所有的配置
+                loadAllConfig();
             });
             subscriptions.put(descriptor, subscription);
         }
