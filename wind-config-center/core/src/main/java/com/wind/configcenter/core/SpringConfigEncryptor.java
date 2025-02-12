@@ -1,5 +1,6 @@
-package com.wind.server.configcenter;
+package com.wind.configcenter.core;
 
+import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.security.crypto.symmetric.AesTextEncryptor;
@@ -21,8 +22,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.wind.configcenter.core.ConfigRepository.PROPERTY_SOURCE_LOADER;
+import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME;
 
 /**
  * 对特定格式的配置进行解密
@@ -35,6 +38,8 @@ import static com.wind.configcenter.core.ConfigRepository.PROPERTY_SOURCE_LOADER
 @Slf4j
 public final class SpringConfigEncryptor {
 
+    private  static final Set<String> REQUIRES_DECRYPT_NAMES = ImmutableSet.of(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
+
     public static final String SECRET_KEY = "WIND_SAE_KEY";
 
     private static SpringConfigEncryptor INSTANCE = getDefaultInstance();
@@ -42,7 +47,7 @@ public final class SpringConfigEncryptor {
     /**
      * 加密配置文件名称标记
      */
-    static final String ENCRYPTION_CONFIG_FLAG = "-encryption";
+    public static final String ENCRYPTION_CONFIG_FLAG = "-encryption";
 
     private final TextEncryptor encryptor;
 
@@ -50,7 +55,7 @@ public final class SpringConfigEncryptor {
         List<PropertySource<?>> sources = PROPERTY_SOURCE_LOADER.load(name, new ByteArrayResource(content.getBytes(StandardCharsets.UTF_8)));
         CompositePropertySource result = new CompositePropertySource(name);
         sources.forEach(source -> {
-            if (isSensitiveConfig(source)) {
+            if (requiresDecrypt(source)) {
                 MapPropertySource propertySource = new MapPropertySource(name, encryptValues(((MapPropertySource) source).getSource()));
                 result.addFirstPropertySource(propertySource);
             } else {
@@ -72,7 +77,7 @@ public final class SpringConfigEncryptor {
     }
 
     public PropertySource<?> decrypt(PropertySource<?> source) {
-        if (isSensitiveConfig(source)) {
+        if (requiresDecrypt(source)) {
             Map<String, Object> result = decryptValues(((MapPropertySource) source).getSource());
             return new MapPropertySource(source.getName(), result);
         }
@@ -135,8 +140,12 @@ public final class SpringConfigEncryptor {
         return val;
     }
 
-    private boolean isSensitiveConfig(PropertySource<?> source) {
-        return source instanceof MapPropertySource && source.getName().contains(ENCRYPTION_CONFIG_FLAG);
+    private boolean requiresDecrypt(PropertySource<?> source) {
+        String name = source.getName();
+        if (REQUIRES_DECRYPT_NAMES.contains(name)){
+            return true;
+        }
+        return source instanceof MapPropertySource && name.contains(ENCRYPTION_CONFIG_FLAG);
     }
 
     public static void configEncryptor(TextEncryptor textEncryptor) {

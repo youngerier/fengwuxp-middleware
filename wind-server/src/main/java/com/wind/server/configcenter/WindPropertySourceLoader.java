@@ -7,6 +7,7 @@ import com.wind.common.enums.WindMiddlewareType;
 import com.wind.common.exception.AssertUtils;
 import com.wind.configcenter.core.ConfigRepository;
 import com.wind.configcenter.core.ConfigRepository.ConfigDescriptor;
+import com.wind.configcenter.core.SpringConfigEncryptor;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.CompositePropertySource;

@@ -11,6 +11,7 @@ import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
 import com.wind.configcenter.core.ConfigRepository;
 import com.wind.nacos.NacosConfigRepository;
+import com.wind.configcenter.core.SpringConfigEncryptor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.ConfigurableBootstrapContext;
@@ -22,6 +23,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertyResolver;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
 
@@ -30,6 +32,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.springframework.cloud.bootstrap.BootstrapApplicationListener.BOOTSTRAP_PROPERTY_SOURCE_NAME;
 import static org.springframework.core.env.StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME;
 import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME;
 
@@ -79,6 +82,10 @@ public class WindNacosBootstrapListener implements ApplicationListener<Applicati
     }
 
     private NacosConfigProperties createNacosProperties(ConfigurableEnvironment environment) {
+        // 尝试解密
+        PropertySource<?> systemProperties = environment.getPropertySources().remove(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
+        environment.getPropertySources().addAfter(BOOTSTRAP_PROPERTY_SOURCE_NAME, SpringConfigEncryptor.getInstance().decrypt(systemProperties));
+
         ConfigurationBeanBinder binder = new DefaultConfigurationBeanBinder();
         NacosConfigProperties result = new NacosConfigProperties();
         binder.bind(getNacosConfigs(environment), true, true, result);

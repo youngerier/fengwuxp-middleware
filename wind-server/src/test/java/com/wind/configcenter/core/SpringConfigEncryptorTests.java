@@ -1,6 +1,5 @@
-package com.wind.server.configcenter;
+package com.wind.configcenter.core;
 
-import com.wind.common.WindConstants;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
