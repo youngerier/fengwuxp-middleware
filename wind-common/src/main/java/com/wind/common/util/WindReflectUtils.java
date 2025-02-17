@@ -7,6 +7,7 @@ import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.ObjectUtils;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -86,8 +87,24 @@ public final class WindReflectUtils {
      */
     @NotNull
     public static Field findField(Class<?> clazz, String fieldName) {
+        Field result = findFieldNullable(clazz, fieldName);
+        AssertUtils.notNull(result, String.format("not found name = %s field", fieldName));
+        return result;
+    }
+
+    /**
+     * 根据字段名称查找 {@link Field}，会递归查找超类
+     *
+     * @param clazz     类类型
+     * @param fieldName 字段名称
+     * @return 字段
+     */
+    @Null
+    public static Field findFieldNullable(Class<?> clazz, String fieldName) {
         Field[] fields = findFields(clazz, Collections.singleton(fieldName));
-        AssertUtils.notEmpty(fields, String.format("not found name = %s field", fieldName));
+        if (fields.length == 0) {
+            return null;
+        }
         return fields[0];
     }
 
