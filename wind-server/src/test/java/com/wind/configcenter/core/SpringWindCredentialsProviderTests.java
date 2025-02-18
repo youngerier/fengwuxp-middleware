@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.env.PropertySource;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -15,7 +16,7 @@ import static com.wind.configcenter.core.ConfigRepository.PROPERTY_SOURCE_LOADER
  * @author wuxp
  * @date 2025-02-02 11:32
  **/
-class SpringConfigEncryptorTests {
+class SpringWindCredentialsProviderTests {
 
     static {
         System.setProperty(SpringConfigEncryptor.SECRET_KEY, RandomStringUtils.randomAlphabetic(32));
@@ -36,8 +37,10 @@ class SpringConfigEncryptorTests {
                 .findFirst();
         Assertions.assertTrue(optional.isPresent());
         PropertySource<?> source = optional.get();
-        Assertions.assertEquals("test", source.getProperty("spring.datasource.username"));
-        Assertions.assertEquals("k1n231,.,fo123", source.getProperty("spring.datasource.password"));
-        Assertions.assertEquals("jdbc:mysql://example.com:3306/test_db", source.getProperty("spring.datasource.url"));
+        TextEncryptor enc = encryptor.getEncryptor();
+        Assertions.assertEquals("test", enc.decrypt((String) source.getProperty("spring.datasource.username")));
+        Assertions.assertEquals("k1n231,.,fo123", enc.decrypt((String) source.getProperty("spring.datasource.password")));
+        Assertions.assertEquals("jdbc:mysql://example.com:3306/test_db", enc.decrypt((String) source.getProperty("spring" +
+                ".datasource.url")));
     }
 }

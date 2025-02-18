@@ -15,7 +15,6 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.PropertySource;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
@@ -136,24 +135,14 @@ public class WindPropertySourceLoader {
                     descriptor.isRefreshable());
         }
         List<PropertySource<?>> configs = repository.getConfigs(descriptor);
-        if (CollectionUtils.isEmpty(configs)) {
-            // 配置不存在，尝试加载加密配置 TODO 待优化
-            configs = tryLoadEncryption(descriptor);
-        }
-        configs.forEach(result::addFirstPropertySource);
-    }
-
-    private List<PropertySource<?>> tryLoadEncryption(ConfigDescriptor origin) {
-        ConfigDescriptor descriptor = ConfigDescriptor.immutable(origin.getName() + SpringConfigEncryptor.ENCRYPTION_CONFIG_FLAG, origin.getGroup(),
-                origin.getFileType());
-        List<PropertySource<?>> configs = repository.getConfigs(descriptor);
-        return configs.stream()
+        configs.stream()
                 .map(SpringConfigEncryptor.getInstance()::decrypt)
-                .collect(Collectors.toList());
+                .forEach(result::addFirstPropertySource);
     }
 
     private void loadRedissonConfig(String redissonName, CompositePropertySource result) {
         if (StringUtils.hasLength(redissonName)) {
+            // TODO 增加凭据替换支持
             String name = String.format("%s%s%s", redissonName, WindConstants.DASHED, WindConstants.REDISSON_NAME);
             ConfigDescriptor descriptor = ConfigDescriptor.immutable(name, WindMiddlewareType.REDIS.name(), ConfigFileType.YAML);
             Map<String, Object> source = ImmutableMap.of(SPRING_REDISSON_CONFIG_NAME, repository.getTextConfig(descriptor));
