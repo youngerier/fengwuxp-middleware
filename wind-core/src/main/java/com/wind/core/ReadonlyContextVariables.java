@@ -4,7 +4,6 @@ import com.wind.common.exception.AssertUtils;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.Map;
 
 /**
@@ -22,11 +21,22 @@ public interface ReadonlyContextVariables {
      * @return 上下文变量
      */
     @Nullable
-    @SuppressWarnings("unchecked")
     default <T> T getContextVariable(@NotBlank String name) {
+        return getContextVariable(name, null);
+    }
+
+    /**
+     * 获取上下文变量
+     *
+     * @param name         变量名称
+     * @param defaultValue 默认值
+     * @return 上下文变量
+     */
+    @SuppressWarnings("unchecked")
+    default <T> T getContextVariable(@NotBlank String name, @Nullable T defaultValue) {
         AssertUtils.hasText(name, "argument context variable name must not empty");
         Map<String, Object> contextVariables = getContextVariables();
-        return contextVariables == null ? null : (T) contextVariables.get(name);
+        return contextVariables == null ? null : (T) contextVariables.getOrDefault(name, defaultValue);
     }
 
     /**
