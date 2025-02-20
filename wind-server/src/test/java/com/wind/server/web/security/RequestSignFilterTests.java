@@ -22,7 +22,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
-import static com.wind.server.web.security.RequestSignFilter.SIGN_TIMESTAMP_EXPIRED;
+import static com.wind.server.web.security.RequestSignFilter.SIGNATURE_TIMESTAMP_VALIDITY_PERIOD;
 
 /**
  * @author wuxp
@@ -84,7 +84,7 @@ class RequestSignFilterTests {
         interceptor.intercept(new ServletServerHttpRequest(request), requestBody, (r, body) -> {
             r.getHeaders().forEach((name, values) -> {
                 if (name.contains("Timestamp")) {
-                    request.addHeader(name, System.currentTimeMillis() - SIGN_TIMESTAMP_EXPIRED.get());
+                    request.addHeader(name, System.currentTimeMillis() - SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get());
                 } else {
                     if (!ObjectUtils.isEmpty(values)) {
                         request.addHeader(name, values.get(0));

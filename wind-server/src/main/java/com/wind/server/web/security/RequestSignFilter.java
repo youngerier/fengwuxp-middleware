@@ -49,7 +49,7 @@ public class RequestSignFilter implements Filter, Ordered {
     /**
      * 签名时间戳 5 分钟内有效
      */
-    public static final AtomicLong SIGN_TIMESTAMP_EXPIRED = new AtomicLong(5 * 60 * 1000);
+    public static final AtomicLong SIGNATURE_TIMESTAMP_VALIDITY_PERIOD = new AtomicLong(5 * 60 * 1000L);
 
     private final SignatureHttpHeaderNames headerNames;
 
@@ -159,7 +159,7 @@ public class RequestSignFilter implements Filter, Ordered {
         } catch (NumberFormatException exception) {
             throw BaseException.common("sign timestamp is invalid");
         }
-        if ((System.currentTimeMillis() - time) >= SIGN_TIMESTAMP_EXPIRED.get()) {
+        if ((System.currentTimeMillis() - time) >= SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get()) {
             throw BaseException.common("sign verify error");
         }
     }

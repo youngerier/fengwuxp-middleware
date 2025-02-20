@@ -51,18 +51,18 @@ public final class SpringConfigEncryptor {
 
     /**
      * 需要交换的凭据
-     * 对于纯文本，配置格式: $$CRE_{凭据名称}，例如：$$CRE_example
-     * 对于 key value 格式凭据，支持如下语法: $$CRE_{凭据名称}.{凭据配置 key}，例如：$$CRE_example.username
+     * 对于纯文本，配置格式: #CRE_{凭据名称}，例如：#CRE_example
+     * 对于 key value 格式凭据，支持如下语法: #CRE_{凭据名称}.{凭据配置 key}，例如：#CRE_example.username
      */
     @VisibleForTesting
-    static final String CREDENTIALS_PREFIX = "$$CRE_";
+    static final String CREDENTIALS_PREFIX = "#CRE_";
 
     /**
      * 需要解密的配置
-     * 支持如下语法: $ENC_{配置内容密文}，例如: $$ENC_x3k24k234
+     * 支持如下语法: $ENC_{配置内容密文}，例如: #ENC_x3k24k234
      */
     @VisibleForTesting
-    static final String ENCRYPT_PREFIX = "$$ENC_";
+    static final String ENCRYPT_PREFIX = "#ENC_";
 
     public static final String SECRET_KEY = "WIND_SAE_KEY";
 
@@ -101,20 +101,20 @@ public final class SpringConfigEncryptor {
 
             keyValues.forEach((key, value) -> {
                 String textValue = asText(value);
-                if (textValue.startsWith(CREDENTIALS_PREFIX)) {
-                    credentialsValues.put(key, value);
-                } else if (textValue.startsWith(ENCRYPT_PREFIX)) {
+                if (textValue.startsWith(ENCRYPT_PREFIX) || REQUIRES_DECRYPT_NAMES.contains(source.getName())) {
                     decryptValues.put(key, value);
+                } else if (textValue.startsWith(CREDENTIALS_PREFIX)) {
+                    credentialsValues.put(key, value);
                 }
             });
-            if (credentialsValues.isEmpty() && decryptValues.isEmpty()) {
+            if (decryptValues.isEmpty() && credentialsValues.isEmpty()) {
                 // 没有需要处理的
                 return source;
             }
 
             Map<String, Object> result = new HashMap<>(keyValues);
-            result.putAll(getCredentials(credentialsValues));
             result.putAll(decryptValues(decryptValues));
+            result.putAll(getCredentials(credentialsValues));
             return new MapPropertySource(source.getName(), Collections.unmodifiableMap(result));
         }
         return source;
