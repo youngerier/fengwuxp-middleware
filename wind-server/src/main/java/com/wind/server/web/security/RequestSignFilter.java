@@ -159,7 +159,7 @@ public class RequestSignFilter implements Filter, Ordered {
         } catch (NumberFormatException exception) {
             throw BaseException.common("sign timestamp is invalid");
         }
-        if ((System.currentTimeMillis() - time) >= SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get()) {
+        if (Math.abs((System.currentTimeMillis() - time)) >= SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get()) {
             throw BaseException.common("sign verify error");
         }
     }
