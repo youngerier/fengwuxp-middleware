@@ -101,7 +101,7 @@ public final class SpringConfigEncryptor {
 
             keyValues.forEach((key, value) -> {
                 String textValue = asText(value);
-                if (textValue.startsWith(ENCRYPT_PREFIX) || REQUIRES_DECRYPT_NAMES.contains(source.getName())) {
+                if (textValue.startsWith(ENCRYPT_PREFIX)) {
                     decryptValues.put(key, value);
                 } else if (textValue.startsWith(CREDENTIALS_PREFIX)) {
                     credentialsValues.put(key, value);
