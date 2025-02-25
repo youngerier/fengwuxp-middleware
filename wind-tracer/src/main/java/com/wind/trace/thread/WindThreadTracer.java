@@ -2,15 +2,16 @@ package com.wind.trace.thread;
 
 
 import com.wind.common.util.IpAddressUtils;
+import com.wind.core.WritableContextVariables;
 import com.wind.sequence.SequenceGenerator;
 import com.wind.trace.WindTraceContext;
 import com.wind.trace.WindTracer;
 import org.slf4j.MDC;
-import org.springframework.lang.NonNull;
 import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -25,15 +26,16 @@ import static com.wind.common.WindConstants.TRACE_ID_NAME;
  **/
 public final class WindThreadTracer implements WindTracer {
 
-    static {
-        // 默认填充本机 ip
-        MDC.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
-    }
-
     /**
      * 生成 traceId
      */
     private static final SequenceGenerator TRACE_GENERATOR = () -> SequenceGenerator.randomAlphanumeric(32);
+
+    private static final WindTraceContext TRACE_CONTEXT = new InheritableThreadLocalTraceContext();
+
+    static {
+        TRACE_CONTEXT.clear();
+    }
 
     @Override
     public void trace() {
@@ -47,67 +49,78 @@ public final class WindThreadTracer implements WindTracer {
 
     @Override
     public void trace(String traceId, @NotNull Map<String, Object> contextVariables) {
-        //  使用 MDC 保存
-        MDC.put(TRACE_ID_NAME, StringUtils.hasText(traceId) ? traceId : TRACE_GENERATOR.next());
-        MDC.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
-        Objects.requireNonNull(contextVariables, "argument contextVariables must not null")
-                .forEach((key, val) -> {
-                    if (val instanceof String) {
-                        MDC.put(key, (String) val);
-                    }
-                });
+        TRACE_CONTEXT.putVariable(TRACE_ID_NAME, StringUtils.hasText(traceId) ? traceId : TRACE_GENERATOR.next());
+        TRACE_CONTEXT.putVariable(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
+        Objects.requireNonNull(contextVariables, "argument contextVariables must not null").forEach(TRACE_CONTEXT::putVariable);
     }
 
     @Override
     public WindTraceContext getTraceContext() {
-        Map<String, Object> mdcContext = getMdcContext();
-        // TODO 待优化
-        return new WindTraceContext() {
-            @Override
-            public String getTraceId() {
-                String traceId = getContextVariable(TRACE_ID_NAME);
-                if (traceId == null) {
-                    // 没有则生成
-                    traceId = TRACE_GENERATOR.next();
-                    MDC.put(TRACE_ID_NAME, traceId);
-                }
-                return traceId;
-            }
-
-            @Override
-            @NonNull
-            public Map<String, Object> asContextVariables() {
-                return mdcContext;
-            }
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public <T> T getContextVariable(String variableName) {
-                return (T) mdcContext.get(variableName);
-            }
-        };
-    }
-
-    @Override
-    public void putContextVariable(String variableName, String variable) {
-        MDC.put(variableName, variable);
-    }
-
-    @NonNull
-    private static Map<String, Object> getMdcContext() {
-        Map<String, String> context = MDC.getCopyOfContextMap();
-        if (context == null) {
-            context = Collections.singletonMap(TRACE_ID_NAME, TRACE_GENERATOR.next());
-            context.forEach(MDC::put);
-        }
-        return Collections.unmodifiableMap(context);
+        return TRACE_CONTEXT;
     }
 
     @Override
     public void clear() {
-        MDC.clear();
-        // 保证 MDC 中一直存在 本机 ip 的属性 TODO 待优化
-        MDC.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
+        TRACE_CONTEXT.clear();
+    }
+
+    private static class InheritableThreadLocalTraceContext implements WindTraceContext {
+
+        private final InheritableThreadLocal<Map<String, Object>> inheritableThreadLocal = new InheritableThreadLocal<Map<String, Object>>() {
+            @Override
+            protected Map<String, Object> childValue(Map<String, Object> parentValue) {
+                return parentValue == null ? new HashMap<>() : new HashMap<>(parentValue);
+            }
+        };
+
+        @Override
+        public String getTraceId() {
+            String traceId = getContextVariable(TRACE_ID_NAME);
+            if (traceId == null) {
+                // 没有则生成
+                traceId = TRACE_GENERATOR.next();
+                putVariable(TRACE_ID_NAME, traceId);
+            }
+            return traceId;
+        }
+
+        @Override
+        public Map<String, Object> getContextVariables() {
+            Map<String, Object> variables = inheritableThreadLocal.get();
+            if (variables == null) {
+                return Collections.emptyMap();
+            }
+            return Collections.unmodifiableMap(variables);
+        }
+
+        @Override
+        public WritableContextVariables putVariable(String name, Object val) {
+            Map<String, Object> variables = inheritableThreadLocal.get();
+            if (variables == null) {
+                variables = new HashMap<>();
+                inheritableThreadLocal.set(variables);
+                putVariable(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
+            }
+            variables.put(name, val);
+            if (val instanceof String) {
+                // 字符传类型变量同步到 MDC 中， TODO 待优化
+                MDC.put(name, (String) val);
+            }
+            return this;
+        }
+
+        @Override
+        public void clear() {
+            MDC.clear();
+            Map<String, Object> map = inheritableThreadLocal.get();
+            if (map != null) {
+                map.clear();
+                inheritableThreadLocal.remove();
+            }
+            // 保证 MDC 中一直存在 本机 ip 的属性 TODO 待优化
+            MDC.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
+            putVariable(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
+        }
     }
 
 }

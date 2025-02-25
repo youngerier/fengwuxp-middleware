@@ -29,7 +29,7 @@ public abstract class TraceContextTask implements TaskDecorator {
                 }
                 traceContext();
                 // 线程切换，复制上下文和 traceId
-                WindTracer.TRACER.trace(context.getTraceId(), context.asContextVariables());
+                WindTracer.TRACER.trace(context.getTraceId(), context.getContextVariables());
                 task.run();
             } finally {
                 if (log.isDebugEnabled()) {

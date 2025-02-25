@@ -85,7 +85,7 @@ public class RequestSignFilter implements Filter, Ordered {
 
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String accessId = request.getHeader(headerNames.getAccessId());
-        if (!StringUtils.hasLength(accessId)) {
+        if (!StringUtils.hasText(accessId)) {
             badRequest(response, "request access key must not empty");
             return;
         }
