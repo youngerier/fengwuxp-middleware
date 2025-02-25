@@ -5,7 +5,6 @@ import com.wind.api.core.signature.ApiSecretAccount;
 import com.wind.api.core.signature.ApiSignatureRequest;
 import com.wind.api.core.signature.SignatureHttpHeaderNames;
 import com.wind.common.WindHttpConstants;
-import com.wind.common.exception.BaseException;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.server.servlet.RepeatableReadRequestWrapper;
@@ -92,6 +91,9 @@ public class RequestSignFilter implements Filter, Ordered {
 
         boolean signRequireBody = ApiSignatureRequest.signRequireRequestBody(request.getContentType());
         HttpServletRequest httpRequest = signRequireBody ? new RepeatableReadRequestWrapper(request) : request;
+        if (!isTimestampValid(request.getHeader(headerNames.getTimestamp()), response)) {
+            return;
+        }
         ApiSignatureRequest signatureRequest = buildSignatureRequest(httpRequest, signRequireBody);
         String requestSign = request.getHeader(headerNames.getSign());
 
@@ -135,8 +137,6 @@ public class RequestSignFilter implements Filter, Ordered {
     }
 
     private ApiSignatureRequest buildSignatureRequest(HttpServletRequest request, boolean requiredBody) throws IOException {
-        String timestamp = request.getHeader(headerNames.getTimestamp());
-        checkTimestamp(timestamp);
         ApiSignatureRequest.ApiSignatureRequestBuilder result = ApiSignatureRequest.builder()
                 // http 请求 path，不包含查询参数和域名
                 .requestPath(request.getRequestURI())
@@ -145,30 +145,31 @@ public class RequestSignFilter implements Filter, Ordered {
                 .method(request.getMethod().toUpperCase())
                 // TODO 随机串的验证
                 .nonce(request.getHeader(headerNames.getNonce()))
-                .timestamp(timestamp);
+                .timestamp(request.getHeader(headerNames.getTimestamp()));
         if (requiredBody) {
             result.requestBody(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8));
         }
         return result.build();
     }
 
-    private void checkTimestamp(String timestamp) {
-        long time;
+    private boolean isTimestampValid(String timestamp, HttpServletResponse response) {
         try {
-            time = Long.parseLong(timestamp);
+            if (Math.abs((System.currentTimeMillis() - Long.parseLong(timestamp))) > SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get()) {
+                // 时间差值 > 有效期时间范围
+                badRequest(response, "sign verify error");
+                return false;
+            }
         } catch (NumberFormatException exception) {
-            throw BaseException.common("sign timestamp is invalid");
+            badRequest(response, "sign timestamp is invalid");
+            return false;
         }
-        if (Math.abs((System.currentTimeMillis() - time)) >= SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get()) {
-            throw BaseException.common("sign verify error");
-        }
+        return true;
     }
 
     @Override
     public int getOrder() {
         return WindWebFilterOrdered.REQUEST_SIGN_FILTER.getOrder();
     }
-
 
     public interface ApiSecretAccountProvider extends BiFunction<String, String, ApiSecretAccount> {
 
