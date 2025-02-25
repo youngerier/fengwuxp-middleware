@@ -40,7 +40,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.24-SNAPSHOT</revision>
+        <revision>1.0.25-SNAPSHOT</revision>
         <!--   占位使用     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
