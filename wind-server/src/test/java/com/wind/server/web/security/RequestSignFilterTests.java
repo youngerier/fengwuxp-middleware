@@ -4,7 +4,6 @@ import com.wind.api.core.signature.ApiSecretAccount;
 import com.wind.client.rest.ApiSignatureRequestInterceptor;
 import com.wind.common.WindConstants;
 import com.wind.common.WindHttpConstants;
-import com.wind.common.exception.BaseException;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -84,7 +83,7 @@ class RequestSignFilterTests {
         interceptor.intercept(new ServletServerHttpRequest(request), requestBody, (r, body) -> {
             r.getHeaders().forEach((name, values) -> {
                 if (name.contains("Timestamp")) {
-                    request.addHeader(name, System.currentTimeMillis() - SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get());
+                    request.addHeader(name, System.currentTimeMillis() - SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get() - 1);
                 } else {
                     if (!ObjectUtils.isEmpty(values)) {
                         request.addHeader(name, values.get(0));
@@ -94,7 +93,8 @@ class RequestSignFilterTests {
             return new MockClientHttpResponse(new byte[0], 200);
         });
         MockHttpServletResponse response = new MockHttpServletResponse();
-        BaseException exception = Assertions.assertThrows(BaseException.class, () -> signFilter.doFilter(request, response, new MockFilterChain()));
-        Assertions.assertEquals("sign verify error", exception.getMessage());
+        signFilter.doFilter(request, response, new MockFilterChain());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        Assertions.assertTrue(response.getContentAsString().contains("sign verify error"));
     }
 }

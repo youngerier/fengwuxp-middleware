@@ -99,7 +99,6 @@ public final class WindThreadTracer implements WindTracer {
             if (variables == null) {
                 variables = new HashMap<>();
                 inheritableThreadLocal.set(variables);
-                putVariable(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
             }
             variables.put(name, val);
             if (val instanceof String) {
@@ -118,7 +117,6 @@ public final class WindThreadTracer implements WindTracer {
                 inheritableThreadLocal.remove();
             }
             // 保证 MDC 中一直存在 本机 ip 的属性 TODO 待优化
-            MDC.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
             putVariable(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
         }
     }

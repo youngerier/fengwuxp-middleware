@@ -2,11 +2,13 @@ package com.wind.trace.thread;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 
 import java.util.HashMap;
 import java.util.Objects;
 
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
+import static com.wind.common.WindConstants.TRACE_ID_NAME;
 
 /**
  * @author wuxp
@@ -59,22 +61,26 @@ class WindThreadTracerTests {
 
     @Test
     void testTraceNewThreadCopy() throws Exception {
-        final String traceId = "test";
-        WindThreadTracer.TRACER.trace(traceId);
+        WindThreadTracer.TRACER.trace();
+        String traceId = WindThreadTracer.TRACER.getTraceId();
+        Assertions.assertEquals(traceId, MDC.get(TRACE_ID_NAME));
         Thread thread = new Thread(TraceContextTask.of().decorate(() -> {
             WindThreadTracer.TRACER.trace();
             Assertions.assertEquals(traceId, WindThreadTracer.TRACER.getTraceId());
+            Assertions.assertEquals(traceId, MDC.get(TRACE_ID_NAME));
             WindThreadTracer.TRACER.clear();
         }));
         thread.join();
         thread.start();
         Assertions.assertEquals(traceId, WindThreadTracer.TRACER.getTraceId());
+
     }
 
     @Test
     void testTraceNewThreadNoCopy() throws Exception {
         final String traceId = "test";
         WindThreadTracer.TRACER.trace(traceId);
+        Assertions.assertEquals(traceId, MDC.get(TRACE_ID_NAME));
         Thread thread = new Thread(() -> {
             WindThreadTracer.TRACER.trace();
             Assertions.assertNotEquals(traceId, WindThreadTracer.TRACER.getTraceId());
