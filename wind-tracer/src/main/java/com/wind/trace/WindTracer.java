@@ -1,7 +1,9 @@
 package com.wind.trace;
 
 import com.wind.trace.thread.WindThreadTracer;
+import org.springframework.lang.Nullable;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import java.util.Collections;
@@ -43,6 +45,14 @@ public interface WindTracer {
      * @param contextVariables trace 上下文变量
      */
     void trace(@Null String traceId, @NotNull Map<String, Object> contextVariables);
+
+    /**
+     * 添加变量
+     *
+     * @param name 变量名
+     * @param val  变量值
+     */
+    void putVariable(@NotBlank String name, @Nullable Object val);
 
     /**
      * 清除 trace 上下文
