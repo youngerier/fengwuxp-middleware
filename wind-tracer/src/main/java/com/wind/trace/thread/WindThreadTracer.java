@@ -2,17 +2,17 @@ package com.wind.trace.thread;
 
 
 import com.wind.common.util.IpAddressUtils;
+import com.wind.core.WritableContextVariables;
 import com.wind.sequence.SequenceGenerator;
-import com.wind.trace.WindTraceContext;
 import com.wind.trace.WindTracer;
 import org.slf4j.MDC;
-import org.springframework.util.StringUtils;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
 import static com.wind.common.WindConstants.TRACE_ID_NAME;
@@ -47,50 +47,62 @@ public final class WindThreadTracer implements WindTracer {
 
     @Override
     public void trace(String traceId, @NotNull Map<String, Object> contextVariables) {
-        putVariable(TRACE_ID_NAME, StringUtils.hasText(traceId) ? traceId : TRACE_GENERATOR.next());
+        if (traceId == null) {
+            traceId = (String) contextVariables.get(TRACE_ID_NAME);
+        }
+        putVariable(TRACE_ID_NAME, traceId == null ? TRACE_GENERATOR.next() : traceId);
         putVariable(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
         Objects.requireNonNull(contextVariables, "argument contextVariables must not null").forEach(this::putVariable);
     }
 
     @Override
-    public WindTraceContext getTraceContext() {
-        Map<String, Object> contextVariables = Collections.unmodifiableMap(TRACE_CONTEXT.get());
-        return new WindTraceContext() {
-            @Override
-            public String getTraceId() {
-                String traceId = getContextVariable(TRACE_ID_NAME);
-                if (traceId == null) {
-                    // 没有则生成
-                    traceId = TRACE_GENERATOR.next();
-                    putVariable(TRACE_ID_NAME, traceId);
-                }
-                return traceId;
-            }
-
-            @Override
-            public Map<String, Object> getContextVariables() {
-                return contextVariables;
-            }
-        };
+    public String getTraceId() {
+        String result = getContextVariable(TRACE_ID_NAME);
+        if (result == null) {
+            // 没有则生成
+            result = TRACE_GENERATOR.next();
+            putVariable(TRACE_ID_NAME, result);
+        }
+        return result;
     }
 
     @Override
-    public void putVariable(String name, Object val) {
-        Map<String, Object> variables = TRACE_CONTEXT.get();
-        variables.put(name, val);
+    public Map<String, Object> getContextVariables() {
+        Map<String, Object> result = nullSecurityGetVariables().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return Collections.unmodifiableMap(result);
+    }
+
+    @Override
+    public WritableContextVariables putVariable(String name, Object val) {
+        // TODO 待优化
+        nullSecurityGetVariables().put(name, val);
         if (val instanceof String) {
-            // 字符传类型变量同步到 MDC 中， TODO 待优化
+            // 字符传类型变量同步到 MDC 中
             MDC.put(name, (String) val);
         }
+        return this;
+    }
+
+    @Override
+    public WritableContextVariables removeVariable(String name) {
+        nullSecurityGetVariables().remove(name);
+        return this;
     }
 
     @Override
     public void clear() {
         MDC.clear();
-        Map<String, Object> variables = TRACE_CONTEXT.get();
-        if (variables != null) {
-            variables.clear();
-        }
+        nullSecurityGetVariables().clear();
         TRACE_CONTEXT.remove();
+    }
+
+    private Map<String, Object> nullSecurityGetVariables() {
+        Map<String, Object> variables = TRACE_CONTEXT.get();
+        if (variables == null) {
+            variables = new HashMap<>();
+            TRACE_CONTEXT.set(variables);
+        }
+        return variables;
     }
 }

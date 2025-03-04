@@ -215,7 +215,7 @@ public final class WindConstants {
     public static final String APP_SHARE_CONFIG_GROUP = "APP_SHARE";
 
     /**
-     * traceId
+     * traceId 变量名称
      */
     public static final String TRACE_ID_NAME = "traceId";
 

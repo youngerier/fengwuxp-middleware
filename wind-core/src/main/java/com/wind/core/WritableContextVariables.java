@@ -21,4 +21,12 @@ public interface WritableContextVariables extends ReadonlyContextVariables {
      * @return this
      */
     WritableContextVariables putVariable(@NotBlank String name, @Nullable Object val);
+
+    /**
+     * 移除变量
+     *
+     * @param name 变量名
+     * @return this
+     */
+    WritableContextVariables removeVariable(@NotBlank String name);
 }

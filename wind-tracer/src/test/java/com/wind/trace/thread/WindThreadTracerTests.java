@@ -23,13 +23,13 @@ class WindThreadTracerTests {
 
     @Test
     void testGetTranceId() {
-        Assertions.assertNotNull(WindTracer.TRACER.getTraceContext().getContextVariables());
+        Assertions.assertNotNull(WindTracer.TRACER.getContextVariables());
         String traceId = WindTracer.TRACER.getTraceId();
         Assertions.assertNotNull(traceId);
         WindTracer.TRACER.clear();
         WindTracer.TRACER.trace();
         Assertions.assertNotEquals(traceId, WindTracer.TRACER.getTraceId());
-        Assertions.assertNotNull(WindTracer.TRACER.getTraceContext().getContextVariable(LOCAL_HOST_IP_V4));
+        Assertions.assertNotNull(WindTracer.TRACER.getContextVariable(LOCAL_HOST_IP_V4));
     }
 
     @Test
@@ -47,10 +47,10 @@ class WindThreadTracerTests {
         contextVariables.put("key1", "1");
         contextVariables.put("key2", 2);
         WindTracer.TRACER.trace("test001", contextVariables);
-        Assertions.assertEquals("1", WindTracer.TRACER.getTraceContext().getContextVariable("key1"));
-        Assertions.assertEquals(2, (Integer) WindTracer.TRACER.getTraceContext().getContextVariable("key2"));
+        Assertions.assertEquals("1", WindTracer.TRACER.getContextVariable("key1"));
+        Assertions.assertEquals(2, (Integer) WindTracer.TRACER.getContextVariable("key2"));
         WindTracer.TRACER.putVariable("key3", false);
-        Assertions.assertEquals(false, Objects.requireNonNull(WindTracer.TRACER.getTraceContext().getContextVariable("key3")));
+        Assertions.assertEquals(false, Objects.requireNonNull(WindTracer.TRACER.getContextVariable("key3")));
     }
 
     @Test
@@ -76,7 +76,7 @@ class WindThreadTracerTests {
                 String actual = WindTracer.TRACER.getTraceId();
                 Assertions.assertEquals(traceId, actual);
                 Assertions.assertEquals(traceId, MDC.get(TRACE_ID_NAME));
-                Assertions.assertEquals("test", WindTracer.TRACER.getTraceContext().requireContextVariable("a"));
+                Assertions.assertEquals("test", WindTracer.TRACER.requireContextVariable("a"));
                 Assertions.assertEquals("test", MDC.get("a"));
             } finally {
                 downLatch.countDown();
@@ -105,4 +105,13 @@ class WindThreadTracerTests {
         Assertions.assertEquals(traceId, WindTracer.TRACER.getTraceId());
     }
 
+    @Test
+    void testRemoveVariable() {
+        Map<String, Object> contextVariables = new HashMap<>();
+        contextVariables.put("a", "test");
+        WindTracer.TRACER.trace(null, contextVariables);
+        Assertions.assertEquals("test", WindTracer.TRACER.getContextVariable("a"));
+        WindTracer.TRACER.removeVariable("a");
+        Assertions.assertNull(WindTracer.TRACER.getContextVariable("a"));
+    }
 }

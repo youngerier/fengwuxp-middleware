@@ -1,9 +1,8 @@
 package com.wind.trace;
 
+import com.wind.core.WritableContextVariables;
 import com.wind.trace.thread.WindThreadTracer;
-import org.springframework.lang.Nullable;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import java.util.Collections;
@@ -15,7 +14,7 @@ import java.util.Map;
  * @author wuxp
  * @date 2023-12-29 10:13
  **/
-public interface WindTracer {
+public interface WindTracer extends WritableContextVariables {
 
     /**
      * 默认的 tracer
@@ -47,34 +46,16 @@ public interface WindTracer {
     void trace(@Null String traceId, @NotNull Map<String, Object> contextVariables);
 
     /**
-     * 添加变量
+     * 获取线程上下文中的 traceId，若不存在则创建
      *
-     * @param name 变量名
-     * @param val  变量值
+     * @return trace id
      */
-    void putVariable(@NotBlank String name, @Nullable Object val);
+    String getTraceId();
 
     /**
      * 清除 trace 上下文
      */
     void clear();
-
-    /**
-     * 获取线程上下文中的 traceId，若不存在则创建
-     *
-     * @return trace id
-     */
-    default String getTraceId() {
-        return getTraceContext().getTraceId();
-    }
-
-    /**
-     * 获取 trace Context
-     *
-     * @return WindTraceContext
-     */
-    @NotNull
-    WindTraceContext getTraceContext();
 }
 
 
