@@ -38,7 +38,7 @@ public final class WindHttpConstants {
     /**
      * http request Device-Id  header name
      */
-    public static final String HTTP_CLIENT_ID_HEADER_NAME = "Wind-Device-Id";
+    public static final String HTTP_REQUEST_CLIENT_ID_HEADER_NAME = "Wind-Device-Id";
 
     /**
      * 匹配所有路径的 Ant pattern

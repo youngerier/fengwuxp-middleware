@@ -23,7 +23,7 @@ import java.util.Map;
 import static com.wind.common.WindConstants.HTTP_REQUEST_URL_TRACE_NAME;
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
 import static com.wind.common.WindConstants.WIND_TRANCE_ID_HEADER_NAME;
-import static com.wind.common.WindHttpConstants.HTTP_CLIENT_ID_HEADER_NAME;
+import static com.wind.common.WindHttpConstants.HTTP_REQUEST_CLIENT_ID_HEADER_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_HOST_HEADER_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_HOST_ATTRIBUTE_NAME;
 import static com.wind.common.WindHttpConstants.HTTP_REQUEST_IP_ATTRIBUTE_NAME;
@@ -88,7 +88,7 @@ public class TraceFilter extends OncePerRequestFilter {
         contextVariables.put(HTTP_REQUEST_HOST_ATTRIBUTE_NAME, getRequestSourceHost(request));
         contextVariables.put(HTTP_REQUEST_URL_TRACE_NAME, request.getRequestURI());
         contextVariables.put(HTTP_USER_AGENT_HEADER_NAME, request.getHeader(HTTP_USER_AGENT_HEADER_NAME));
-        contextVariables.put(HTTP_CLIENT_ID_HEADER_NAME, request.getHeader(HTTP_CLIENT_ID_HEADER_NAME));
+        contextVariables.put(HTTP_REQUEST_CLIENT_ID_HEADER_NAME, request.getHeader(HTTP_REQUEST_CLIENT_ID_HEADER_NAME));
         contextVariables.put(LOCAL_HOST_IP_V4, IpAddressUtils.getLocalIpv4WithCache());
         WindTracer.TRACER.trace(traceId, contextVariables);
         return WindTracer.TRACER.getTraceId();
