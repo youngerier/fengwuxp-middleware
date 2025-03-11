@@ -9,9 +9,8 @@ import com.alibaba.spring.context.config.DefaultConfigurationBeanBinder;
 import com.google.common.base.CaseFormat;
 import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
-import com.wind.common.util.ServiceInfoUtils;
+import com.wind.configcenter.core.ConfigFunctionEvaluator;
 import com.wind.configcenter.core.ConfigRepository;
-import com.wind.configcenter.core.SpringConfigEncryptor;
 import com.wind.nacos.NacosConfigRepository;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.ConfigurableBootstrapContext;
@@ -86,7 +85,7 @@ public class WindNacosBootstrapListener implements ApplicationListener<Applicati
     private NacosConfigProperties createNacosProperties(ConfigurableEnvironment environment) {
         // 尝试解密
         PropertySource<?> systemProperties = environment.getPropertySources().remove(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
-        environment.getPropertySources().addAfter(BOOTSTRAP_PROPERTY_SOURCE_NAME, SpringConfigEncryptor.getInstance().decrypt(systemProperties));
+        environment.getPropertySources().addAfter(BOOTSTRAP_PROPERTY_SOURCE_NAME, ConfigFunctionEvaluator.getInstance().eval(systemProperties));
 
         ConfigurationBeanBinder binder = new DefaultConfigurationBeanBinder();
         NacosConfigProperties result = new NacosConfigProperties();

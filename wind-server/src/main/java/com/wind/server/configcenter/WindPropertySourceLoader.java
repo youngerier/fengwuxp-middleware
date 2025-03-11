@@ -7,7 +7,6 @@ import com.wind.common.enums.WindMiddlewareType;
 import com.wind.common.exception.AssertUtils;
 import com.wind.configcenter.core.ConfigRepository;
 import com.wind.configcenter.core.ConfigRepository.ConfigDescriptor;
-import com.wind.configcenter.core.SpringConfigEncryptor;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.CompositePropertySource;
@@ -134,10 +133,7 @@ public class WindPropertySourceLoader {
             log.debug("load config，id = {}, group = {}, refreshable = {}", descriptor.getConfigId(), descriptor.getGroup(),
                     descriptor.isRefreshable());
         }
-        List<PropertySource<?>> configs = repository.getConfigs(descriptor);
-        configs.stream()
-                .map(SpringConfigEncryptor.getInstance()::decrypt)
-                .forEach(result::addFirstPropertySource);
+        repository.getConfigs(descriptor).forEach(result::addFirstPropertySource);
     }
 
     private void loadRedissonConfig(String redissonName, CompositePropertySource result) {

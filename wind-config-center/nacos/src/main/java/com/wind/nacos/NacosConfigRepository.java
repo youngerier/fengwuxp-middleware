@@ -9,6 +9,7 @@ import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.configcenter.core.ConfigFunctionEvaluator;
 import com.wind.configcenter.core.ConfigRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,9 @@ public class NacosConfigRepository implements ConfigRepository {
     @Override
     public String getTextConfig(ConfigDescriptor descriptor) {
         try {
-            return configService.getConfig(descriptor.getConfigId(), descriptor.getGroup(), properties.getTimeout());
+            String result = configService.getConfig(descriptor.getConfigId(), descriptor.getGroup(), properties.getTimeout());
+            // 尝试执行配置的函数
+            return ConfigFunctionEvaluator.getInstance().eval(descriptor.getConfigId(), result);
         } catch (NacosException exception) {
             throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("load config：%s error", descriptor.getConfigId()), exception);
         }

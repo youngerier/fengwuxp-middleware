@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
 import static com.wind.common.WindConstants.TRACE_ID_NAME;
@@ -68,9 +67,8 @@ public final class WindThreadTracer implements WindTracer {
 
     @Override
     public Map<String, Object> getContextVariables() {
-        Map<String, Object> result = nullSecurityGetVariables().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        return Collections.unmodifiableMap(result);
+        // TODO copy context
+        return Collections.unmodifiableMap(nullSecurityGetVariables());
     }
 
     @Override

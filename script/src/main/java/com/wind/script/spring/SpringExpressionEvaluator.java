@@ -61,9 +61,11 @@ public final class SpringExpressionEvaluator {
      */
     public static final SpringExpressionEvaluator TEMPLATE = new SpringExpressionEvaluator(TEMPLATE_PARSER_CONTEXT);
 
+
+    @Nullable
     private final ParserContext context;
 
-    private SpringExpressionEvaluator(ParserContext context) {
+    public SpringExpressionEvaluator(@Nullable ParserContext context) {
         this.context = context;
     }
 

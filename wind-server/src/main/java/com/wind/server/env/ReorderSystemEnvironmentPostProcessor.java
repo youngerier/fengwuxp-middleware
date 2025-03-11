@@ -1,6 +1,5 @@
 package com.wind.server.env;
 
-import com.wind.configcenter.core.SpringConfigEncryptor;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
@@ -22,7 +21,7 @@ public class ReorderSystemEnvironmentPostProcessor implements EnvironmentPostPro
         MutablePropertySources propertySources = environment.getPropertySources();
         PropertySource<?> systemProperties = propertySources.remove(StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
         if (systemProperties != null) {
-            propertySources.addFirst(SpringConfigEncryptor.getInstance().decrypt(systemProperties));
+            propertySources.addFirst(systemProperties);
         }
     }
 
