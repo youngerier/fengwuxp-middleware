@@ -61,14 +61,12 @@ public final class SpringExpressionEvaluator {
      */
     public static final SpringExpressionEvaluator TEMPLATE = new SpringExpressionEvaluator(TEMPLATE_PARSER_CONTEXT);
 
-
     @Nullable
     private final ParserContext context;
 
     public SpringExpressionEvaluator(@Nullable ParserContext context) {
         this.context = context;
     }
-
 
     /**
      * @param expression spring 表达式
@@ -77,7 +75,7 @@ public final class SpringExpressionEvaluator {
     @SuppressWarnings("unchecked")
     @Nullable
     public <T> T eval(String expression) {
-        return (T) eval(expression, getEvaluationContext(Collections.emptyMap()), Object.class);
+        return (T) eval(expression, createEvaluationContext(Collections.emptyMap()), Object.class);
     }
 
     /**
@@ -88,7 +86,7 @@ public final class SpringExpressionEvaluator {
     @SuppressWarnings("unchecked")
     @Nullable
     public <T> T eval(String expression, EvaluationContext evaluationContext) {
-        return (T) eval(expression, evaluationContext, Object.class);
+        return (T) eval(expression, wrapperSecurityContext(evaluationContext), Object.class);
     }
 
     /**
@@ -101,7 +99,7 @@ public final class SpringExpressionEvaluator {
      */
     @Nullable
     public <T> T eval(String expression, EvaluationContext evaluationContext, Class<T> desiredResultType) {
-        return parseExpression(expression).getValue(evaluationContext, desiredResultType);
+        return parseExpression(expression).getValue(wrapperSecurityContext(evaluationContext), desiredResultType);
     }
 
     /**
@@ -125,7 +123,7 @@ public final class SpringExpressionEvaluator {
      */
     @Nullable
     public <T> T eval(String expression, Map<String, Object> variables, Class<T> desiredResultType) {
-        return eval(expression, getEvaluationContext(variables), desiredResultType);
+        return eval(expression, createEvaluationContext(variables), desiredResultType);
     }
 
     private Expression parseExpression(String expression) {
@@ -139,14 +137,18 @@ public final class SpringExpressionEvaluator {
     }
 
     @Nonnull
-    private static EvaluationContext getEvaluationContext(Map<String, Object> variables) {
-        StandardEvaluationContext evaluationContext = new StandardEvaluationContext();
+    private static EvaluationContext createEvaluationContext(Map<String, Object> variables) {
+        StandardEvaluationContext result = new StandardEvaluationContext();
+        variables.forEach(result::setVariable);
+        return wrapperSecurityContext(result);
+    }
+
+    private static EvaluationContext wrapperSecurityContext(EvaluationContext context) {
         if (SECURITY_MODE.get()) {
-            evaluationContext.getMethodResolvers().clear();
-            evaluationContext.getMethodResolvers().add(new WindSecurityReflectiveMethodResolver());
+            context.getMethodResolvers().clear();
+            context.getMethodResolvers().add(new WindSecurityReflectiveMethodResolver());
         }
-        variables.forEach(evaluationContext::setVariable);
-        return evaluationContext;
+        return context;
     }
 
     /**

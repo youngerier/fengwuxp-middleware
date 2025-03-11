@@ -10,7 +10,6 @@ import com.wind.security.crypto.symmetric.AesTextEncryptor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.util.StringUtils;
@@ -84,10 +83,20 @@ final class ConfigFunctionRootObject {
 
     private static TextEncryptor getDefaultEncryptor() {
         String secret = ServiceInfoUtils.getSystemProperty(SECRET_KEY);
-        if (!StringUtils.hasText(secret)) {
-            secret = RandomStringUtils.random(64);
+        if (StringUtils.hasText(secret)) {
+            return new AesTextEncryptor(secret, WindConstants.WIND);
         }
-        return new AesTextEncryptor(secret, WindConstants.WIND);
+        return new TextEncryptor() {
+            @Override
+            public String encrypt(String text) {
+                return text;
+            }
+
+            @Override
+            public String decrypt(String encryptedText) {
+                return encryptedText;
+            }
+        };
     }
 
     @NotNull

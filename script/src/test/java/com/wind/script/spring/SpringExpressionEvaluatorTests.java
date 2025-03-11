@@ -5,7 +5,6 @@ import com.wind.common.exception.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
@@ -61,11 +60,13 @@ class SpringExpressionEvaluatorTests {
     }
 
     @Test
-    void testRenderTemplateText() throws Exception {
-        SpringExpressionEvaluator evaluator=new SpringExpressionEvaluator(new TemplateParserContext());
+    void testRenderTemplateText() {
+        SpringExpressionEvaluator.setSecurityMode(false);
+        SpringExpressionEvaluator evaluator = new SpringExpressionEvaluator(new TemplateParserContext());
         String expression = "spring.datasource.password=#{render('a')}example=${a}";
         StandardEvaluationContext context = new StandardEvaluationContext(new ExampleObject());
         Assertions.assertEquals("spring.datasource.password=render_funcs_aexample=${a}", evaluator.eval(expression, context));
+        SpringExpressionEvaluator.setSecurityMode(true);
     }
 
     public static class ExampleObject {

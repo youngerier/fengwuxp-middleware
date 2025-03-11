@@ -21,7 +21,8 @@ public final class WindSecurityReflectiveMethodResolver extends ReflectiveMethod
             "java.lang.Class",
             "com.wind.common.util.StringMatchUtils",
             "com.wind.common.util.StringJoinSplitUtils",
-            "com.wind.script.spring.SpringExpressionOperators"
+            "com.wind.script.spring.SpringExpressionOperators",
+            "com.wind.configcenter.core.ConfigFunctionRootObject"
     );
 
     private static final Set<String> SAFE_CLASSNAMES = new HashSet<>();

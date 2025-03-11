@@ -20,9 +20,9 @@ import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES
  * 用于执行配置中的 spring expression 函数表达式，用于解析或替换配置中的敏感内容或配置
  * 支持如下语法：
  * # 配置解密
- * example.username=#{DEC('xxxx')}
+ * example.username=@{DEC('xxxx')}
  * # 通过 KMS 等方式提供配置
- * example.username=#{CRE('xxxx')}
+ * example.username=@{CRE('xxxx')}
  *
  * @author wuxp
  * @date 2025-03-11 10:17
@@ -32,7 +32,7 @@ public final class ConfigFunctionEvaluator {
 
     private static final Set<String> REQUIRES_DECRYPT_NAMES = ImmutableSet.of(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
 
-    private static final SpringExpressionEvaluator EVALUATOR = new SpringExpressionEvaluator(new TemplateParserContext());
+    private static final SpringExpressionEvaluator EVALUATOR = new SpringExpressionEvaluator(new TemplateParserContext("@{","}"));
 
     private static final ConfigFunctionEvaluator INSTANCE = new ConfigFunctionEvaluator(new ConfigFunctionRootObject());
 

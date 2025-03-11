@@ -41,7 +41,7 @@ class ConfigFunctionEvaluatorTests {
     @Test
     void testEval() {
         String encrypt = textEncryptor.encrypt("test");
-        String result = evaluator.eval("test", "example.name=#{DEC('" + encrypt + "')}&example.password=#{CRE('password','password')}");
+        String result = evaluator.eval("test", "example.name=@{DEC('" + encrypt + "')}&example.password=@{CRE('password','password')}");
         Assertions.assertEquals("example.name=test&example.password=abc", result);
     }
 
@@ -49,15 +49,15 @@ class ConfigFunctionEvaluatorTests {
     void testEvalWithSource() {
         Map<String, Object> keyValues = new HashMap<>();
         keyValues.put("test.example", "a");
-        keyValues.put("test.example.enc", String.format("#{DEC('%s')}", textEncryptor.encrypt("test")));
-        keyValues.put("test.user.name", "#{CRE('example','userName')}");
-        keyValues.put("test.user.password", "#{CRE('example','password')}");
-        keyValues.put("test.rds.accountName", "#{CRE('rds_dev','name')}");
-        keyValues.put("test.rds.password", "#{CRE('rds_dev','accountPassword')}");
-        keyValues.put("test.rds.value", "#{CRE('rds_dev','value')}");
-        keyValues.put("test.jwt.key", "#{CRE('jwt_text_key')}");
-        keyValues.put("test.jwt.rasPublicKey", "#{CRE('jwt_rsa_key','rsaPublic')}");
-        keyValues.put("test.jwt.rasPrivateKey", "#{CRE('jwt_rsa_key','rasPrivate')}");
+        keyValues.put("test.example.enc", String.format("@{DEC('%s')}", textEncryptor.encrypt("test")));
+        keyValues.put("test.user.name", "@{CRE('example','userName')}");
+        keyValues.put("test.user.password", "@{CRE('example','password')}");
+        keyValues.put("test.rds.accountName", "@{CRE('rds_dev','name')}");
+        keyValues.put("test.rds.password", "@{CRE('rds_dev','accountPassword')}");
+        keyValues.put("test.rds.value", "@{CRE('rds_dev','value')}");
+        keyValues.put("test.jwt.key", "@{CRE('jwt_text_key')}");
+        keyValues.put("test.jwt.rasPublicKey", "@{CRE('jwt_rsa_key','rsaPublic')}");
+        keyValues.put("test.jwt.rasPrivateKey", "@{CRE('jwt_rsa_key','rasPrivate')}");
         MapPropertySource source = new MapPropertySource("test", keyValues);
         PropertySource<?> result = evaluator.eval(source);
         Assertions.assertEquals("abc2", result.getProperty("test.rds.password"));
