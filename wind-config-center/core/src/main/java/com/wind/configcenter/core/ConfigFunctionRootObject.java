@@ -4,12 +4,12 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.wind.common.WindConstants;
 import com.wind.common.annotations.VisibleForTesting;
+import com.wind.common.jul.JulLogFactory;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.core.WindCredentialsProvider;
 import com.wind.security.crypto.symmetric.AesTextEncryptor;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.util.StringUtils;
@@ -17,6 +17,7 @@ import org.springframework.util.StringUtils;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.ServiceLoader;
+import java.util.logging.Logger;
 
 /**
  * 用于配置执行的 spring expression root object
@@ -24,10 +25,11 @@ import java.util.ServiceLoader;
  * @author wuxp
  * @date 2025-03-11 10:44
  **/
-@Slf4j
 @AllArgsConstructor
 @Getter
 final class ConfigFunctionRootObject {
+
+    private static final Logger LOGGER = JulLogFactory.getLogger(ConfigFunctionRootObject.class);
 
     @VisibleForTesting
     static final String SECRET_KEY = "WIND_SAE_KEY";
@@ -50,7 +52,7 @@ final class ConfigFunctionRootObject {
         try {
             return encryptor.decrypt(content);
         } catch (Exception exception) {
-            log.debug("decrypt config failure, content = {}", content, exception);
+            LOGGER.info("decrypt config failure, content = " + content + " , message = " + exception.getMessage());
             return content;
         }
     }
@@ -104,7 +106,7 @@ final class ConfigFunctionRootObject {
     private static WindCredentialsProvider getCredentialsProvider() {
         ServiceLoader<WindCredentialsProvider> services = ServiceLoader.load(WindCredentialsProvider.class);
         for (WindCredentialsProvider e : services) {
-            log.info("Active WindCredentialsProvider = {}", WindCredentialsProvider.class.getName());
+            LOGGER.info("Active WindCredentialsProvider " + WindCredentialsProvider.class.getName());
             return e;
         }
         return ConfigFunctionRootObject::getCredentials;

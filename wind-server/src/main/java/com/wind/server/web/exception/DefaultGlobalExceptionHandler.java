@@ -2,13 +2,11 @@ package com.wind.server.web.exception;
 
 
 import com.wind.common.WindConstants;
-import com.wind.common.WindHttpConstants;
 import com.wind.common.exception.BaseException;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.server.web.supports.ApiResp;
 import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
-import com.wind.web.util.HttpServletRequestUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -41,7 +39,8 @@ import static com.wind.common.WindConstants.WIND_SERVER_PROPERTIES_PREFIX;
  * @author wxup
  */
 @Slf4j
-@ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX, name = "enabled-global-exception", havingValue = WindConstants.TRUE, matchIfMissing = true)
+@ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX, name = "enabled-global-exception", havingValue = WindConstants.TRUE, matchIfMissing
+        = true)
 @RestControllerAdvice()
 @AllArgsConstructor
 public class DefaultGlobalExceptionHandler {

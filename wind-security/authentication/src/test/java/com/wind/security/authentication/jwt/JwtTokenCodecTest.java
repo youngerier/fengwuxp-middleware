@@ -1,6 +1,5 @@
 package com.wind.security.authentication.jwt;
 
-import com.wind.common.exception.BaseException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.Base64Utils;

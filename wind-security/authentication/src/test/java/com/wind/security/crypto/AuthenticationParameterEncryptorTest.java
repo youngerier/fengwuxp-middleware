@@ -14,7 +14,7 @@ class AuthenticationParameterEncryptorTest {
     @Test
     void decrypt() {
         KeyPair keyPair = genKeyPir();
-        AuthenticationParameterEncryptor.TEXT_ENCRYPTOR.set(RasTextEncryptor.ofPublicEncrypt(keyPair.getPublic(),keyPair.getPrivate()));
+        AuthenticationParameterEncryptor.TEXT_ENCRYPTOR.set(RasTextEncryptor.ofPublicEncrypt(keyPair.getPublic(), keyPair.getPrivate()));
         String principal = RandomStringUtils.randomAlphabetic(16);
         String credentials = RandomStringUtils.randomAlphabetic(16);
         AuthenticationParameterEncryptor.AuthenticationParameter encrypt1 = AuthenticationParameterEncryptor.encrypt(principal, credentials);

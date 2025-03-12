@@ -1,6 +1,7 @@
 package com.wind.configcenter.core;
 
 import com.google.common.collect.ImmutableSet;
+import com.wind.common.jul.JulLogFactory;
 import com.wind.script.spring.SpringExpressionEvaluator;
 import org.springframework.boot.origin.OriginTrackedValue;
 import org.springframework.core.env.MapPropertySource;
@@ -12,7 +13,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 
 import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME;
@@ -30,11 +30,7 @@ import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES
  **/
 public final class ConfigFunctionEvaluator {
 
-    private static final Logger LOGGER = Logger.getLogger(ConfigFunctionEvaluator.class.getName());
-
-    static {
-        LOGGER.addHandler(new ConsoleHandler());
-    }
+    private static final Logger LOGGER = JulLogFactory.getLogger(ConfigFunctionEvaluator.class);
 
     private static final Set<String> REQUIRES_DECRYPT_NAMES = ImmutableSet.of(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
 
@@ -59,7 +55,7 @@ public final class ConfigFunctionEvaluator {
         try {
             return EVALUATOR.eval(content, new StandardEvaluationContext(rootObject));
         } catch (Exception exception) {
-            LOGGER.info("eval config content exception, config name = " + name);
+            LOGGER.info("eval config content exception, config name = " + name + ", message = " + exception.getMessage());
             return content;
         }
     }

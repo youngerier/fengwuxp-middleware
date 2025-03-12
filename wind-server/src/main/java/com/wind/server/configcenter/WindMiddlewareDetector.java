@@ -33,7 +33,7 @@ public final class WindMiddlewareDetector {
     /**
      * 是否使用 redisson
      */
-    public static boolean useRedisson(){
+    public static boolean useRedisson() {
         return ClassDetectionUtils.isPresent("org.redisson.api.RedissonClient");
     }
 

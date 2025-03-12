@@ -82,7 +82,7 @@ public class SentinelWebInterceptor implements HandlerInterceptor {
         try {
             List<Object> args = new ArrayList<>(resource.getArgs());
             args.add(Tags.of(resource.getMetricsTags()));
-            Entry entry = SphU.entry(resource.getName(), resource.getResourceType(), resource.getEntryType(), args.toArray(new Object[0]) );
+            Entry entry = SphU.entry(resource.getName(), resource.getResourceType(), resource.getEntryType(), args.toArray(new Object[0]));
             request.setAttribute(entryAttributeName, entry);
         } catch (BlockException exception) {
             try {

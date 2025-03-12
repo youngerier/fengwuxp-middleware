@@ -41,6 +41,8 @@ class ConfigFunctionEvaluatorTests {
     @Test
     void testEval() {
         String encrypt = textEncryptor.encrypt("test");
+        // @{CRE('nobe_polardb_mysql','AccountName')}
+        // @{CRE('nobe_polardb_mysql','AccountName')}
         String result = evaluator.eval("test", "example.name=@{DEC('" + encrypt + "')}&example.password=@{CRE('password','password')}");
         Assertions.assertEquals("example.name=test&example.password=abc", result);
         String result1 = evaluator.eval("test", "singleServerConfig:\n" +
@@ -60,7 +62,7 @@ class ConfigFunctionEvaluatorTests {
                 "threads: 0\n" +
                 "nettyThreads: 0\n" +
                 "codec: !<org.redisson.codec.Kryo5Codec> {}\n" +
-                "transportMode: \"NIO\"",result1);
+                "transportMode: \"NIO\"", result1);
     }
 
     @Test

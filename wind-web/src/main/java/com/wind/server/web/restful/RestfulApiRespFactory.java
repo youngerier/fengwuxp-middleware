@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public final class RestfulApiRespFactory {
 
-    private static final String UNKNOWN_ERROR ="unknown error";
+    private static final String UNKNOWN_ERROR = "unknown error";
 
     private static final AtomicReference<FriendlyExceptionMessageConverter> CONVERTER =
             new AtomicReference<>(FriendlyExceptionMessageConverter.none());

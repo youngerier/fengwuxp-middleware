@@ -9,6 +9,7 @@ import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.common.jul.JulLogFactory;
 import com.wind.configcenter.core.ConfigFunctionEvaluator;
 import com.wind.configcenter.core.ConfigRepository;
 import lombok.AllArgsConstructor;
@@ -18,7 +19,6 @@ import org.springframework.core.env.PropertySource;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.ConsoleHandler;
 import java.util.logging.Logger;
 
 /**
@@ -31,11 +31,7 @@ import java.util.logging.Logger;
 @Slf4j
 public class NacosConfigRepository implements ConfigRepository {
 
-    private static final Logger LOGGER = Logger.getLogger(NacosConfigRepository.class.getName());
-
-    static {
-        LOGGER.addHandler(new ConsoleHandler());
-    }
+    private static final Logger LOGGER = JulLogFactory.getLogger(NacosConfigRepository.class);
 
     private final ConfigService configService;
 
@@ -52,7 +48,7 @@ public class NacosConfigRepository implements ConfigRepository {
 
     @Override
     public String getTextConfig(ConfigDescriptor descriptor) {
-        LOGGER.info("get config content dataId = "+descriptor.getConfigId());
+        LOGGER.info("get config content dataId = " + descriptor.getConfigId());
         try {
             String result = configService.getConfig(descriptor.getConfigId(), descriptor.getGroup(), properties.getTimeout());
             // 尝试执行配置的函数
