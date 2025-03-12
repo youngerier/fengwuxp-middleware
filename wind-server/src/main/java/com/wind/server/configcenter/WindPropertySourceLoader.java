@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.wind.common.WindConstants.SPRING_APPLICATION_NAME;
@@ -41,6 +43,12 @@ import static com.wind.common.WindConstants.WIND_SERVER_USED_MIDDLEWARE;
 @AllArgsConstructor
 @Slf4j
 public class WindPropertySourceLoader {
+
+    private static final Logger LOGGER = Logger.getLogger(WindPropertySourceLoader.class.getName());
+
+    static {
+        LOGGER.addHandler(new ConsoleHandler());
+    }
 
     private final ConfigRepository repository;
 

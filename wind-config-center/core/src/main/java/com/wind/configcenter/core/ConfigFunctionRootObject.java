@@ -75,6 +75,7 @@ final class ConfigFunctionRootObject {
     public String CRE(String name, @Nullable String key) {
         String credentials = windCredentialsProvider.getCredentials(name);
         if (StringUtils.hasText(key)) {
+            // 有配置 key 则认为是 json
             JSONObject values = JSON.parseObject(credentials);
             return (String) values.get(key);
         }
@@ -103,6 +104,7 @@ final class ConfigFunctionRootObject {
     private static WindCredentialsProvider getCredentialsProvider() {
         ServiceLoader<WindCredentialsProvider> services = ServiceLoader.load(WindCredentialsProvider.class);
         for (WindCredentialsProvider e : services) {
+            log.info("Active WindCredentialsProvider = {}", WindCredentialsProvider.class.getName());
             return e;
         }
         return ConfigFunctionRootObject::getCredentials;

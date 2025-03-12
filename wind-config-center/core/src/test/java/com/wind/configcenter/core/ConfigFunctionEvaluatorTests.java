@@ -43,6 +43,24 @@ class ConfigFunctionEvaluatorTests {
         String encrypt = textEncryptor.encrypt("test");
         String result = evaluator.eval("test", "example.name=@{DEC('" + encrypt + "')}&example.password=@{CRE('password','password')}");
         Assertions.assertEquals("example.name=test&example.password=abc", result);
+        String result1 = evaluator.eval("test", "singleServerConfig:\n" +
+                "  username: @{CRE('example','userName')}\n" +
+                "  password: @{CRE('example','password')}\n" +
+                "  address: redis://xxxx\n" +
+                "  database: 11\n" +
+                "threads: 0\n" +
+                "nettyThreads: 0\n" +
+                "codec: !<org.redisson.codec.Kryo5Codec> {}\n" +
+                "transportMode: \"NIO\"");
+        Assertions.assertEquals("singleServerConfig:\n" +
+                "  username: a\n" +
+                "  password: abc\n" +
+                "  address: redis://xxxx\n" +
+                "  database: 11\n" +
+                "threads: 0\n" +
+                "nettyThreads: 0\n" +
+                "codec: !<org.redisson.codec.Kryo5Codec> {}\n" +
+                "transportMode: \"NIO\"",result1);
     }
 
     @Test

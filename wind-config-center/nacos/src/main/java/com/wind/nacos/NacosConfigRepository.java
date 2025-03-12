@@ -18,6 +18,8 @@ import org.springframework.core.env.PropertySource;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Logger;
 
 /**
  * 从 nacos 中加载配置
@@ -28,6 +30,12 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 public class NacosConfigRepository implements ConfigRepository {
+
+    private static final Logger LOGGER = Logger.getLogger(NacosConfigRepository.class.getName());
+
+    static {
+        LOGGER.addHandler(new ConsoleHandler());
+    }
 
     private final ConfigService configService;
 
@@ -44,6 +52,7 @@ public class NacosConfigRepository implements ConfigRepository {
 
     @Override
     public String getTextConfig(ConfigDescriptor descriptor) {
+        LOGGER.info("get config content dataId = "+descriptor.getConfigId());
         try {
             String result = configService.getConfig(descriptor.getConfigId(), descriptor.getGroup(), properties.getTimeout());
             // 尝试执行配置的函数
