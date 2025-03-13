@@ -33,7 +33,7 @@
         <module>wind-archetype</module>
         <module>tools</module>
         <module>object-mask</module>
-        <module>script</module>
+        <module>wind-script</module>
         <module>sequence-generate</module>
         <module>tests</module>
         <module>wind-rocketmq</module>
