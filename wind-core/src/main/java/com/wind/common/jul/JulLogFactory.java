@@ -14,7 +14,7 @@ public final class JulLogFactory {
     }
 
     public static Logger getLogger(Class<?> clazz) {
-        return Logger.getLogger(clazz.getName());
+        return getLogger(clazz.getName());
     }
 
     public static Logger getLogger(String name) {
