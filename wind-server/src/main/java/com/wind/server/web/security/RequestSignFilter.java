@@ -50,6 +50,8 @@ public class RequestSignFilter implements Filter, Ordered {
      */
     public static final AtomicLong SIGNATURE_TIMESTAMP_VALIDITY_PERIOD = new AtomicLong(5 * 60 * 1000L);
 
+    private static final String SIGAN_VERIFY_ERROR_MESSAGE = "sign verify error";
+
     private final SignatureHttpHeaderNames headerNames;
 
     private final ApiSecretAccountProvider apiSecretAccountProvider;
@@ -91,7 +93,8 @@ public class RequestSignFilter implements Filter, Ordered {
 
         boolean signRequireBody = ApiSignatureRequest.signRequireRequestBody(request.getContentType());
         HttpServletRequest httpRequest = signRequireBody ? new RepeatableReadRequestWrapper(request) : request;
-        if (!isTimestampValid(request.getHeader(headerNames.getTimestamp()), response)) {
+        if (isInvalidTimestamp(request.getHeader(headerNames.getTimestamp()))) {
+            badRequest(response, SIGAN_VERIFY_ERROR_MESSAGE);
             return;
         }
         ApiSignatureRequest signatureRequest = buildSignatureRequest(httpRequest, signRequireBody);
@@ -118,7 +121,7 @@ public class RequestSignFilter implements Filter, Ordered {
             }
         }
         log.error("sign verify error, signature request = {}", signatureRequest);
-        badRequest(response, "sign verify error");
+        badRequest(response, SIGAN_VERIFY_ERROR_MESSAGE);
     }
 
     private void badRequest(HttpServletResponse response, String message) {
@@ -152,18 +155,14 @@ public class RequestSignFilter implements Filter, Ordered {
         return result.build();
     }
 
-    private boolean isTimestampValid(String timestamp, HttpServletResponse response) {
+    private boolean isInvalidTimestamp(String timestamp) {
         try {
-            if (Math.abs((System.currentTimeMillis() - Long.parseLong(timestamp))) > SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get()) {
-                // 时间差值 > 有效期时间范围
-                badRequest(response, "sign verify error");
-                return false;
-            }
+            // 时间差值 > 有效期时间范围则无效
+            return Math.abs((System.currentTimeMillis() - Long.parseLong(timestamp))) > SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get();
         } catch (NumberFormatException exception) {
-            badRequest(response, "sign timestamp is invalid");
-            return false;
+            log.info("sign timestamp is invalid");
+            return true;
         }
-        return true;
     }
 
     @Override
