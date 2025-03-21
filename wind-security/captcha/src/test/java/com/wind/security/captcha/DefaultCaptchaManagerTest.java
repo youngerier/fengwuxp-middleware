@@ -108,8 +108,8 @@ class DefaultCaptchaManagerTest {
         Captcha captcha2 = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
         Captcha captcha3 = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
         Assertions.assertEquals(captcha1.getValue(), captcha2.getValue());
-        Assertions.assertEquals(captcha1.getValue(), captcha3.getValue());
-        captchaManager.verify(captcha1.getValue(), SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
+        Assertions.assertNotEquals(captcha1.getValue(), captcha3.getValue());
+        captchaManager.verify(captcha3.getValue(), SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
         Assertions.assertNull(captchaManager.getCaptchaStorage().get(captcha1.getType(), SimpleUseScene.LOGIN, owner));
     }
 

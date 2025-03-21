@@ -74,8 +74,8 @@ public interface Captcha extends CaptchaValue {
             // 过期时间没有，表示位过期
             return false;
         }
-        // 发送次数 < 2 & 验证次数 <= 最大允许验证次数 & 失效时间 > 当前时间
-        return getSendTimes() < 2 && getVerificationCount() <= getAllowVerificationTimes() && getExpireTime() > System.currentTimeMillis();
+        // 发送次数 < 2 & 验证次数 < 最大允许验证次数 & 失效时间 > 当前时间
+        return getSendTimes() < 2 && getVerificationCount() < getAllowVerificationTimes() && getExpireTime() > System.currentTimeMillis();
     }
 
     /**
