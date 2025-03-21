@@ -37,6 +37,11 @@ public interface Captcha extends CaptchaValue {
     int getVerificationCount();
 
     /**
+     * @return 已发送次数
+     */
+    int getSendTimes();
+
+    /**
      * @return 允许验证次数
      */
     int getAllowVerificationTimes();
@@ -47,11 +52,18 @@ public interface Captcha extends CaptchaValue {
     long getExpireTime();
 
     /**
-     * 记录一次验证次数
+     * 累计一次发送次数
      *
      * @return {@link #getVerificationCount()} 值更新后的验证码对象
      */
-    Captcha increase();
+    Captcha increaseSendTimes();
+
+    /**
+     * 累计一次验证次数
+     *
+     * @return {@link #getVerificationCount()} 值更新后的验证码对象
+     */
+    Captcha increaseVerificationCount();
 
     /**
      * @return 是否有效
@@ -62,9 +74,8 @@ public interface Captcha extends CaptchaValue {
             // 过期时间没有，表示位过期
             return false;
         }
-        // 验证次数小于允许验证次数 且 未过期
-        return getVerificationCount() < getAllowVerificationTimes() &&
-                getExpireTime() > System.currentTimeMillis();
+        // 发送次数 < 2 & 验证次数 <= 最大允许验证次数 & 失效时间 > 当前时间
+        return getSendTimes() < 2 && getVerificationCount() <= getAllowVerificationTimes() && getExpireTime() > System.currentTimeMillis();
     }
 
     /**
@@ -75,12 +86,7 @@ public interface Captcha extends CaptchaValue {
      **/
     interface CaptchaType extends DescriptiveEnum {
 
-        /**
-         * @return 是否存在多个验证码同时进行验证
-         */
-        boolean isSupportMultiple();
     }
-
 
     /**
      * 验证码使用场景

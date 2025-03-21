@@ -1,7 +1,6 @@
 package com.wind.security.captcha;
 
 import com.google.common.collect.ImmutableSet;
-import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import lombok.AllArgsConstructor;
@@ -26,7 +25,6 @@ public class DefaultCaptchaManager implements CaptchaManager {
     private final Collection<CaptchaContentProvider> delegates;
 
     @Getter
-    @VisibleForTesting
     private final CaptchaStorage captchaStorage;
 
     private final CaptchaGenerateChecker generateChecker;
@@ -59,11 +57,12 @@ public class DefaultCaptchaManager implements CaptchaManager {
         // 检查是否允许生成验证码
         generateChecker.preCheck(owner, type);
         if (ALLOW_USE_PREVIOUS_CAPTCHA_TYPES.contains(type)) {
-            // 图片验证码每次都重新生成
+            // 允许在未失效之前允许重复使用
             Captcha prevCaptcha = captchaStorage.get(type, useScene, owner);
             if (prevCaptcha != null && prevCaptcha.isAvailable()) {
-                // 验证码还有效
-                return prevCaptcha;
+                Captcha result = prevCaptcha.increaseSendTimes();
+                captchaStorage.store(result);
+                return result;
             }
         }
         CaptchaContentProvider delegate = getDelegate(type, useScene);
@@ -74,8 +73,9 @@ public class DefaultCaptchaManager implements CaptchaManager {
                 .owner(owner)
                 .type(type)
                 .useScene(useScene)
-                .expireTime(System.currentTimeMillis() + delegate.getEffectiveTime().toMillis())
+                .expireTime(System.currentTimeMillis() + delegate.getEffectiveTime().toMillis() + 1500)
                 .verificationCount(0)
+                .sendTimes(1)
                 .allowVerificationTimes(delegate.getMaxAllowVerificationTimes())
                 .build();
         captchaStorage.store(result);
@@ -104,7 +104,7 @@ public class DefaultCaptchaManager implements CaptchaManager {
             // 移除
             captchaStorage.remove(type, useScene, owner);
         } else {
-            Captcha next = captcha.increase();
+            Captcha next = captcha.increaseVerificationCount();
             if (next.isAvailable()) {
                 // 还可以继续用于验证，更新验证码
                 captchaStorage.store(next);

@@ -46,6 +46,11 @@ public class ImmutableCaptcha implements Captcha {
     private final int verificationCount;
 
     /**
+     * 已发送次数
+     */
+    private final int sendTimes;
+
+    /**
      * 允许验证次数
      */
     private final int allowVerificationTimes;
@@ -59,7 +64,7 @@ public class ImmutableCaptcha implements Captcha {
      * 为了给序列化框架使用，提供一个空构造
      */
     ImmutableCaptcha() {
-        this(null, null, null, null, null, 0, 0, 0);
+        this(null, null, null, null, null, 0, 1, 0, 0);
     }
 
     /**
@@ -67,8 +72,19 @@ public class ImmutableCaptcha implements Captcha {
      *
      * @return 新的验证码
      */
-    public ImmutableCaptcha increase() {
-        return new ImmutableCaptcha(owner, type, useScene, value, content, verificationCount + 1, allowVerificationTimes, expireTime);
+    public ImmutableCaptcha increaseSendTimes() {
+        // 重新发送，过期时间延长 3 分钟
+        return new ImmutableCaptcha(owner, type, useScene, value, content, verificationCount, sendTimes + 1, allowVerificationTimes,
+                expireTime + 3 * 60 * 1000);
+    }
+
+    /**
+     * 统计已验证次数
+     *
+     * @return 新的验证码
+     */
+    public ImmutableCaptcha increaseVerificationCount() {
+        return new ImmutableCaptcha(owner, type, useScene, value, content, verificationCount + 1, sendTimes, allowVerificationTimes, expireTime);
     }
 
     /**

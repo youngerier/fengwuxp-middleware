@@ -12,15 +12,13 @@ import lombok.Getter;
 public enum SimpleCaptchaType implements Captcha.CaptchaType {
 
 
-    MOBILE_PHONE("短信验证码", true),
+    MOBILE_PHONE("短信验证码"),
 
-    EMAIL("邮箱验证码", true),
+    EMAIL("邮箱验证码"),
 
-    PICTURE("图片验证码", false),
+    PICTURE("图片验证码"),
 
-    QR_CODE("二维码验证码", false);
+    QR_CODE("二维码验证码");
 
     private final String desc;
-
-    private final boolean supportMultiple;
 }
