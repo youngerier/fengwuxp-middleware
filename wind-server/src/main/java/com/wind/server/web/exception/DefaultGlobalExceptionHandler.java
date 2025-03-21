@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolation;
@@ -82,6 +84,24 @@ public class DefaultGlobalExceptionHandler {
     }
 
     /**
+     * 上传文件文件过大
+     */
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    @ResponseBody
+    public ApiResp<Void> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception) {
+        return RestfulApiRespFactory.payloadToLarge();
+    }
+
+    /**
+     * 文件上传异常
+     */
+    @ExceptionHandler(value = MultipartException.class)
+    @ResponseBody
+    public ApiResp<Void> handleMultipartException(MultipartException exception) {
+        return RestfulApiRespFactory.badRequest(exception.getMessage());
+    }
+
+    /**
      * controller bind data 的异常
      */
     @ExceptionHandler(value = BindException.class)
@@ -95,14 +115,13 @@ public class DefaultGlobalExceptionHandler {
         return RestfulApiRespFactory.badRequest(String.format("%s#%s：%s", fieldError.getObjectName(), fieldError.getField(), message));
     }
 
-
     /**
-     * 404 的异常就会被这个方法捕获
+     * Not Found 异常处理
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ApiResp<Void> handle404Error(Exception exception) {
+    public ApiResp<Void> handleNotFoundError(Exception exception) {
         return RestfulApiRespFactory.notFound(exception.getMessage());
     }
 

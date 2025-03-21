@@ -98,8 +98,16 @@ public final class RestfulApiRespFactory {
         return of(HttpStatus.FORBIDDEN, data, DefaultExceptionCode.FORBIDDEN, errorMessage);
     }
 
+    public static <T> ApiResp<T> payloadToLarge() {
+        return payloadToLarge(DefaultExceptionCode.PAYLOAD_TOO_LARGE.getDesc());
+    }
+
+    public static <T> ApiResp<T> payloadToLarge(String errorMessage) {
+        return of(HttpStatus.PAYLOAD_TOO_LARGE, null, DefaultExceptionCode.PAYLOAD_TOO_LARGE, errorMessage);
+    }
+
     public static <T> ApiResp<T> toManyRequests() {
-        return of(HttpStatus.TOO_MANY_REQUESTS, null, DefaultExceptionCode.TO_MANY_REQUESTS, DefaultExceptionCode.TO_MANY_REQUESTS.getDesc());
+        return toManyRequests(DefaultExceptionCode.TO_MANY_REQUESTS.getDesc());
     }
 
     public static <T> ApiResp<T> toManyRequests(String errorMessage) {

@@ -20,6 +20,8 @@ public enum DefaultExceptionCode implements ExceptionCode {
 
     FORBIDDEN("403", "无权限访问该资源"),
 
+    PAYLOAD_TOO_LARGE("413", "上传文件大小超过限制"),
+
     TO_MANY_REQUESTS("429", "请求过于频繁"),
 
     NOT_FOUND("404", "资源不存在"),
