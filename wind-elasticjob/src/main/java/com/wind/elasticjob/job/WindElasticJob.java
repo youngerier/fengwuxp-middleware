@@ -59,4 +59,11 @@ public interface WindElasticJob {
     default boolean isFailover() {
         return true;
     }
+
+    /**
+     * @return 任务错过后是否重新执行
+     */
+    default boolean isMisFire() {
+        return true;
+    }
 }

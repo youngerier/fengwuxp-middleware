@@ -76,6 +76,8 @@ public class WindElasticJobRegistrar {
                 .overwrite(job.isOverwrite())
                 // 故障转移
                 .failover(job.isFailover())
+                // 任务错过后是否重新执行
+                .misfire(job.isMisFire())
                 .build();
     }
 }
