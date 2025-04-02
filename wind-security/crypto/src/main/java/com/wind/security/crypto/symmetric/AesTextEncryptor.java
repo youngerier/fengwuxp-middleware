@@ -21,7 +21,6 @@ public class AesTextEncryptor implements TextEncryptor {
 
     private final AesBytesEncryptor bytesEncryptor;
 
-
     public AesTextEncryptor(String password, String salt) {
         this(password, salt, null);
     }
