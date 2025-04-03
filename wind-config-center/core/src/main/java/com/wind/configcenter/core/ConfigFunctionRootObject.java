@@ -4,7 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.wind.common.WindConstants;
 import com.wind.common.annotations.VisibleForTesting;
-import com.wind.common.jul.JulLogFactory;
+import com.wind.common.jul.WindJulLogFactory;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.core.WindCredentialsProvider;
 import com.wind.security.crypto.symmetric.AesTextEncryptor;
@@ -29,7 +29,7 @@ import java.util.logging.Logger;
 @Getter
 final class ConfigFunctionRootObject {
 
-    private static final Logger LOGGER = JulLogFactory.getLogger(ConfigFunctionRootObject.class);
+    private static final Logger LOGGER = WindJulLogFactory.getLogger(ConfigFunctionRootObject.class);
 
     @VisibleForTesting
     static final String SECRET_KEY = "WIND_SAE_KEY";

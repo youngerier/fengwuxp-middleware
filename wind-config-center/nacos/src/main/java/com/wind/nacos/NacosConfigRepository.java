@@ -9,7 +9,7 @@ import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
-import com.wind.common.jul.JulLogFactory;
+import com.wind.common.jul.WindJulLogFactory;
 import com.wind.configcenter.core.ConfigFunctionEvaluator;
 import com.wind.configcenter.core.ConfigRepository;
 import lombok.AllArgsConstructor;
@@ -31,7 +31,7 @@ import java.util.logging.Logger;
 @Slf4j
 public class NacosConfigRepository implements ConfigRepository {
 
-    private static final Logger LOGGER = JulLogFactory.getLogger(NacosConfigRepository.class);
+    private static final Logger LOGGER = WindJulLogFactory.getLogger(NacosConfigRepository.class);
 
     private final ConfigService configService;
 

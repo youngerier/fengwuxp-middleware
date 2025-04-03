@@ -1,6 +1,6 @@
 package com.wind.server.configcenter;
 
-import com.wind.common.jul.JulLogFactory;
+import com.wind.common.jul.WindJulLogFactory;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.core.env.ConfigurableEnvironment;
 
@@ -17,7 +17,7 @@ import static org.springframework.cloud.bootstrap.BootstrapApplicationListener.B
  **/
 public class WindGlobalPropertySourceInitializer extends WindAbstractPropertySourceInitializer {
 
-    private static final Logger LOGGER = JulLogFactory.getLogger(WindGlobalPropertySourceInitializer.class);
+    private static final Logger LOGGER = WindJulLogFactory.getLogger(WindGlobalPropertySourceInitializer.class);
 
     @Override
     protected void load(WindPropertySourceLoader loader, ConfigurableEnvironment environment) {

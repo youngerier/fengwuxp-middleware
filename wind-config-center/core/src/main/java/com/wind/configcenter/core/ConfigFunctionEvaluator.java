@@ -1,7 +1,7 @@
 package com.wind.configcenter.core;
 
 import com.google.common.collect.ImmutableSet;
-import com.wind.common.jul.JulLogFactory;
+import com.wind.common.jul.WindJulLogFactory;
 import com.wind.script.spring.SpringExpressionEvaluator;
 import org.springframework.boot.origin.OriginTrackedValue;
 import org.springframework.core.env.MapPropertySource;
@@ -30,7 +30,7 @@ import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES
  **/
 public final class ConfigFunctionEvaluator {
 
-    private static final Logger LOGGER = JulLogFactory.getLogger(ConfigFunctionEvaluator.class);
+    private static final Logger LOGGER = WindJulLogFactory.getLogger(ConfigFunctionEvaluator.class);
 
     private static final Set<String> REQUIRES_DECRYPT_NAMES = ImmutableSet.of(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
 

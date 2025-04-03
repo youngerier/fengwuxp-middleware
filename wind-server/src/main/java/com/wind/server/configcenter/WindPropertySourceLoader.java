@@ -5,7 +5,7 @@ import com.wind.common.WindConstants;
 import com.wind.common.enums.ConfigFileType;
 import com.wind.common.enums.WindMiddlewareType;
 import com.wind.common.exception.AssertUtils;
-import com.wind.common.jul.JulLogFactory;
+import com.wind.common.jul.WindJulLogFactory;
 import com.wind.configcenter.core.ConfigRepository;
 import com.wind.configcenter.core.ConfigRepository.ConfigDescriptor;
 import lombok.AllArgsConstructor;
@@ -44,7 +44,7 @@ import static com.wind.common.WindConstants.WIND_SERVER_USED_MIDDLEWARE;
 @Slf4j
 public class WindPropertySourceLoader {
 
-    private static final Logger LOGGER = JulLogFactory.getLogger(WindPropertySourceLoader.class);
+    private static final Logger LOGGER = WindJulLogFactory.getLogger(WindPropertySourceLoader.class);
 
     private final ConfigRepository repository;
 
