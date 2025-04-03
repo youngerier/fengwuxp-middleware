@@ -56,6 +56,6 @@ public class AesTextEncryptor implements TextEncryptor {
     @Override
     public String decrypt(String encryptedText) {
         byte[] bytes = Base64Utils.decodeFromString(encryptedText);
-        return new String(bytesEncryptor.decrypt(bytes));
+        return new String(bytesEncryptor.decrypt(bytes), StandardCharsets.UTF_8);
     }
 }
