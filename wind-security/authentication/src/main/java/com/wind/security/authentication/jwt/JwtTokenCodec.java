@@ -80,6 +80,7 @@ public final class JwtTokenCodec {
      * @param user 用户信息
      * @return 用户 token
      */
+    @NotNull
     public JwtToken encoding(JwtUser user) {
         Jwt jwt = jwtEncoder.encode(
                 JwtEncoderParameters.from(
@@ -98,6 +99,7 @@ public final class JwtTokenCodec {
      * @param userId 用户 id
      * @return refresh token
      */
+    @NotNull
     public JwtToken encodingRefreshToken(Long userId) {
         Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, newJwtBuilder(String.valueOf(userId),
                 properties.getRefreshEffectiveTime()).build()));

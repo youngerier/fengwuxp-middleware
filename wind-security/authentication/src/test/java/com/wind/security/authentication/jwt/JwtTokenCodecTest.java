@@ -36,6 +36,7 @@ class JwtTokenCodecTest {
     void testCodecRefreshToken() {
         JwtToken token = jwtTokenCodec.encodingRefreshToken(1L);
         Assertions.assertEquals(1L, token.getSubjectAsLong());
+        Assertions.assertEquals(1L, jwtTokenCodec.parseRefreshToken(token.getTokenValue()).getSubjectAsLong());
     }
 
     @Test
