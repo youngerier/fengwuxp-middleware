@@ -37,7 +37,6 @@ public abstract class AbstractPageQuery<OrderField extends QueryOrderField> impl
     /**
      * 查询类型
      */
-    @NotNull
     private QueryType queryType = QueryType.QUERY_BOTH;
 
     /**
@@ -54,6 +53,11 @@ public abstract class AbstractPageQuery<OrderField extends QueryOrderField> impl
     public void setQuerySize(@NonNull Integer querySize) {
         AssertUtils.isTrue(querySize <= getMaxQuerySize(), () -> String.format("查询大小不能超过：%d", MAX_QUERY_SIZE.get()));
         this.querySize = querySize;
+    }
+
+    @NotNull
+    public QueryType getQueryType() {
+        return queryType == null ? QueryType.QUERY_BOTH : queryType;
     }
 
     /**
