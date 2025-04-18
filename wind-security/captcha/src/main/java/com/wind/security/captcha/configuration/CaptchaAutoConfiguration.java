@@ -3,6 +3,8 @@ package com.wind.security.captcha.configuration;
 import com.wind.common.locks.LockFactory;
 import com.wind.security.captcha.CaptchaContentProvider;
 import com.wind.security.captcha.CaptchaGenerateChecker;
+import com.wind.security.captcha.CaptchaManager;
+import com.wind.security.captcha.CaptchaManagerLocksWrapper;
 import com.wind.security.captcha.CaptchaStorage;
 import com.wind.security.captcha.DefaultCaptchaManager;
 import com.wind.security.captcha.SimpleCaptchaGenerateChecker;
@@ -25,6 +27,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import java.util.Collection;
 
@@ -111,11 +114,17 @@ public class CaptchaAutoConfiguration {
 
     @Bean
     @ConditionalOnBean({CaptchaContentProvider.class, CaptchaStorage.class, CaptchaGenerateChecker.class})
-    public DefaultCaptchaManager defaultCaptchaManager(Collection<CaptchaContentProvider> delegates, CaptchaStorage captchaStorage,
-                                                       CaptchaGenerateChecker generateLimiter, CaptchaProperties properties) {
+    public CaptchaManager defaultCaptchaManager(Collection<CaptchaContentProvider> delegates, CaptchaStorage captchaStorage,
+                                                CaptchaGenerateChecker generateLimiter, CaptchaProperties properties) {
         return new DefaultCaptchaManager(delegates, captchaStorage, generateLimiter, properties.isVerificationIgnoreCase());
     }
 
+    @Bean
+    @ConditionalOnBean({CaptchaManager.class, LockFactory.class})
+    @Primary
+    public CaptchaManagerLocksWrapper captchaManagerLocksWrapper(CaptchaManager delegate, LockFactory lockFactory) {
+        return new CaptchaManagerLocksWrapper(delegate, lockFactory);
+    }
 
 }
 

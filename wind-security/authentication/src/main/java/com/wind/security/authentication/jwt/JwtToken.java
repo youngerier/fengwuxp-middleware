@@ -42,6 +42,12 @@ public final class JwtToken implements Serializable {
      */
     private final Long expireTime;
 
+    @Deprecated
+    public Long getUserId() {
+        return Long.parseLong(subject);
+    }
+
+
     /**
      * 获取长整型的 subject
      *

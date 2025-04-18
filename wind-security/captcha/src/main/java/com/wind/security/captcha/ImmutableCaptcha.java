@@ -73,9 +73,9 @@ public class ImmutableCaptcha implements Captcha {
      * @return 新的验证码
      */
     public ImmutableCaptcha increaseSendTimes() {
-        // 重新发送，过期时间延长 3 分钟
+        // 重新发送，过期时间延长 5 分钟
         return new ImmutableCaptcha(owner, type, useScene, value, content, verificationCount, sendTimes + 1, allowVerificationTimes,
-                expireTime + 3 * 60 * 1000);
+                expireTime + 5 * 60 * 1000);
     }
 
     /**
