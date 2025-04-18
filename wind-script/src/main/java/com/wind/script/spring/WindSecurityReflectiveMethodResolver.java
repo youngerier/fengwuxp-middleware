@@ -39,6 +39,8 @@ public final class WindSecurityReflectiveMethodResolver extends ReflectiveMethod
             "java.util.Arrays",
             "java.util.Objects",
             "java.lang.Class",
+            "org.springframework.util.CollectionUtils",
+            "org.springframework.util.StringUtils",
             "com.wind.common.util.StringMatchUtils",
             "com.wind.common.util.StringJoinSplitUtils",
             "com.wind.script.spring.SpringExpressionOperators",
