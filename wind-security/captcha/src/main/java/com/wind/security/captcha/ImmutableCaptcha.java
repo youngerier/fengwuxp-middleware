@@ -46,7 +46,7 @@ public class ImmutableCaptcha implements Captcha {
     private final int verificationCount;
 
     /**
-     * 已发送次数
+     * 已发送次数，从 1 开始
      */
     private final int sendTimes;
 

@@ -1,6 +1,7 @@
 package com.wind.security.captcha;
 
 import com.google.common.collect.ImmutableSet;
+import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import lombok.AllArgsConstructor;
@@ -21,7 +22,8 @@ public class DefaultCaptchaManager implements CaptchaManager {
     /**
      * 生成时允许使用之前的值的验证码类型
      */
-    private static final Set<Captcha.CaptchaType> ALLOW_USE_PREVIOUS_CAPTCHA_TYPES = ImmutableSet.of(SimpleCaptchaType.EMAIL,
+    @VisibleForTesting
+    static final Set<Captcha.CaptchaType> ALLOW_USE_PREVIOUS_CAPTCHA_TYPES = ImmutableSet.of(SimpleCaptchaType.EMAIL,
             SimpleCaptchaType.MOBILE_PHONE);
 
     private final Collection<CaptchaContentProvider> delegates;
@@ -62,10 +64,12 @@ public class DefaultCaptchaManager implements CaptchaManager {
         if (ALLOW_USE_PREVIOUS_CAPTCHA_TYPES.contains(type)) {
             // 允许在未失效之前允许重复使用
             Captcha prevCaptcha = captchaStorage.get(type, useScene, realOwner);
-            if (prevCaptcha != null && prevCaptcha.isAvailable()) {
+            if (prevCaptcha != null) {
                 Captcha result = prevCaptcha.increaseSendTimes();
-                captchaStorage.store(result);
-                return result;
+                if (result.isAvailable()) {
+                    captchaStorage.store(result);
+                    return result;
+                }
             }
         }
         CaptchaContentProvider delegate = getDelegate(type, useScene);
