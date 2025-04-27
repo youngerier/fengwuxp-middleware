@@ -5,6 +5,7 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.Set;
@@ -14,6 +15,7 @@ import java.util.Set;
  * @date 2023-09-24 10:13
  **/
 @AllArgsConstructor
+@Slf4j
 public class DefaultCaptchaManager implements CaptchaManager {
 
     /**
@@ -55,10 +57,11 @@ public class DefaultCaptchaManager implements CaptchaManager {
     @Override
     public Captcha generate(Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner) {
         // 检查是否允许生成验证码
-        generateChecker.preCheck(owner, type);
+        String realOwner = owner.trim();
+        generateChecker.preCheck(realOwner, type);
         if (ALLOW_USE_PREVIOUS_CAPTCHA_TYPES.contains(type)) {
             // 允许在未失效之前允许重复使用
-            Captcha prevCaptcha = captchaStorage.get(type, useScene, owner);
+            Captcha prevCaptcha = captchaStorage.get(type, useScene, realOwner);
             if (prevCaptcha != null && prevCaptcha.isAvailable()) {
                 Captcha result = prevCaptcha.increaseSendTimes();
                 captchaStorage.store(result);
@@ -66,11 +69,11 @@ public class DefaultCaptchaManager implements CaptchaManager {
             }
         }
         CaptchaContentProvider delegate = getDelegate(type, useScene);
-        CaptchaValue captchaValue = delegate.getValue(owner, useScene);
+        CaptchaValue captchaValue = delegate.getValue(realOwner, useScene);
         Captcha result = ImmutableCaptcha.builder()
                 .content(captchaValue.getContent())
                 .value(captchaValue.getValue())
-                .owner(owner)
+                .owner(realOwner)
                 .type(type)
                 .useScene(useScene)
                 .expireTime(System.currentTimeMillis() + delegate.getEffectiveTime().toMillis() + 1500)
@@ -92,17 +95,18 @@ public class DefaultCaptchaManager implements CaptchaManager {
      */
     @Override
     public void verify(String expected, Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner) {
-        Captcha captcha = captchaStorage.get(type, useScene, owner);
+        String realOwner = owner.trim();
+        Captcha captcha = captchaStorage.get(type, useScene, realOwner);
         AssertUtils.notNull(captcha, CaptchaI18nMessageKeys.getCaptchaNotExistOrExpired(type));
         if (!captcha.isAvailable()) {
             // 验证码已失效，移除
-            captchaStorage.remove(type, useScene, owner);
+            captchaStorage.remove(type, useScene, realOwner);
             throw BaseException.common(CaptchaI18nMessageKeys.getCaptchaNotExistOrExpired(type));
         }
-        boolean isPass = verificationIgnoreCase ? captcha.getValue().equalsIgnoreCase(expected) : captcha.getValue().equals(expected);
+        boolean isPass = verificationIgnoreCase ? captcha.getValue().equalsIgnoreCase(expected.trim()) : captcha.getValue().equals(expected.trim());
         if (isPass) {
             // 移除
-            captchaStorage.remove(type, useScene, owner);
+            captchaStorage.remove(type, useScene, realOwner);
         } else {
             Captcha next = captcha.increaseVerificationCount();
             if (next.isAvailable()) {
@@ -110,7 +114,7 @@ public class DefaultCaptchaManager implements CaptchaManager {
                 captchaStorage.store(next);
             } else {
                 // 验证码已失效，移除
-                captchaStorage.remove(type, useScene, owner);
+                captchaStorage.remove(type, useScene, realOwner);
             }
             throw BaseException.common(CaptchaI18nMessageKeys.getCaptchaVerityFailure(type));
         }

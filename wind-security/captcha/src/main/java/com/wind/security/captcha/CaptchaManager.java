@@ -1,5 +1,8 @@
 package com.wind.security.captcha;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 /**
  * 验证码管理器
  *
@@ -17,7 +20,7 @@ public interface CaptchaManager {
      * @param owner    验证码所有者
      * @return 验证码
      */
-    Captcha generate(Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner);
+    Captcha generate(@NotNull Captcha.CaptchaType type, @NotNull Captcha.CaptchaUseScene useScene,  @NotBlank String owner);
 
     /**
      * 验证验证码
@@ -27,6 +30,6 @@ public interface CaptchaManager {
      * @param useScene 验证码使用场景
      * @param owner    验证码所有者
      */
-    void verify(String expected, Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner);
+    void verify(@NotBlank String expected, @NotNull Captcha.CaptchaType type,  @NotNull Captcha.CaptchaUseScene useScene,  @NotBlank String owner);
 }
 
