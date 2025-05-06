@@ -66,6 +66,9 @@ public final class WindSecurityReflectiveMethodResolver extends ReflectiveMethod
 
     @Override
     protected Method[] getMethods(Class<?> type) {
+        if (type.isEnum() || type.isArray() || type.isPrimitive()) {
+            return super.getMethods(type);
+        }
         String name = type.getName();
         AssertUtils.isTrue(packages.stream().anyMatch(name::startsWith), () -> "不允许调用 class name = " + type.getName() + " 的方法");
         return super.getMethods(type);
