@@ -8,6 +8,7 @@ import com.wind.common.locks.WindLock;
 import lombok.AllArgsConstructor;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 基于锁支持的验证码管理器
@@ -17,6 +18,8 @@ import java.util.concurrent.TimeUnit;
  **/
 @AllArgsConstructor
 public class CaptchaManagerLocksWrapper implements CaptchaManager {
+
+    private static final AtomicInteger LOCK_LEASE_TIME = new AtomicInteger(5 * 1000);
 
     private static final String GEN_LOCK_KEY_PREFIX = "captcha-gen-%s-%s-%s";
 
@@ -44,7 +47,7 @@ public class CaptchaManagerLocksWrapper implements CaptchaManager {
     public void verify(String expected, Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner) {
         WindLock lock = lockFactory.apply(String.format(VERIFY_LOCK_KEY_PREFIX, type, useScene, owner));
         try {
-            AssertUtils.isTrue(lock.tryLock(300, 3000, TimeUnit.MICROSECONDS), "captcha verify get lock failure");
+            AssertUtils.isTrue(lock.tryLock(500, LOCK_LEASE_TIME.get(), TimeUnit.MICROSECONDS), "captcha verify get lock failure");
             delegate.verify(expected, type, useScene, owner);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
@@ -53,5 +56,14 @@ public class CaptchaManagerLocksWrapper implements CaptchaManager {
             lock.unlock();
         }
 
+    }
+
+    /**
+     * 设置锁的过期时间
+     *
+     * @param leaseTime 锁的过期时间
+     */
+    public static void setLockLeaseTime(int leaseTime) {
+        LOCK_LEASE_TIME.set(leaseTime);
     }
 }
