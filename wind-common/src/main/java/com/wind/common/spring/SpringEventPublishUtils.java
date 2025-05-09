@@ -88,6 +88,7 @@ public final class SpringEventPublishUtils {
                         publishEvent(event);
                     } finally {
                         // Reset ThreadLocal
+                        TRANSACTION_EVENT_IDS.remove();
                         TRANSACTION_EVENT_IDS.set(new HashSet<>());
                     }
                 }
