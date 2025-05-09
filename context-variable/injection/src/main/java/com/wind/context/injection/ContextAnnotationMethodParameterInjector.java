@@ -146,7 +146,7 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
 
     @Getter
     @AllArgsConstructor
-    static abstract class AbstractInjectionDescriptor {
+    abstract static class AbstractInjectionDescriptor {
 
         /**
          * 参数
@@ -209,9 +209,7 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
 
         @Override
         protected Object getArg(Object value, Map<String, Object> variables) {
-            fieldAnnotations.forEach((field, annotation) -> {
-                injectField(field, annotation, value, variables);
-            });
+            fieldAnnotations.forEach((field, annotation) -> injectField(field, annotation, value, variables));
             return value;
         }
 
@@ -241,9 +239,7 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
         protected Object getArg(Object value, Map<String, Object> variables) {
             Object[] values = (Object[]) value;
             for (Object v : values) {
-                getFieldAnnotations().forEach((field, annotation) -> {
-                    injectField(field, annotation, v, variables);
-                });
+                getFieldAnnotations().forEach((field, annotation) -> injectField(field, annotation, v, variables));
             }
             return values;
         }
@@ -264,9 +260,7 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
         @SuppressWarnings("unchecked")
         protected Object getArg(Object value, Map<String, Object> variables) {
             for (Object v : (Collection<Object>) value) {
-                getFieldAnnotations().forEach((field, annotation) -> {
-                    injectField(field, annotation, v, variables);
-                });
+                getFieldAnnotations().forEach((field, annotation) -> injectField(field, annotation, v, variables));
             }
             return value;
         }
