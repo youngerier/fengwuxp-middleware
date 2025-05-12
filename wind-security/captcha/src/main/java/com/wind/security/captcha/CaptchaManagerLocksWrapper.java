@@ -33,11 +33,11 @@ public class CaptchaManagerLocksWrapper implements CaptchaManager {
     public Captcha generate(Captcha.CaptchaType type, Captcha.CaptchaUseScene useScene, String owner) {
         WindLock lock = lockFactory.apply(String.format(GEN_LOCK_KEY_PREFIX, type, useScene, owner));
         try {
-            AssertUtils.isTrue(lock.tryLock(300, 3000, TimeUnit.MICROSECONDS), "captcha gen get lock failure");
+            AssertUtils.state(lock.tryLock(300, 3000, TimeUnit.MICROSECONDS), () -> BaseException.friendly("captcha gen get lock failure"));
             return delegate.generate(type, useScene, owner);
         } catch (InterruptedException exception) {
             Thread.currentThread().interrupt();
-            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, exception.getMessage(), exception);
+            throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, exception.getMessage(), exception);
         } finally {
             lock.unlock();
         }

@@ -126,7 +126,7 @@ public class BaseException extends RuntimeException {
      * 友好的业务异常
      *
      * @param message 原始错误信息，如果会响应给用户，将会自动转换友好消息
-     * @return 异常
+     * @return 业务异常
      * @see DefaultExceptionCode#COMMON_FRIENDLY_ERROR
      */
     public static BaseException friendly(String message) {
