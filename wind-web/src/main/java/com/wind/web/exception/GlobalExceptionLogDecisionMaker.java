@@ -41,7 +41,7 @@ public final class GlobalExceptionLogDecisionMaker {
      * 是否未输出过错误日志
      *
      * @param throwable 异常
-     * @return if true 改异常在请求上下文中没有输出过错误日志
+     * @return if true 该改异常在请求上下文中没有输出过错误日志
      */
     private static boolean isNonePrintErrorLog(Throwable throwable) {
         return HttpServletRequestUtils.getRequestAttribute(WindHttpConstants.getRequestExceptionLogOutputMarkerAttributeName(throwable)) == null;

@@ -74,12 +74,20 @@ public class BaseException extends RuntimeException {
         return new BaseException(DefaultExceptionCode.BAD_REQUEST, message);
     }
 
+    public static BaseException badRequest(MessagePlaceholder message) {
+        return new BaseException(DefaultExceptionCode.BAD_REQUEST, message);
+    }
+
     public static BaseException unAuthorized(String message) {
         return new BaseException(DefaultExceptionCode.UNAUTHORIZED, message);
     }
 
     public static BaseException unAuthorized(ExceptionLogLevel level, String message) {
         return new BaseException(DefaultExceptionCode.UNAUTHORIZED, level, message);
+    }
+
+    public static BaseException unAuthorized(MessagePlaceholder message) {
+        return new BaseException(DefaultExceptionCode.UNAUTHORIZED, message);
     }
 
     public static BaseException forbidden(String message) {
@@ -90,7 +98,15 @@ public class BaseException extends RuntimeException {
         return new BaseException(level, message);
     }
 
+    public static BaseException forbidden(MessagePlaceholder message) {
+        return new BaseException(DefaultExceptionCode.FORBIDDEN, message);
+    }
+
     public static BaseException notFound(String message) {
+        return new BaseException(DefaultExceptionCode.NOT_FOUND, message);
+    }
+
+    public static BaseException notFound(MessagePlaceholder message) {
         return new BaseException(DefaultExceptionCode.NOT_FOUND, message);
     }
 
@@ -102,24 +118,23 @@ public class BaseException extends RuntimeException {
         return new BaseException(level, message);
     }
 
-    public static BaseException badRequest(MessagePlaceholder message) {
-        return new BaseException(DefaultExceptionCode.BAD_REQUEST, message);
-    }
-
-    public static BaseException unAuthorized(MessagePlaceholder message) {
-        return new BaseException(DefaultExceptionCode.UNAUTHORIZED, message);
-    }
-
-    public static BaseException forbidden(MessagePlaceholder message) {
-        return new BaseException(DefaultExceptionCode.FORBIDDEN, message);
-    }
-
-    public static BaseException notFound(MessagePlaceholder message) {
-        return new BaseException(DefaultExceptionCode.NOT_FOUND, message);
-    }
-
     public static BaseException common(MessagePlaceholder message) {
         return new BaseException(message);
+    }
+
+    /**
+     * 友好的业务异常
+     *
+     * @param message 原始错误信息，如果会响应给用户，将会自动转换友好消息
+     * @return 异常
+     * @see DefaultExceptionCode#COMMON_FRIENDLY_ERROR
+     */
+    public static BaseException friendly(String message) {
+        return new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, message);
+    }
+
+    public static BaseException friendly(MessagePlaceholder message) {
+        return new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, message);
     }
 
 }

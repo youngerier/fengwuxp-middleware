@@ -1,8 +1,13 @@
 package com.wind.server.web.restful;
 
 import com.wind.common.exception.BaseException;
+import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.common.exception.ExceptionCode;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.common.message.MessagePlaceholder;
+import org.springframework.lang.Nullable;
+
+import java.util.Objects;
 
 /**
  * 友好的异常消息转换器
@@ -18,15 +23,34 @@ public interface FriendlyExceptionMessageConverter {
      * @param throwable 异常信息
      * @return 转换后便于用户理解的消息
      */
+    @Nullable
     String convert(Throwable throwable);
 
+    /**
+     * 转换异常消息
+     *
+     * @param throwable      异常信息
+     * @param defaultMessage 默认消息
+     * @return 转换后便于用户理解的消息
+     */
     default String convert(Throwable throwable, String defaultMessage) {
         String result = convert(throwable);
         return result == null ? defaultMessage : result;
     }
 
-    static FriendlyExceptionMessageConverter none() {
-        return Throwable::getMessage;
+    /**
+     * 默认的 FriendlyExceptionMessageConverter
+     */
+    static FriendlyExceptionMessageConverter defaults() {
+        return throwable -> {
+            if (throwable instanceof BaseException) {
+                ExceptionCode code = ((BaseException) throwable).getCode();
+                if (Objects.equals(code, DefaultExceptionCode.COMMON_FRIENDLY_ERROR)) {
+                    return code.getDesc();
+                }
+            }
+            return throwable.getMessage();
+        };
     }
 
     /**
@@ -40,6 +64,10 @@ public interface FriendlyExceptionMessageConverter {
                 MessagePlaceholder placeholder = ((BaseException) throwable).getMessagePlaceholder();
                 if (placeholder != null) {
                     return SpringI18nMessageUtils.getMessage(placeholder.getPattern(), placeholder.getArgs());
+                }
+                ExceptionCode code = ((BaseException) throwable).getCode();
+                if (Objects.equals(code, DefaultExceptionCode.COMMON_FRIENDLY_ERROR)) {
+                    return SpringI18nMessageUtils.getMessage(code.getDesc());
                 }
             }
             return SpringI18nMessageUtils.getMessage(throwable.getMessage());
