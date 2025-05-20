@@ -9,6 +9,10 @@ import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 import com.wind.common.exception.AssertUtils;
+import com.wind.security.authentication.WindAuthenticationToken;
+import com.wind.security.authentication.WindAuthenticationUser;
+import com.wind.sequence.SequenceGenerator;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -64,14 +68,14 @@ public final class JwtTokenCodec {
      * @return jwt token payload
      */
     @NotNull
-    public JwtToken parse(@NotBlank String jwtToken) {
+    public WindAuthenticationToken parse(@NotBlank String jwtToken) {
         AssertUtils.hasText(jwtToken, "argument token must not null");
         Jwt jwt = jwtDecoder.decode(jwtToken);
         Map<String, Object> claims = jwt.getClaims();
-        JwtUser user = JSON.to(properties.getUserType(), claims.get(AUTHENTICATION_VARIABLE_NAME));
+        WindAuthenticationUser user = JSON.to(WindAuthenticationUser.class, claims.get(AUTHENTICATION_VARIABLE_NAME));
         Instant expiresAt = Objects.requireNonNull(jwt.getExpiresAt(), "token expire must not null");
         AssertUtils.state(expiresAt.isAfter(Instant.now()), () -> new JwtExpiredException("token is expired"));
-        return new JwtToken(jwtToken, jwt.getSubject(), user, expiresAt.toEpochMilli());
+        return new WindAuthenticationToken(jwt.getId(), jwtToken, jwt.getSubject(), user, expiresAt.toEpochMilli());
     }
 
     /**
@@ -81,16 +85,18 @@ public final class JwtTokenCodec {
      * @return 用户 token
      */
     @NotNull
-    public JwtToken encoding(JwtUser user) {
+    public WindAuthenticationToken encoding(WindAuthenticationUser user) {
         Jwt jwt = jwtEncoder.encode(
                 JwtEncoderParameters.from(
                         jwsHeader,
                         newJwtBuilder(String.valueOf(user.getId()), properties.getEffectiveTime())
                                 .claim(AUTHENTICATION_VARIABLE_NAME, user)
+                                .id(DigestUtils.sha256Hex(String.format("%s@%s", SequenceGenerator.randomNumeric(512), user)))
                                 .build()
                 )
         );
-        return new JwtToken(jwt.getTokenValue(), jwt.getSubject(), user, Objects.requireNonNull(jwt.getExpiresAt()).toEpochMilli());
+        return new WindAuthenticationToken(jwt.getId(), jwt.getTokenValue(), jwt.getSubject(), user,
+                Objects.requireNonNull(jwt.getExpiresAt()).toEpochMilli());
     }
 
     /**
@@ -100,10 +106,14 @@ public final class JwtTokenCodec {
      * @return refresh token
      */
     @NotNull
-    public JwtToken encodingRefreshToken(Long userId) {
-        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, newJwtBuilder(String.valueOf(userId),
-                properties.getRefreshEffectiveTime()).build()));
-        return new JwtToken(jwt.getTokenValue(), jwt.getSubject(), null, Objects.requireNonNull(jwt.getExpiresAt()).toEpochMilli());
+    public WindAuthenticationToken encodingRefreshToken(String userId) {
+        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,
+                newJwtBuilder(userId, properties.getRefreshEffectiveTime())
+                        // refresh token id 增加 refresh@ 前缀
+                        .id("refresh@" + DigestUtils.sha256Hex(String.format("%s#%s", SequenceGenerator.randomNumeric(512), userId)))
+                        .build()));
+        return new WindAuthenticationToken(jwt.getId(), jwt.getTokenValue(), jwt.getSubject(), null,
+                Objects.requireNonNull(jwt.getExpiresAt()).toEpochMilli());
     }
 
     /**
@@ -114,13 +124,13 @@ public final class JwtTokenCodec {
      * @return 用户 id
      */
     @NotNull
-    public JwtToken parseRefreshToken(@NotBlank String refreshToken) {
+    public WindAuthenticationToken parseRefreshToken(@NotBlank String refreshToken) {
         AssertUtils.hasText(refreshToken, "argument token must not null");
         Jwt jwt = jwtDecoder.decode(refreshToken);
         Instant expiresAt = Objects.requireNonNull(jwt.getExpiresAt(), "refresh token expire must not null");
         AssertUtils.notNull(expiresAt, "jwt token expireAt must not null");
         AssertUtils.state(expiresAt.isAfter(Instant.now()), () -> new JwtExpiredException("refresh token is expired"));
-        return new JwtToken(refreshToken, jwt.getSubject(), null, expiresAt.toEpochMilli());
+        return new WindAuthenticationToken(jwt.getId(), refreshToken, jwt.getSubject(), null, expiresAt.toEpochMilli());
     }
 
     private JwtClaimsSet.Builder newJwtBuilder(String userId, Duration effectiveTime) {

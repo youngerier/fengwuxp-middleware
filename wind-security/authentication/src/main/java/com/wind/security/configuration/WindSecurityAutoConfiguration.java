@@ -2,7 +2,10 @@ package com.wind.security.configuration;
 
 import com.wind.common.locks.JdkLockFactory;
 import com.wind.common.locks.LockFactory;
+import com.wind.security.authentication.AuthenticationTokenCodecService;
+import com.wind.security.authentication.AuthenticationTokenUserMap;
 import com.wind.security.authentication.WindAuthenticationProperties;
+import com.wind.security.authentication.jwt.DefaultJwtAuthenticationTokenCodecService;
 import com.wind.security.authentication.jwt.JwtProperties;
 import com.wind.security.authentication.jwt.JwtTokenCodec;
 import com.wind.security.authority.SimpleSecurityAccessOperations;
@@ -77,6 +80,12 @@ public class WindSecurityAutoConfiguration {
     public WebRequestAuthorizationManager webRequestAuthorizationManager(WebRequestAuthorityLoader webRequestAuthorityLoader,
                                                                          SecurityAccessOperations securityAccessOperations) {
         return new WebRequestAuthorizationManager(webRequestAuthorityLoader, securityAccessOperations);
+    }
+
+    @Bean
+    @ConditionalOnBean({JwtTokenCodec.class, AuthenticationTokenUserMap.class})
+    public AuthenticationTokenCodecService defaultAuthenticationTokenCodecService(JwtTokenCodec codec, AuthenticationTokenUserMap tokenUserMap) {
+        return new DefaultJwtAuthenticationTokenCodecService(codec, tokenUserMap);
     }
 }
 

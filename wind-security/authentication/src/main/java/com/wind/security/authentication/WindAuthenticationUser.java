@@ -1,6 +1,7 @@
-package com.wind.security.authentication.jwt;
+package com.wind.security.authentication;
 
 import com.wind.common.exception.AssertUtils;
+import com.wind.common.exception.BaseException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * jwt token User
+ * Authentication User
  *
  * @author wuxp
  * @date 2023-10-26 12:49
@@ -19,14 +20,15 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class JwtUser implements Serializable {
+public class WindAuthenticationUser implements Serializable {
 
     private static final long serialVersionUID = -7270843983936135796L;
 
     /**
-     * 用户ID
+     * 用户 id
+     * TODO 待优化 改为 String，临时兼容旧逻辑
      */
-    private Long id;
+    private Object id;
 
     /**
      * 用户名
@@ -38,8 +40,23 @@ public class JwtUser implements Serializable {
      */
     private Map<String, Object> attributes = Collections.emptyMap();
 
-    public JwtUser(Long id, String userName) {
-        this(id, userName, Collections.emptyMap());
+    public WindAuthenticationUser(Long id, String userName) {
+        this(String.valueOf(id), userName, Collections.emptyMap());
+    }
+
+    /**
+     * 获取长整型的 id
+     *
+     * @return id
+     */
+    public Long getIdAsLong() {
+        if (id instanceof Long) {
+            return (Long) id;
+        }
+        if (id instanceof String) {
+            return Long.parseLong((String) id);
+        }
+        throw BaseException.common("invalid user id");
     }
 
     @Nullable

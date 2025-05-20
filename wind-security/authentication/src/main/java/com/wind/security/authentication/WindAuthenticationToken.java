@@ -1,4 +1,4 @@
-package com.wind.security.authentication.jwt;
+package com.wind.security.authentication;
 
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
@@ -10,16 +10,21 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
- * jwt token
+ * Authentication Token
  *
  * @author wuxp
  * @date 2023-09-26 09:35
  **/
 @AllArgsConstructor
 @Getter
-public final class JwtToken implements Serializable {
+public final class WindAuthenticationToken implements Serializable {
 
     private static final long serialVersionUID = 1801730423764136024L;
+
+    /**
+     * token id 全局唯一的
+     */
+    private final String id;
 
     /**
      * token
@@ -35,7 +40,7 @@ public final class JwtToken implements Serializable {
      * 用户信息，如果是 refresh token，该字段为空
      */
     @Nullable
-    private final JwtUser user;
+    private final WindAuthenticationUser user;
 
     /**
      * token 过期时间戳
@@ -52,7 +57,7 @@ public final class JwtToken implements Serializable {
     }
 
     @NotNull
-    public JwtUser requireUser() {
+    public WindAuthenticationUser requireUser() {
         AssertUtils.state(user != null, () -> BaseException.unAuthorized("user un authorized"));
         return user;
     }

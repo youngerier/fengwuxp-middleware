@@ -1,6 +1,7 @@
 package com.wind.security.authentication.jwt;
 
 import com.wind.security.AbstractRsaProperties;
+import com.wind.security.authentication.WindAuthenticationUser;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -55,6 +56,7 @@ public class JwtProperties extends AbstractRsaProperties {
      */
     private String rsaPrivateKey;
 
-    private Class<? extends JwtUser> userType = JwtUser.class;
+    @Deprecated
+    private Class<? extends WindAuthenticationUser> userType = WindAuthenticationUser.class;
 
 }
