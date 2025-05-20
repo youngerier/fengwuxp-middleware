@@ -1,7 +1,7 @@
 package com.wind.security.authentication.jwt;
 
-import com.wind.security.authentication.WindAuthenticationUser;
 import com.wind.security.authentication.WindAuthenticationToken;
+import com.wind.security.authentication.WindAuthenticationUser;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.Base64Utils;
@@ -24,6 +24,14 @@ class JwtTokenCodecTests {
     }
 
     @Test
+    void testCodecUserTokenWithTtlExpired() {
+        WindAuthenticationUser user = new WindAuthenticationUser(1L, "");
+        WindAuthenticationToken token = jwtTokenCodec.encoding(user, Duration.ofNanos(1));
+        JwtExpiredException exception = Assertions.assertThrows(JwtExpiredException.class, () -> jwtTokenCodec.parse(token.getTokenValue()));
+        Assertions.assertEquals("token is expired", exception.getMessage());
+    }
+
+    @Test
     void testJwtTokenEqJti() {
         WindAuthenticationUser user = new WindAuthenticationUser(1L, "");
         WindAuthenticationToken token = jwtTokenCodec.encoding(user);
@@ -33,10 +41,10 @@ class JwtTokenCodecTests {
     }
 
     @Test
-    void testEncodingJwtTokenNotEqJti() throws Exception{
+    void testEncodingJwtTokenNotEqJti() throws Exception {
         WindAuthenticationUser user = new WindAuthenticationUser(1L, "");
         WindAuthenticationToken token1 = jwtTokenCodec.encoding(user);
-        WindAuthenticationToken token2 =  jwtTokenCodec.encoding(user);
+        WindAuthenticationToken token2 = jwtTokenCodec.encoding(user);
         Assertions.assertNotEquals(token1.getId(), token2.getId());
     }
 
@@ -75,7 +83,7 @@ class JwtTokenCodecTests {
     }
 
 
-     static JwtProperties jwtProperties(Duration duration) {
+    static JwtProperties jwtProperties(Duration duration) {
         KeyPair keyPair = genKeyPir();
         String publicKey = Base64Utils.encodeToString(keyPair.getPublic().getEncoded());
         String privateKey = Base64Utils.encodeToString(keyPair.getPrivate().getEncoded());

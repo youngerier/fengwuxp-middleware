@@ -11,22 +11,22 @@ public interface AuthenticationTokenUserMap {
     /**
      * put token id 和用户 userId 的关系
      *
-     * @param tokenId token id
      * @param userId  用户 id
+     * @param tokenId token id
      */
-    void put(String tokenId, String userId);
+    void put(String userId, String tokenId);
 
     /**
-     * 通过 token id 获取用户 userId
+     * 通过 用户 id 获取用户 tokenId
      *
-     * @param tokenId token id
+     * @param userId 用户 id
      */
-    String getUserId(String tokenId);
+    String getTokenId(String userId);
 
     /**
      * 移除 token id
      *
-     * @param tokenId token id
+     * @param userId 用户 id
      */
-    void remove(String tokenId);
+    void removeTokenId(String userId);
 }

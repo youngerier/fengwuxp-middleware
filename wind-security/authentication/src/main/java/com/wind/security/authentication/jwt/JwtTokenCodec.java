@@ -86,10 +86,21 @@ public final class JwtTokenCodec {
      */
     @NotNull
     public WindAuthenticationToken encoding(WindAuthenticationUser user) {
+        return encoding(user, properties.getEffectiveTime());
+    }
+
+    /**
+     * 生成用户 token
+     *
+     * @param user          用户信息
+     * @param effectiveTime token 有效期
+     * @return 用户 token
+     */
+    public WindAuthenticationToken encoding(WindAuthenticationUser user, Duration effectiveTime) {
         Jwt jwt = jwtEncoder.encode(
                 JwtEncoderParameters.from(
                         jwsHeader,
-                        newJwtBuilder(String.valueOf(user.getId()), properties.getEffectiveTime())
+                        newJwtBuilder(String.valueOf(user.getId()), effectiveTime)
                                 .claim(AUTHENTICATION_VARIABLE_NAME, user)
                                 .id(DigestUtils.sha256Hex(String.format("%s@%s", SequenceGenerator.randomNumeric(512), user)))
                                 .build()

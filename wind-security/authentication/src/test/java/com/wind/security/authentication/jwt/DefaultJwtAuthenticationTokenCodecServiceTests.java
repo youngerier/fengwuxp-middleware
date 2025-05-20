@@ -4,12 +4,12 @@ import com.wind.common.exception.BaseException;
 import com.wind.security.authentication.AuthenticationTokenCodecService;
 import com.wind.security.authentication.AuthenticationTokenUserMap;
 import com.wind.security.authentication.WindAuthenticationToken;
+import com.wind.security.authentication.WindAuthenticationUser;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ class DefaultJwtAuthenticationTokenCodecServiceTests {
 
     @Test
     void testGenerateToken() {
-        WindAuthenticationToken token = tokenCodecService.generateToken("1", RandomStringUtils.randomAlphabetic(12), Collections.emptyMap());
+        WindAuthenticationToken token = tokenCodecService.generateToken(new WindAuthenticationUser(1L, RandomStringUtils.randomAlphabetic(12)));
         WindAuthenticationToken parsed = tokenCodecService.parseAndValidateToken(token.getTokenValue());
         Assertions.assertEquals(token.getId(), parsed.getId());
         Assertions.assertEquals(token.getSubject(), parsed.getSubject());
@@ -33,10 +33,10 @@ class DefaultJwtAuthenticationTokenCodecServiceTests {
 
     @Test
     void testParseAndValidateTokenWithException() {
-        WindAuthenticationToken token = tokenCodecService.generateToken("1", RandomStringUtils.randomAlphabetic(12), Collections.emptyMap());
-        tokenUserMap.remove(token.getId());
+        WindAuthenticationToken token = tokenCodecService.generateToken(new WindAuthenticationUser(1L, RandomStringUtils.randomAlphabetic(12)));
+        tokenUserMap.removeTokenId(token.getSubject());
         BaseException exception = Assertions.assertThrows(BaseException.class, () -> tokenCodecService.parseAndValidateToken(token.getTokenValue()));
-        Assertions.assertEquals("invalid access token", exception.getMessage());
+        Assertions.assertEquals("invalid access token user", exception.getMessage());
     }
 
     @Test
@@ -50,9 +50,10 @@ class DefaultJwtAuthenticationTokenCodecServiceTests {
     @Test
     void testParseAndValidateRefreshTokenWithException() {
         WindAuthenticationToken token = tokenCodecService.generateRefreshToken("1");
-        tokenCodecService.revokeRefreshToken(token.getTokenValue());
-        BaseException exception = Assertions.assertThrows(BaseException.class, () -> tokenCodecService.parseAndValidateRefreshToken(token.getTokenValue()));
-        Assertions.assertEquals("invalid refresh token", exception.getMessage());
+        tokenCodecService.revokeAllToken(token.getSubject());
+        BaseException exception = Assertions.assertThrows(BaseException.class,
+                () -> tokenCodecService.parseAndValidateRefreshToken(token.getTokenValue()));
+        Assertions.assertEquals("invalid refresh token user", exception.getMessage());
     }
 
     private AuthenticationTokenCodecService createCodeService(AuthenticationTokenUserMap tokenStore) {
@@ -66,18 +67,18 @@ class DefaultJwtAuthenticationTokenCodecServiceTests {
             private final Map<String, String> caches = new HashMap<>();
 
             @Override
-            public void put(String tokenId, String userId) {
-                caches.put(tokenId, userId);
+            public void put(String userId, String tokenId) {
+                caches.put(userId, tokenId);
             }
 
             @Override
-            public String getUserId(String tokenId) {
-                return caches.get(tokenId);
+            public String getTokenId(String userId) {
+                return caches.get(userId);
             }
 
             @Override
-            public void remove(String tokenId) {
-                caches.remove(tokenId);
+            public void removeTokenId(String userId) {
+                caches.remove(userId);
             }
         };
     }

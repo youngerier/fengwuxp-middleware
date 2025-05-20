@@ -41,7 +41,11 @@ public class WindAuthenticationUser implements Serializable {
     private Map<String, Object> attributes = Collections.emptyMap();
 
     public WindAuthenticationUser(Long id, String userName) {
-        this(String.valueOf(id), userName, Collections.emptyMap());
+        this(String.valueOf(id), userName);
+    }
+
+    public WindAuthenticationUser(String id, String userName) {
+        this(id, userName, Collections.emptyMap());
     }
 
     /**

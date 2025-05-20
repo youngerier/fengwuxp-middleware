@@ -1,8 +1,10 @@
 package com.wind.security.authentication;
 
+import org.springframework.lang.Nullable;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.util.Map;
+import java.time.Duration;
 
 /**
  * 鉴权 token 生成\解析验证服务
@@ -12,27 +14,25 @@ import java.util.Map;
  **/
 public interface AuthenticationTokenCodecService {
 
+
     /**
      * 通过用户创建一个 Authentication token
      *
-     * @param userId     用户 id
-     * @param userName   用户名
-     * @param attributes 用户属性
+     * @param user 用户
      * @return Authentication token 对象
      */
-    default WindAuthenticationToken generateToken(@NotNull Long userId, @NotBlank String userName, @NotNull Map<String, Object> attributes) {
-        return generateToken(String.valueOf(userId), userName, attributes);
+    default WindAuthenticationToken generateToken(WindAuthenticationUser user) {
+        return generateToken(user, null);
     }
 
     /**
      * 通过用户创建一个 Authentication token
      *
-     * @param userId     用户 id
-     * @param userName   用户名
-     * @param attributes 用户属性
+     * @param user 用户
+     * @param ttl  token 的 存活时间，未指定则使用默认时长
      * @return Authentication token 对象
      */
-    WindAuthenticationToken generateToken(@NotBlank String userId, @NotBlank String userName, @NotNull Map<String, Object> attributes);
+    WindAuthenticationToken generateToken(WindAuthenticationUser user, @Nullable Duration ttl);
 
     /**
      * 通过用户创建一个 Authentication token
@@ -69,16 +69,10 @@ public interface AuthenticationTokenCodecService {
     WindAuthenticationToken parseAndValidateRefreshToken(@NotBlank String refreshToken);
 
     /**
-     * 撤销访问令牌，使其失效。
+     * 撤销 access token 和 refresh token
      *
-     * @param accessToken 访问令牌字符串
+     * @param userId 用户 id
      */
-    void revokeAccessToken(@NotBlank String accessToken);
+    void revokeAllToken(@NotBlank String userId);
 
-    /**
-     * 撤销刷新令牌，使其无法继续使用。
-     *
-     * @param refreshToken 刷新令牌字符串
-     */
-    void revokeRefreshToken(@NotBlank String refreshToken);
 }
