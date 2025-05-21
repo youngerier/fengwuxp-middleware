@@ -16,32 +16,39 @@ import java.util.Objects;
  * @author wuxp
  * @date 2025-05-20 14:38
  **/
-@AllArgsConstructor
 @Slf4j
 public class DefaultJwtAuthenticationTokenCodecService implements AuthenticationTokenCodecService {
 
     private final JwtTokenCodec jwtTokenCodec;
 
-    private final AuthenticationTokenUserMap delegate;
+    private final AuthenticationTokenUserMap userTokenMap;
+
+    private final AuthenticationTokenUserMap refreshTokenMap;
+
+    public DefaultJwtAuthenticationTokenCodecService(JwtTokenCodec jwtTokenCodec, AuthenticationTokenUserMap delegate) {
+        this.jwtTokenCodec = jwtTokenCodec;
+        this.userTokenMap = new AuthenticationTokenUserMapWrapper(delegate, WindConstants.EMPTY);
+        this.refreshTokenMap = new AuthenticationTokenUserMapWrapper(delegate, "refresh@");
+    }
 
     @Override
     public WindAuthenticationToken generateToken(WindAuthenticationUser user, Duration ttl) {
-        WindAuthenticationToken result = ttl == null ? jwtTokenCodec.encoding(user) : jwtTokenCodec.encoding(user, ttl);
-        userTokenWrapper().put(String.valueOf(user.getId()), result.getId());
+        WindAuthenticationToken result = jwtTokenCodec.encoding(user, ttl);
+        userTokenMap.put(String.valueOf(user.getId()), result.getId());
         return result;
     }
 
     @Override
-    public WindAuthenticationToken generateRefreshToken(String userId) {
-        WindAuthenticationToken result = jwtTokenCodec.encodingRefreshToken(userId);
-        refreshTokenUserWrapper().put(userId, result.getId());
+    public WindAuthenticationToken generateRefreshToken(String userId, Duration ttl) {
+        WindAuthenticationToken result = jwtTokenCodec.encodingRefreshToken(userId, ttl);
+        refreshTokenMap.put(userId, result.getId());
         return result;
     }
 
     @Override
     public WindAuthenticationToken parseAndValidateToken(String accessToken) {
         WindAuthenticationToken result = jwtTokenCodec.parse(accessToken);
-        String tokenId = userTokenWrapper().getTokenId(result.getSubject());
+        String tokenId = userTokenMap.getTokenId(result.getSubject());
         AssertUtils.hasText(tokenId, "invalid access token user");
         AssertUtils.isTrue(Objects.equals(tokenId, result.getId()), "invalid access token");
         return result;
@@ -50,7 +57,7 @@ public class DefaultJwtAuthenticationTokenCodecService implements Authentication
     @Override
     public WindAuthenticationToken parseAndValidateRefreshToken(String refreshToken) {
         WindAuthenticationToken result = jwtTokenCodec.parseRefreshToken(refreshToken);
-        String tokenId = refreshTokenUserWrapper().getTokenId(result.getSubject());
+        String tokenId = refreshTokenMap.getTokenId(result.getSubject());
         AssertUtils.hasText(tokenId, "invalid refresh token user");
         AssertUtils.isTrue(Objects.equals(tokenId, result.getId()), "invalid refresh token");
         return result;
@@ -58,17 +65,14 @@ public class DefaultJwtAuthenticationTokenCodecService implements Authentication
 
     @Override
     public void revokeAllToken(String userId) {
-        userTokenWrapper().removeTokenId(userId);
-        refreshTokenUserWrapper().removeTokenId(userId);
+        try {
+            userTokenMap.removeTokenId(userId);
+        } catch (Exception ignore) {
+            // ignore
+        }
+        refreshTokenMap.removeTokenId(userId);
     }
 
-    private AuthenticationTokenUserMap userTokenWrapper() {
-        return new AuthenticationTokenUserMapWrapper(delegate, WindConstants.EMPTY);
-    }
-
-    private AuthenticationTokenUserMap refreshTokenUserWrapper() {
-        return new AuthenticationTokenUserMapWrapper(delegate, "refresh_");
-    }
 
     @AllArgsConstructor
     private static class AuthenticationTokenUserMapWrapper implements AuthenticationTokenUserMap {

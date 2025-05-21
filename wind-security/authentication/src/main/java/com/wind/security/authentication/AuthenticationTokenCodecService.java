@@ -50,7 +50,18 @@ public interface AuthenticationTokenCodecService {
      * @param userId 用户 id
      * @return Authentication token 对象
      */
-    WindAuthenticationToken generateRefreshToken(@NotBlank String userId);
+    default WindAuthenticationToken generateRefreshToken(@NotBlank String userId) {
+        return generateRefreshToken(userId, null);
+    }
+
+    /**
+     * 通过用户创建一个 Authentication token
+     *
+     * @param userId 用户 id
+     * @param ttl    token 的 存活时间，未指定则使用默认时长
+     * @return Authentication token 对象
+     */
+    WindAuthenticationToken generateRefreshToken(@NotBlank String userId, @Nullable Duration ttl);
 
     /**
      * 解析并检查 Authentication token

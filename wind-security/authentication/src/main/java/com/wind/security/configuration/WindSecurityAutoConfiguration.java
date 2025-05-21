@@ -60,7 +60,13 @@ public class WindSecurityAutoConfiguration {
     @Bean
     @ConditionalOnBean(JwtProperties.class)
     public JwtTokenCodec jwtTokenCodec(JwtProperties properties) {
-        return new JwtTokenCodec(properties);
+        return JwtTokenCodec.builder()
+                .issuer(properties.getIssuer())
+                .audience(properties.getAudience())
+                .effectiveTime(properties.getEffectiveTime())
+                .refreshEffectiveTime(properties.getRefreshEffectiveTime())
+                .rsaKeyPair(properties.getKeyPair())
+                .build();
     }
 
     @Bean

@@ -13,6 +13,7 @@ import com.wind.security.authentication.WindAuthenticationToken;
 import com.wind.security.authentication.WindAuthenticationUser;
 import com.wind.sequence.SequenceGenerator;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.lang.Nullable;
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -45,7 +46,27 @@ public final class JwtTokenCodec {
 
     private static final String JWT_AUTH_KEY_ID = "Jwt-Auth-Codec-Wind";
 
-    private final JwtProperties properties;
+    /**
+     * jwt issuer
+     * jwt的颁发者，其值应为大小写敏感的字符串或Uri。
+     */
+    private final String issuer;
+
+    /**
+     * jwt audience
+     * jwt的适用对象，其值应为大小写敏感的字符串或 Uri。一般可以为特定的 App、服务或模块
+     */
+    private final String audience;
+
+    /**
+     * Generate token to set expire time
+     */
+    private final Duration effectiveTime;
+
+    /**
+     * refresh jwt token expire time
+     */
+    private final Duration refreshEffectiveTime;
 
     private final JwtEncoder jwtEncoder;
 
@@ -53,11 +74,18 @@ public final class JwtTokenCodec {
 
     private final JwsHeader jwsHeader = JwsHeader.with(SignatureAlgorithm.RS256).build();
 
-    public JwtTokenCodec(JwtProperties properties) {
-        this.properties = properties;
-        RSAKey rsaKey = generateRsaKey(properties.getKeyPair());
+    private JwtTokenCodec(JwtTokenCodecBuilder builder) {
+        this.audience = builder.audience;
+        this.issuer = builder.issuer;
+        this.effectiveTime = builder.effectiveTime;
+        this.refreshEffectiveTime = builder.refreshEffectiveTime;
+        RSAKey rsaKey = generateRsaKey(builder.rsaKeyPair);
         this.jwtEncoder = buildJwtEncoder(rsaKey);
         this.jwtDecoder = buildJwtDecoder(rsaKey);
+    }
+
+    public static JwtTokenCodecBuilder builder() {
+        return new JwtTokenCodecBuilder();
     }
 
     /**
@@ -86,23 +114,21 @@ public final class JwtTokenCodec {
      */
     @NotNull
     public WindAuthenticationToken encoding(WindAuthenticationUser user) {
-        return encoding(user, properties.getEffectiveTime());
+        return encoding(user, effectiveTime);
     }
 
     /**
      * 生成用户 token
      *
-     * @param user          用户信息
-     * @param effectiveTime token 有效期
+     * @param user 用户信息
+     * @param ttl  token 有效期，为空则使用默认有效期
      * @return 用户 token
      */
-    public WindAuthenticationToken encoding(WindAuthenticationUser user, Duration effectiveTime) {
-        Jwt jwt = jwtEncoder.encode(
-                JwtEncoderParameters.from(
-                        jwsHeader,
-                        newJwtBuilder(String.valueOf(user.getId()), effectiveTime)
+    public WindAuthenticationToken encoding(WindAuthenticationUser user, @Nullable Duration ttl) {
+        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,
+                        newJwtBuilder(String.valueOf(user.getId()), ttl == null ? effectiveTime : ttl)
                                 .claim(AUTHENTICATION_VARIABLE_NAME, user)
-                                .id(DigestUtils.sha256Hex(String.format("%s@%s", SequenceGenerator.randomNumeric(512), user)))
+                                .id(genJti(user))
                                 .build()
                 )
         );
@@ -114,17 +140,28 @@ public final class JwtTokenCodec {
      * 生成 refresh token
      *
      * @param userId 用户 id
+     * @param ttl    refresh token 有效期，为空则使用默认有效期
+     * @return refresh token
+     */
+    @NotNull
+    public WindAuthenticationToken encodingRefreshToken(String userId, @Nullable Duration ttl) {
+        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,
+                        newJwtBuilder(userId, ttl == null ? refreshEffectiveTime : ttl).id(genJti(userId)).build()
+                )
+        );
+        return new WindAuthenticationToken(jwt.getId(), jwt.getTokenValue(), jwt.getSubject(), null,
+                Objects.requireNonNull(jwt.getExpiresAt()).toEpochMilli());
+    }
+
+    /**
+     * 生成 refresh token
+     *
+     * @param userId 用户 id
      * @return refresh token
      */
     @NotNull
     public WindAuthenticationToken encodingRefreshToken(String userId) {
-        Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,
-                newJwtBuilder(userId, properties.getRefreshEffectiveTime())
-                        // refresh token id 增加 refresh@ 前缀
-                        .id("refresh@" + DigestUtils.sha256Hex(String.format("%s#%s", SequenceGenerator.randomNumeric(512), userId)))
-                        .build()));
-        return new WindAuthenticationToken(jwt.getId(), jwt.getTokenValue(), jwt.getSubject(), null,
-                Objects.requireNonNull(jwt.getExpiresAt()).toEpochMilli());
+        return encodingRefreshToken(userId, refreshEffectiveTime);
     }
 
     /**
@@ -145,11 +182,7 @@ public final class JwtTokenCodec {
     }
 
     private JwtClaimsSet.Builder newJwtBuilder(String userId, Duration effectiveTime) {
-        return JwtClaimsSet.builder()
-                .expiresAt(Instant.now().plusSeconds(effectiveTime.getSeconds()))
-                .audience(Collections.singletonList(properties.getAudience()))
-                .issuer(properties.getIssuer())
-                .subject(userId);
+        return JwtClaimsSet.builder().expiresAt(Instant.now().plusSeconds(effectiveTime.getSeconds())).audience(Collections.singletonList(audience)).issuer(issuer).subject(userId);
     }
 
     private JwtDecoder buildJwtDecoder(RSAKey rsaKey) {
@@ -162,12 +195,85 @@ public final class JwtTokenCodec {
         return new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(rsaKey)));
     }
 
-    private RSAKey generateRsaKey(KeyPair keyPair) {
-        // https://github.com/spring-projects/spring-security/blob/main/oauth2/oauth2-jose/src/test/java/org/springframework/security/oauth2/jose/TestKeys.java
-        return new RSAKey.Builder((RSAPublicKey) keyPair.getPublic())
-                .privateKey(keyPair.getPrivate())
-                .keyID(JWT_AUTH_KEY_ID)
-                .build();
+    /**
+     * JWT 的唯一标识符（JWT ID）
+     * 参见：<a href="https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.7">JWT Registered Claim</a>
+     *
+     * @param userInfo 用户信息
+     * @return jti
+     */
+    private String genJti(Object userInfo) {
+        String text = String.format("%s@%d#%s", SequenceGenerator.randomAlphanumeric(getClass().getName(), 1024),
+                System.currentTimeMillis(), userInfo);
+        return DigestUtils.sha256Hex(text);
     }
 
+    private RSAKey generateRsaKey(KeyPair keyPair) {
+        // https://github.com/spring-projects/spring-security/blob/main/oauth2/oauth2-jose/src/test/java/org/springframework/security/oauth2/jose/TestKeys.java
+        return new RSAKey.Builder((RSAPublicKey) keyPair.getPublic()).privateKey(keyPair.getPrivate()).keyID(JWT_AUTH_KEY_ID).build();
+    }
+
+
+    public static class JwtTokenCodecBuilder {
+
+        /**
+         * jwt issuer
+         * jwt的颁发者，其值应为大小写敏感的字符串或Uri。
+         */
+        private String issuer;
+
+        /**
+         * jwt audience
+         * jwt的适用对象，其值应为大小写敏感的字符串或 Uri。一般可以为特定的 App、服务或模块
+         */
+        private String audience;
+
+        /**
+         * Generate token to set expire time
+         */
+        private Duration effectiveTime = Duration.ofHours(2);
+
+        /**
+         * refresh jwt token expire time
+         */
+        private Duration refreshEffectiveTime = Duration.ofDays(3);
+
+        /**
+         * rsa 秘钥对
+         */
+        private KeyPair rsaKeyPair;
+
+
+        private JwtTokenCodecBuilder() {
+        }
+
+        public JwtTokenCodecBuilder issuer(String issuer) {
+            this.issuer = issuer;
+            return this;
+        }
+
+        public JwtTokenCodecBuilder audience(String audience) {
+            this.audience = audience;
+            return this;
+        }
+
+        public JwtTokenCodecBuilder effectiveTime(Duration effectiveTime) {
+            this.effectiveTime = effectiveTime;
+            return this;
+        }
+
+        public JwtTokenCodecBuilder refreshEffectiveTime(Duration refreshEffectiveTime) {
+            this.refreshEffectiveTime = refreshEffectiveTime;
+            return this;
+        }
+
+        public JwtTokenCodecBuilder rsaKeyPair(KeyPair rsaKeyPair) {
+            this.rsaKeyPair = rsaKeyPair;
+            return this;
+        }
+
+        public JwtTokenCodec build() {
+            return new JwtTokenCodec(this);
+        }
+    }
 }

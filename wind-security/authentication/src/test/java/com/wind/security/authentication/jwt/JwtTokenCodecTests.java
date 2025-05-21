@@ -13,7 +13,7 @@ import java.time.Duration;
 
 class JwtTokenCodecTests {
 
-    private final JwtTokenCodec jwtTokenCodec = new JwtTokenCodec(jwtProperties(Duration.ofMinutes(1)));
+    private final JwtTokenCodec jwtTokenCodec = createCodec(jwtProperties(Duration.ofMinutes(1)));
 
     @Test
     void testCodecUserToken() {
@@ -50,7 +50,7 @@ class JwtTokenCodecTests {
 
     @Test
     void testCodecUserTokenExpired() throws Exception {
-        JwtTokenCodec codec = new JwtTokenCodec(jwtProperties(Duration.ofMillis(100)));
+        JwtTokenCodec codec = createCodec(jwtProperties(Duration.ofMillis(100)));
         WindAuthenticationUser user = new WindAuthenticationUser(1L, "");
         WindAuthenticationToken token = codec.encoding(user);
         Thread.sleep(101);
@@ -74,12 +74,22 @@ class JwtTokenCodecTests {
 
     @Test
     void testRefreshTokenExpired() throws Exception {
-        JwtTokenCodec codec = new JwtTokenCodec(jwtProperties(Duration.ofMillis(100)));
+        JwtTokenCodec codec = createCodec(jwtProperties(Duration.ofMillis(100)));
         WindAuthenticationToken token = codec.encodingRefreshToken("1");
         Thread.sleep(101);
         String tokenValue = token.getTokenValue();
         JwtExpiredException exception = Assertions.assertThrows(JwtExpiredException.class, () -> codec.parseRefreshToken(tokenValue));
         Assertions.assertEquals("refresh token is expired", exception.getMessage());
+    }
+
+    static JwtTokenCodec createCodec(JwtProperties properties) {
+        return JwtTokenCodec.builder()
+                .issuer(properties.getIssuer())
+                .audience(properties.getAudience())
+                .effectiveTime(properties.getEffectiveTime())
+                .refreshEffectiveTime(properties.getRefreshEffectiveTime())
+                .rsaKeyPair(properties.getKeyPair())
+                .build();
     }
 
 

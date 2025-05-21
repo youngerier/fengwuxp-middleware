@@ -57,7 +57,7 @@ class DefaultJwtAuthenticationTokenCodecServiceTests {
     }
 
     private AuthenticationTokenCodecService createCodeService(AuthenticationTokenUserMap tokenStore) {
-        JwtTokenCodec tokenCodec = new JwtTokenCodec(JwtTokenCodecTests.jwtProperties(Duration.ofHours(1)));
+        JwtTokenCodec tokenCodec =  JwtTokenCodecTests.createCodec(JwtTokenCodecTests.jwtProperties(Duration.ofHours(1)));
         return new DefaultJwtAuthenticationTokenCodecService(tokenCodec, tokenStore);
     }
 
