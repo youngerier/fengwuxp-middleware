@@ -19,6 +19,8 @@ import java.util.Objects;
 @Slf4j
 public class DefaultJwtAuthenticationTokenCodecService implements AuthenticationTokenCodecService {
 
+    public static final String REFRESH_TOKEN_USER_PREFIX="__REFRESH__@";
+
     private final JwtTokenCodec jwtTokenCodec;
 
     private final AuthenticationTokenUserMap userTokenMap;
@@ -28,7 +30,7 @@ public class DefaultJwtAuthenticationTokenCodecService implements Authentication
     public DefaultJwtAuthenticationTokenCodecService(JwtTokenCodec jwtTokenCodec, AuthenticationTokenUserMap delegate) {
         this.jwtTokenCodec = jwtTokenCodec;
         this.userTokenMap = new AuthenticationTokenUserMapWrapper(delegate, WindConstants.EMPTY);
-        this.refreshTokenMap = new AuthenticationTokenUserMapWrapper(delegate, "refresh@");
+        this.refreshTokenMap = new AuthenticationTokenUserMapWrapper(delegate, REFRESH_TOKEN_USER_PREFIX);
     }
 
     @Override

@@ -54,8 +54,8 @@ public class WindAuthenticationUser implements Serializable {
      * @return id
      */
     public Long getIdAsLong() {
-        if (id instanceof Long) {
-            return (Long) id;
+        if (id instanceof Number) {
+            return ((Number) id).longValue();
         }
         if (id instanceof String) {
             return Long.parseLong((String) id);

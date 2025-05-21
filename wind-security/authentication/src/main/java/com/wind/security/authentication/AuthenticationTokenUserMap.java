@@ -1,5 +1,7 @@
 package com.wind.security.authentication;
 
+import org.springframework.lang.Nullable;
+
 /**
  * 认证 token id 和用户关系的 map
  *
@@ -21,6 +23,7 @@ public interface AuthenticationTokenUserMap {
      *
      * @param userId 用户 id
      */
+    @Nullable
     String getTokenId(String userId);
 
     /**
