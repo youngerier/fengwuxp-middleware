@@ -42,7 +42,7 @@ public class SpringI18nMessageSourceInitializer implements ApplicationListener<A
         if (event.getApplicationContext() instanceof ConfigurableWebServerApplicationContext) {
             // 仅在 Web 上下文中执行
             try {
-                LOCALE_RESOLVER.set(new AcceptI18nHeaderLocaleResolver(Arrays.asList("Wind-Language", "Accept-Language")));
+                LOCALE_RESOLVER.set(new WindAcceptI18nHeaderLocaleResolver(Arrays.asList("Wind-Language", "Accept-Language")));
                 SpringI18nMessageUtils.setMessageSource(event.getApplicationContext().getBean(MessageSource.class));
                 SpringI18nMessageUtils.setLocaleSupplier(SpringI18nMessageSourceInitializer::getWebRequestLocal);
                 RestfulApiRespFactory.configureFriendlyExceptionMessageConverter(FriendlyExceptionMessageConverter.i18n());

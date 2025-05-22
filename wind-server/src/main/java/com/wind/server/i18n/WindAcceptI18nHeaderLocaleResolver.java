@@ -22,24 +22,24 @@ import java.util.Locale;
  * @date 2024-07-16 11:20
  * @see org.springframework.web.servlet.i18n.AcceptHeaderLocaleResolver
  **/
-public class AcceptI18nHeaderLocaleResolver implements LocaleResolver {
+public class WindAcceptI18nHeaderLocaleResolver implements LocaleResolver {
 
     private final Locale defaultLocale;
 
     private final List<String> headerNames;
 
-    public AcceptI18nHeaderLocaleResolver(List<String> headerNames, Locale defaultLocale) {
+    public WindAcceptI18nHeaderLocaleResolver(List<String> headerNames, Locale defaultLocale) {
         AssertUtils.notNull(defaultLocale, "argument defaultLocale must not null");
         AssertUtils.notEmpty(headerNames, "argument headerNames must not empty");
         this.headerNames = headerNames;
         this.defaultLocale = defaultLocale;
     }
 
-    public AcceptI18nHeaderLocaleResolver(List<String> headerNames) {
+    public WindAcceptI18nHeaderLocaleResolver(List<String> headerNames) {
         this(headerNames, Locale.SIMPLIFIED_CHINESE);
     }
 
-    public AcceptI18nHeaderLocaleResolver() {
+    public WindAcceptI18nHeaderLocaleResolver() {
         this(Collections.singletonList("Accept-Language"), Locale.SIMPLIFIED_CHINESE);
     }
 
