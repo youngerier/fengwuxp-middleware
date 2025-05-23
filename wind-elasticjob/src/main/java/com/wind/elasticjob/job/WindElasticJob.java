@@ -25,7 +25,7 @@ public interface WindElasticJob {
     String getName();
 
     /**
-     * @return 任务参数
+     * @return sharding items and sharding parameters.
      */
     default String getShardingItemParameters() {
         return WindConstants.EMPTY;
