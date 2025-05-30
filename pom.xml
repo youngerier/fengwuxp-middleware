@@ -37,6 +37,7 @@
         <module>wind-sequence</module>
         <module>tests</module>
         <module>wind-rocketmq</module>
+        <module>wind-websocket</module>
     </modules>
 
     <properties>
