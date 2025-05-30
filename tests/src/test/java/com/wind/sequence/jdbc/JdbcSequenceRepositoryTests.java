@@ -1,4 +1,4 @@
-package com.wind.server.jdbc;
+package com.wind.sequence.jdbc;
 
 import com.wind.AbstractJdbcTest;
 import com.wind.sequence.SequenceGenerator;

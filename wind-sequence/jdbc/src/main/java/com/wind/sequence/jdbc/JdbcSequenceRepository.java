@@ -1,4 +1,4 @@
-package com.wind.server.jdbc;
+package com.wind.sequence.jdbc;
 
 import com.wind.common.exception.AssertUtils;
 import com.wind.sequence.SequenceGenerator;
@@ -8,6 +8,7 @@ import lombok.Getter;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -41,7 +42,7 @@ public class JdbcSequenceRepository implements SequenceRepository {
     }
 
     public JdbcSequenceRepository(SequenceSql sequenceSql, JdbcTemplate jdbcTemplate, PlatformTransactionManager transactionManager) {
-        this(sequenceSql, jdbcTemplate, transactionManager, PROPAGATION_REQUIRED);
+        this(sequenceSql, jdbcTemplate, transactionManager, TransactionDefinition.PROPAGATION_REQUIRED);
     }
 
     public JdbcSequenceRepository(SequenceSql sequenceSql, JdbcTemplate jdbcTemplate, PlatformTransactionManager transactionManager,

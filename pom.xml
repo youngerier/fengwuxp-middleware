@@ -34,7 +34,7 @@
         <module>tools</module>
         <module>object-mask</module>
         <module>wind-script</module>
-        <module>sequence-generate</module>
+        <module>wind-sequence</module>
         <module>tests</module>
         <module>wind-rocketmq</module>
     </modules>
@@ -273,7 +273,12 @@
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
-                <artifactId>wind-sequence-generate</artifactId>
+                <artifactId>wind-sequence-core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.middleware</groupId>
+                <artifactId>wind-sequence-jdbc</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

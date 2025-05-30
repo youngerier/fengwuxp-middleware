@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.wind.middleware</groupId>
-        <artifactId>wind-middleware</artifactId>
+        <artifactId>wind-sequence</artifactId>
         <version>${revision}</version>
     </parent>
 
-    <artifactId>wind-sequence-generate</artifactId>
+    <artifactId>wind-sequence-core</artifactId>
 
     <dependencies>
         <dependency>
