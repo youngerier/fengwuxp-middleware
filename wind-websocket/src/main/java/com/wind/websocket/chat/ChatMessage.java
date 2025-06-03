@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 所有的聊天都关联一个会话（即使是 2 个人），通过通过会话对其他消息接受者进行消息广播
+ * 所有的聊天都关联一个会话（即使是 2 个人），通过通过会话对其他消息接收者进行消息广播
  * Client A           Server                    Client B/C/D
  * |                  |                             |
  * |— sendMessage() —>|                             |

@@ -53,7 +53,7 @@ public interface WindSocketSession extends WindSocketSessionDescriptor {
     Collection<WindSocketClientClientConnection> getConnections();
 
     /**
-     * @return 获取用户在会话中的所有链接
+     * @return 获取用户在会话中的所有连接
      */
     @NotNull
     List<WindSocketClientClientConnection> getUserConnections(@NotNull String userId);
