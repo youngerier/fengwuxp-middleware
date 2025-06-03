@@ -3,6 +3,7 @@ package com.wind.websocket.core;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
+import java.util.Map;
 
 /**
  * socket 会话管理服务
@@ -36,9 +37,21 @@ public interface WindSocketSessionManager {
      *
      * @param sessionId 指定的会话 id
      * @param name      会话名称
-     * @return 会话 id
+     * @return 会话
      */
-    WindSocketSession createSession(@Null String sessionId, @Null String name);
+   default WindSocketSession createSession(@Null String sessionId, @Null String name){
+       return createSession(sessionId, name, null);
+   }
+
+    /**
+     * 创建会话
+     *
+     * @param sessionId 指定的会话 id
+     * @param name      会话名称
+     * @param metadata  会话元数据
+     * @return 会话
+     */
+    WindSocketSession createSession(@Null String sessionId, @Null String name, Map<String, Object> metadata);
 
     /**
      * 更新会话名称

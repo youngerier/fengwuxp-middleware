@@ -1,21 +1,20 @@
 package com.wind.websocket.core;
 
-import com.wind.common.exception.AssertUtils;
+import com.wind.core.ObjectReadonlyMetadata;
 import com.wind.websocket.WindWebSocketMetadataNames;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import java.time.LocalDateTime;
-import java.util.Map;
 
 /**
- * websocket 客户端连接
+ * websocket connection 描述符
  *
  * @author wuxp
- * @date 2025-05-30 15:39
+ * @date 2025-05-31 09:06
  **/
-public interface WindSocketClientConnection {
+public interface SocketClientConnectionDescriptor extends ObjectReadonlyMetadata {
 
     /**
      * @return 获取连接 id
@@ -79,50 +78,5 @@ public interface WindSocketClientConnection {
     @NotNull
     default LocalDateTime getGmtConnected() {
         return requireMetadataValue(WindWebSocketMetadataNames.GMT_CONNECTED_NAME);
-    }
-
-    /**
-     * 发送文本消息
-     *
-     * @param message 消息内容
-     */
-    default void sendText(@NotNull String message) {
-        send(message);
-    }
-
-    /**
-     * 发送消息
-     *
-     * @param payload 消息负载
-     */
-    void send(@NotNull Object payload);
-
-    /**
-     * 关闭连接
-     */
-    void close();
-
-    /**
-     * @return 连接是否存活
-     */
-    boolean isAlive();
-
-    /**
-     * @return 获取连接的元数据
-     */
-    @NotNull
-    Map<String, Object> getMetadata();
-
-    @SuppressWarnings("unchecked")
-    @Null
-    default <T> T getMetadataValue(String key) {
-        return (T) getMetadata().get(key);
-    }
-
-    @NotNull
-    default <T> T requireMetadataValue(String key) {
-        T result = getMetadataValue(key);
-        AssertUtils.notNull(result, () -> String.format("metadata key = %s must not null", key));
-        return result;
     }
 }

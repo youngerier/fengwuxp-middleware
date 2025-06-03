@@ -2,17 +2,15 @@ package com.wind.websocket.core;
 
 import com.wind.common.exception.AssertUtils;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 /**
- * web socket session
+ * web socket session，用于聚合一组用户，管理用户的连接，便于用户在会话内相互通信
  * 1. 一个会话中包含多个（2个以及以上）用户以及多个，在同一个会话中，一个用户可能有多个（不同的设备）连接
  * 2. 特殊情况下，会话中可能只存在一个真实用户（例如：系统通知的群组）
  * <p>
@@ -24,27 +22,7 @@ import java.util.Objects;
  * @author wuxp
  * @date 2025-05-30 15:48
  **/
-public interface WindSocketSession {
-
-    /**
-     * @return 获取会话id
-     */
-    @NotBlank
-    String getId();
-
-    /**
-     * @return 聊天会话名称
-     */
-    @NotBlank
-    default String getName() {
-        return getId();
-    }
-
-    /**
-     * @return 创建时间
-     */
-    @NotNull
-    LocalDateTime getGmtCreate();
+public interface WindSocketSession extends WindSocketSessionDescriptor {
 
     /**
      * 用户加入会话
@@ -52,7 +30,7 @@ public interface WindSocketSession {
      * @param userId     用户 id
      * @param connection 连接信息，允许为空，用户可能不在线
      */
-    void joinUser(@NotNull String userId, @Null WindSocketClientConnection connection);
+    void joinUser(@NotNull String userId, @Null WindSocketClientClientConnection connection);
 
     /**
      * 用户移除会话
@@ -72,20 +50,20 @@ public interface WindSocketSession {
      * @return 获取会话中的所有连接
      */
     @NotNull
-    Collection<WindSocketClientConnection> getConnections();
+    Collection<WindSocketClientClientConnection> getConnections();
 
     /**
      * @return 获取用户在会话中的所有链接
      */
     @NotNull
-    List<WindSocketClientConnection> getUserConnections(@NotNull String userId);
+    List<WindSocketClientClientConnection> getUserConnections(@NotNull String userId);
 
     /**
      * @param userId           用户id
      * @param clientDeviceType 客户端设备标识
      * @return 获取用户在会话中的所有链接
      */
-    default WindSocketClientConnection getUserConnectionWithDeviceType(@NotNull String userId, @NotNull String clientDeviceType) {
+    default WindSocketClientClientConnection getUserConnectionWithDeviceType(@NotNull String userId, @NotNull String clientDeviceType) {
         AssertUtils.hasText(clientDeviceType, "argument clientDeviceType must not null");
         return getUserConnections(userId)
                 .stream()
@@ -123,14 +101,6 @@ public interface WindSocketSession {
      */
     default void broadcast(@NotNull Object payload) {
         broadcast(payload, Collections.emptyList());
-    }
-
-    /**
-     * @return 会话连接管理策略
-     */
-    @NotNull
-    default WindSessionConnectionPolicy getSessionConnectionPolicy() {
-        return WindSessionConnectionPolicy.DEFAULT;
     }
 
 }

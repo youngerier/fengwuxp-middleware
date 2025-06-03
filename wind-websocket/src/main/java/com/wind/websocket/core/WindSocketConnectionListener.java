@@ -13,14 +13,14 @@ public interface WindSocketConnectionListener {
      *
      * @param connection 连接
      */
-    void onConnect(WindSocketClientConnection connection);
+    void onConnect(WindSocketClientClientConnection connection);
 
     /**
      * 断开连接
      *
      * @param connection 连接
      */
-    void onDisconnect(WindSocketClientConnection connection);
+    void onDisconnect(WindSocketClientClientConnection connection);
 
     /**
      * 连接异常
@@ -28,5 +28,5 @@ public interface WindSocketConnectionListener {
      * @param connection 连接
      * @param throwable  异常信息
      */
-    void onError(WindSocketClientConnection connection, Throwable throwable);
+    void onError(WindSocketClientClientConnection connection, Throwable throwable);
 }

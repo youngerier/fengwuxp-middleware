@@ -3,6 +3,7 @@ package com.wind.websocket.chat;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,8 @@ import java.util.Collections;
  * @author wuxp
  * @date 2025-05-30 17:48
  **/
-class ImmutableChatMessageTest {
+@Slf4j
+class ImmutableChatMessageTests {
 
     private ObjectMapper objectMapper;
 
@@ -46,7 +48,7 @@ class ImmutableChatMessageTest {
 
         // 序列化为 JSON
         String json = objectMapper.writeValueAsString(message);
-        System.out.println("Serialized JSON:\n" + json);
+        log.info("Serialized JSON = {}", json);
 
         // 反序列化回对象
         ImmutableChatMessage deserialized = objectMapper.readValue(json, ImmutableChatMessage.class);

@@ -89,4 +89,5 @@ public interface ChatMessage {
     default Map<String, String> getMetadata() {
         return Collections.emptyMap();
     }
+
 }
