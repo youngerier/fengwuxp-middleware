@@ -318,6 +318,11 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
+                <groupId>com.wind.middleware</groupId>
+                <artifactId>wind-websocket</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
                 <version>${mysql.version}</version>
