@@ -5,7 +5,7 @@ import com.wind.common.WindConstants;
 import com.wind.common.enums.ConfigFileType;
 import com.wind.common.enums.WindMiddlewareType;
 import com.wind.common.exception.AssertUtils;
-import com.wind.common.util.ClassDetectionUtils;
+import com.wind.common.jul.WindJulLogFactory;
 import com.wind.configcenter.core.ConfigRepository;
 import com.wind.configcenter.core.ConfigRepository.ConfigDescriptor;
 import lombok.AllArgsConstructor;
@@ -18,11 +18,13 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.wind.common.WindConstants.SPRING_APPLICATION_NAME;
@@ -42,12 +44,7 @@ import static com.wind.common.WindConstants.WIND_SERVER_USED_MIDDLEWARE;
 @Slf4j
 public class WindPropertySourceLoader {
 
-    private static final String REDISSON_CLIENT_CLASS_NAME = "org.redisson.api.RedissonClient";
-
-    /**
-     * 是否使用 redisson
-     */
-    private static final boolean REDISSON_IF_PRESENT = ClassDetectionUtils.isPresent(REDISSON_CLIENT_CLASS_NAME);
+    private static final Logger LOGGER = WindJulLogFactory.getLogger(WindPropertySourceLoader.class);
 
     private final ConfigRepository repository;
 
@@ -78,14 +75,14 @@ public class WindPropertySourceLoader {
     private PropertySource<?> locateConfigs(Environment environment) {
         CompositePropertySource result = new CompositePropertySource(repository.getConfigSourceName());
         String applicationName = environment.getProperty(SPRING_APPLICATION_NAME);
-        AssertUtils.hasText(applicationName, () -> SPRING_APPLICATION_NAME + " must not empty");
+        AssertUtils.hasText(applicationName, () -> String.format("%s must not empty", SPRING_APPLICATION_NAME));
         // 中间件配置共享模式下的名称
         String middlewareShareName = environment.getProperty(WIND_MIDDLEWARE_SHARE_NAME, applicationName);
         // 加载中间件配置
         for (WindMiddlewareType type : getUsedMiddlewareTypes(environment)) {
             String name = environment.getProperty(type.getConfigName(), middlewareShareName);
             AssertUtils.notNull(name, type.getConfigName() + " must not empty");
-            if (Objects.equals(type, WindMiddlewareType.REDIS) && REDISSON_IF_PRESENT) {
+            if (Objects.equals(type, WindMiddlewareType.REDIS) && WindMiddlewareDetector.useRedisson()) {
                 // redisson 配置支持
                 loadRedissonConfig(name, result);
             } else if (Objects.equals(type, WindMiddlewareType.DYNAMIC_TP)) {
@@ -112,10 +109,13 @@ public class WindPropertySourceLoader {
 
     private static List<WindMiddlewareType> getUsedMiddlewareTypes(Environment environment) {
         String config = environment.getProperty(WIND_SERVER_USED_MIDDLEWARE);
+        List<WindMiddlewareType> result = new ArrayList<>(WindMiddlewareDetector.getDependenciesMiddlewareTypes());
         if (StringUtils.hasLength(config)) {
-            return Arrays.stream(config.split(WindConstants.COMMA)).map(WindMiddlewareType::valueOf).collect(Collectors.toList());
+            Set<WindMiddlewareType> middlewareTypes =
+                    Arrays.stream(config.split(WindConstants.COMMA)).map(WindMiddlewareType::valueOf).collect(Collectors.toSet());
+            result.addAll(middlewareTypes);
         }
-        return Collections.emptyList();
+        return result;
     }
 
     private SimpleConfigDescriptor buildDescriptor(String name, String group) {
@@ -124,7 +124,9 @@ public class WindPropertySourceLoader {
 
     private SimpleConfigDescriptor buildDescriptor(String name, String group, ConfigFileType fileType) {
         SimpleConfigDescriptor result = SimpleConfigDescriptor.of(name, group);
-        result.setFileType(fileType);
+        if (result.getFileType() == null) {
+            result.setFileType(fileType);
+        }
         // 开启 RefreshScope 支持
         result.setRefreshable(true);
         return result;
@@ -135,12 +137,12 @@ public class WindPropertySourceLoader {
             log.debug("load config，id = {}, group = {}, refreshable = {}", descriptor.getConfigId(), descriptor.getGroup(),
                     descriptor.isRefreshable());
         }
-        List<PropertySource<?>> configs = repository.getConfigs(descriptor);
-        configs.forEach(result::addFirstPropertySource);
+        repository.getConfigs(descriptor).forEach(result::addFirstPropertySource);
     }
 
     private void loadRedissonConfig(String redissonName, CompositePropertySource result) {
         if (StringUtils.hasLength(redissonName)) {
+            // TODO 增加凭据替换支持
             String name = String.format("%s%s%s", redissonName, WindConstants.DASHED, WindConstants.REDISSON_NAME);
             ConfigDescriptor descriptor = ConfigDescriptor.immutable(name, WindMiddlewareType.REDIS.name(), ConfigFileType.YAML);
             Map<String, Object> source = ImmutableMap.of(SPRING_REDISSON_CONFIG_NAME, repository.getTextConfig(descriptor));

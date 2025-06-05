@@ -3,18 +3,19 @@ package com.wind.common.query.supports;
 
 import com.wind.common.exception.AssertUtils;
 import lombok.Data;
+import org.springframework.lang.NonNull;
 
 import javax.validation.constraints.NotNull;
 import java.beans.Transient;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 分页查询对象基类
+ * 分页查询对象
  *
  * @author wxup
  */
 @Data
-public abstract class AbstractPageQuery<F extends QueryOrderField> {
+public abstract class AbstractPageQuery<OrderField extends QueryOrderField> implements WindPageQuery<OrderField> {
 
     /**
      * 避免查询页面数据过大，拖垮数据库
@@ -22,36 +23,41 @@ public abstract class AbstractPageQuery<F extends QueryOrderField> {
     private static final AtomicInteger MAX_QUERY_SIZE = new AtomicInteger(3000);
 
     /**
-     * 当前查询页码
+     * 查询页码
      */
     @NotNull
     private Integer queryPage = 1;
 
     /**
-     * 当前查询大小
+     * 查询大小
      */
     @NotNull
     private Integer querySize = 20;
 
     /**
-     * 当前查询类型
+     * 查询类型
      */
     private QueryType queryType = QueryType.QUERY_BOTH;
 
     /**
-     * 获取排序字段
-     * 排序字段和排序类型安装数组顺序一一对应
+     * 排序字段
      */
-    private F[] orderFields;
+    private OrderField[] orderFields;
 
     /**
-     * 获取排序类型
+     * 排序类型
      */
     private QueryOrderType[] orderTypes;
 
-    public void setQuerySize(Integer querySize) {
+    @Override
+    public void setQuerySize(@NonNull Integer querySize) {
         AssertUtils.isTrue(querySize <= getMaxQuerySize(), () -> String.format("查询大小不能超过：%d", MAX_QUERY_SIZE.get()));
         this.querySize = querySize;
+    }
+
+    @NotNull
+    public QueryType getQueryType() {
+        return queryType == null ? QueryType.QUERY_BOTH : queryType;
     }
 
     /**

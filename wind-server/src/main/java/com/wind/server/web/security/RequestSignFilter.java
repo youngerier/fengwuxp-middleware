@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.BiFunction;
 
 
@@ -43,6 +44,13 @@ import java.util.function.BiFunction;
 @Slf4j
 @AllArgsConstructor
 public class RequestSignFilter implements Filter, Ordered {
+
+    /**
+     * 签名时间戳 5 分钟内有效
+     */
+    public static final AtomicLong SIGNATURE_TIMESTAMP_VALIDITY_PERIOD = new AtomicLong(5 * 60 * 1000L);
+
+    private static final String SIGAN_VERIFY_ERROR_MESSAGE = "sign verify error";
 
     private final SignatureHttpHeaderNames headerNames;
 
@@ -78,13 +86,17 @@ public class RequestSignFilter implements Filter, Ordered {
 
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         String accessId = request.getHeader(headerNames.getAccessId());
-        if (!StringUtils.hasLength(accessId)) {
+        if (!StringUtils.hasText(accessId)) {
             badRequest(response, "request access key must not empty");
             return;
         }
 
         boolean signRequireBody = ApiSignatureRequest.signRequireRequestBody(request.getContentType());
         HttpServletRequest httpRequest = signRequireBody ? new RepeatableReadRequestWrapper(request) : request;
+        if (isInvalidTimestamp(request.getHeader(headerNames.getTimestamp()))) {
+            badRequest(response, SIGAN_VERIFY_ERROR_MESSAGE);
+            return;
+        }
         ApiSignatureRequest signatureRequest = buildSignatureRequest(httpRequest, signRequireBody);
         String requestSign = request.getHeader(headerNames.getSign());
 
@@ -109,7 +121,7 @@ public class RequestSignFilter implements Filter, Ordered {
             }
         }
         log.error("sign verify error, signature request = {}", signatureRequest);
-        badRequest(response, "sign verify error");
+        badRequest(response, SIGAN_VERIFY_ERROR_MESSAGE);
     }
 
     private void badRequest(HttpServletResponse response, String message) {
@@ -134,6 +146,7 @@ public class RequestSignFilter implements Filter, Ordered {
                 .queryString(request.getQueryString())
                 // 仅在存在查询字符串时才设置，避免获取到表单参数
                 .method(request.getMethod().toUpperCase())
+                // TODO 随机串的验证
                 .nonce(request.getHeader(headerNames.getNonce()))
                 .timestamp(request.getHeader(headerNames.getTimestamp()));
         if (requiredBody) {
@@ -142,11 +155,20 @@ public class RequestSignFilter implements Filter, Ordered {
         return result.build();
     }
 
+    private boolean isInvalidTimestamp(String timestamp) {
+        try {
+            // 时间差值 > 有效期时间范围则无效
+            return Math.abs((System.currentTimeMillis() - Long.parseLong(timestamp))) > SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get();
+        } catch (NumberFormatException exception) {
+            log.info("sign timestamp is invalid");
+            return true;
+        }
+    }
+
     @Override
     public int getOrder() {
         return WindWebFilterOrdered.REQUEST_SIGN_FILTER.getOrder();
     }
-
 
     public interface ApiSecretAccountProvider extends BiFunction<String, String, ApiSecretAccount> {
 

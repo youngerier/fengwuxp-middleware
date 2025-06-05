@@ -1,9 +1,8 @@
 package com.wind.trace;
 
-import com.wind.common.exception.AssertUtils;
+import com.wind.core.WritableContextVariables;
 import com.wind.trace.thread.WindThreadTracer;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Null;
 import java.util.Collections;
@@ -15,7 +14,7 @@ import java.util.Map;
  * @author wuxp
  * @date 2023-12-29 10:13
  **/
-public interface WindTracer {
+public interface WindTracer extends WritableContextVariables {
 
     /**
      * 默认的 tracer
@@ -23,7 +22,7 @@ public interface WindTracer {
     WindTracer TRACER = new WindThreadTracer();
 
     /**
-     * 自动生成 traceId 并设置到上下文中
+     * 如果上下文中不存在 traceId 则生成
      *
      * @see #trace(String)
      */
@@ -47,44 +46,16 @@ public interface WindTracer {
     void trace(@Null String traceId, @NotNull Map<String, Object> contextVariables);
 
     /**
-     * 清除 trace 上下文
-     */
-    void clear();
-
-    /**
-     * 获取线程上下文中的 traceId
+     * 获取线程上下文中的 traceId，若不存在则创建
      *
      * @return trace id
      */
-    default String getTraceId() {
-        return getTraceContext().getTraceId();
-    }
+    String getTraceId();
 
     /**
-     * 添加上下文变量
-     *
-     * @param variableName 变量名称
-     * @param variable     变量值
+     * 清除 trace 上下文
      */
-    void putContextVariable(@NotBlank String variableName, @NotNull String variable);
-
-    /**
-     * 添加上下文变量
-     *
-     * @param variables 变量 map
-     */
-    default void putContextVariables(@NotNull Map<String, String> variables) {
-        AssertUtils.notNull(variables, "argument variables must not null");
-        variables.forEach(this::putContextVariable);
-    }
-
-    /**
-     * 获取 trace Context
-     *
-     * @return WindTraceContext
-     */
-    @NotNull
-    WindTraceContext getTraceContext();
+    void clear();
 }
 
 

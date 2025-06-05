@@ -1,9 +1,9 @@
 package ${basePackage}.services;
 
-import ${basePackage}.services.model.dto.${name}DTO;
-import ${basePackage}.services.model.query.${name}Query;
-import ${basePackage}.services.model.request.Create${name}Request;
-import ${basePackage}.services.model.request.Update${name}Request;
+import ${basePackage}.model.dto.${name}DTO;
+import ${basePackage}.model.query.${name}Query;
+import ${basePackage}.model.request.Create${name}Request;
+import ${basePackage}.model.request.Update${name}Request;
 import com.wind.common.query.supports.Pagination;
 
 import javax.validation.constraints.NotEmpty;

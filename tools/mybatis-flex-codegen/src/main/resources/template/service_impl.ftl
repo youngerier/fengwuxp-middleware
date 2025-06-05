@@ -1,15 +1,15 @@
 package ${basePackage}.services.impl;
 
-import com.capte.nobe.infrastructure.dal.MybatisQueryHelper;
+import com.wind.mybatis.flex.MybatisQueryHelper;
 import ${basePackage}.dal.entities.table.${name}NameRefs;
 import ${basePackage}.dal.entities.${name};
 import ${basePackage}.dal.mapper.${name}Mapper;
 import ${basePackage}.services.${name}Service;
-import ${basePackage}.services.mapstruct.${name}Converter;
-import ${basePackage}.services.model.dto.${name}DTO;
-import ${basePackage}.services.model.query.${name}Query;
-import ${basePackage}.services.model.request.Create${name}Request;
-import ${basePackage}.services.model.request.Update${name}Request;
+import ${basePackage}.mapstruct.${name}Converter;
+import ${basePackage}.model.dto.${name}DTO;
+import ${basePackage}.model.query.${name}Query;
+import ${basePackage}.model.request.Create${name}Request;
+import ${basePackage}.model.request.Update${name}Request;
 import com.mybatisflex.core.paginate.Page;
 import com.mybatisflex.core.query.QueryWrapper;
 import com.wind.common.query.supports.Pagination;
@@ -88,7 +88,7 @@ public Pagination
         <#list extraProps.query.fields as f >
             <#if f_index==0>
                 <#if f.type=='String'>
-                    .where(${firstLowName}.${f.name}.like(query.get${f.firstUpCaseName}()))
+                    .where(${firstLowName}.${f.name}.eq(query.get${f.firstUpCaseName}()))
                 <#elseif f.type=='Date' >
                     .where(${firstLowName}.${f.name}<#if f.name?starts_with('min')>.ge<#else >.le</#if>(query.get${f.firstUpCaseName}()))<#if !f_has_next>;</#if>
                 <#else >
@@ -96,7 +96,7 @@ public Pagination
                 </#if>
             <#else >
                 <#if f.type=='String'>
-                    .and(${firstLowName}.${f.name}.like(query.get${f.firstUpCaseName}()))<#if !f_has_next>;</#if>
+                    .and(${firstLowName}.${f.name}.eq(query.get${f.firstUpCaseName}()))<#if !f_has_next>;</#if>
                 <#elseif f.type=='Date' || f.type=='LocalDateTime' >
                     <#if f.name?starts_with('min')>
                         <#assign fieldName=f.name?replace("min","")/>

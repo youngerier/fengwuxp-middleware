@@ -21,6 +21,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
+import static com.wind.server.web.security.RequestSignFilter.SIGNATURE_TIMESTAMP_VALIDITY_PERIOD;
+
 /**
  * @author wuxp
  * @date 2024-03-04 13:14
@@ -69,5 +71,30 @@ class RequestSignFilterTests {
         MockHttpServletResponse response = new MockHttpServletResponse();
         signFilter.doFilter(request, response, new MockFilterChain());
         Assertions.assertNotNull(request.getAttribute(WindHttpConstants.API_SECRET_ACCOUNT_ATTRIBUTE_NAME));
+    }
+
+    @Test
+    void testSignExpire() throws Exception {
+        UriComponents uriComponents = UriComponentsBuilder.fromUriString("https://www.example.com/api/v1/examples?a=2&b=20&name=张三").build();
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", uriComponents.getPath());
+        byte[] requestBody = RandomStringUtils.randomAlphabetic(1000).getBytes(StandardCharsets.UTF_8);
+        request.setContent(requestBody);
+        ApiSignatureRequestInterceptor interceptor = new ApiSignatureRequestInterceptor(httpRequest -> secretAccount);
+        interceptor.intercept(new ServletServerHttpRequest(request), requestBody, (r, body) -> {
+            r.getHeaders().forEach((name, values) -> {
+                if (name.contains("Timestamp")) {
+                    request.addHeader(name, System.currentTimeMillis() - SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get() - 1);
+                } else {
+                    if (!ObjectUtils.isEmpty(values)) {
+                        request.addHeader(name, values.get(0));
+                    }
+                }
+            });
+            return new MockClientHttpResponse(new byte[0], 200);
+        });
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        signFilter.doFilter(request, response, new MockFilterChain());
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST.value(), response.getStatus());
+        Assertions.assertTrue(response.getContentAsString().contains("sign verify error"));
     }
 }

@@ -20,6 +20,7 @@ Default logback configuration provided for import
                         "date": "%d{yyyy-MM-dd HH:mm:ss.SSS}",
                         "A-TraceId": "%X{traceId:-}",
                         "tenant": "%X{tenant:-}",
+                        "userId": "%X{userId:-}",
                         "appName": "${APP_NAME}",
                         "env": "${SPRING_PROFILES_ACTIVE}",
                         "requestUrl": "%X{requestUrl:-}",
@@ -44,9 +45,7 @@ Default logback configuration provided for import
         <producerConfig>buffer-memory=${KAFKA_BUFFER_MEMORY}</producerConfig>
         <producerConfig>properties.max.request.size==${KAFKA_MAX_REQUEST_SIZE}</producerConfig>
     </appender>
-    <appender name="KAFKA_ASYNC" class="ch.qos.logback.classic.AsyncAppender">
-        <!-- if neverBlock is set to true, the async appender discards messages when its internal queue is full -->
-        <neverBlock>true</neverBlock>
+    <appender name="DISRUPTOR_KAFKA" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
         <appender-ref ref="KAFKA"/>
     </appender>
 </included>

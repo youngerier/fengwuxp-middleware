@@ -24,6 +24,8 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -78,8 +80,9 @@ public class SentinelWebInterceptor implements HandlerInterceptor {
         }
         ContextUtil.enter(resource.getContextName(), resource.getOrigin());
         try {
-            Entry entry = SphU.entry(resource.getName(), resource.getResourceType(), resource.getEntryType(),
-                    new Object[]{Tags.of(resource.getMetricsTags())});
+            List<Object> args = new ArrayList<>(resource.getArgs());
+            args.add(Tags.of(resource.getMetricsTags()));
+            Entry entry = SphU.entry(resource.getName(), resource.getResourceType(), resource.getEntryType(), args.toArray(new Object[0]));
             request.setAttribute(entryAttributeName, entry);
         } catch (BlockException exception) {
             try {

@@ -1,6 +1,7 @@
 package com.wind.common.util;
 
 import com.wind.common.WindConstants;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.StringUtils;
 
@@ -49,20 +50,20 @@ public final class StringJoinSplitUtils {
     }
 
     @Nullable
-    public static String joinEnums(Collection<? extends Enum<?>> enums) {
+    public static String joinEnums(@Nullable Collection<? extends Enum<?>> enums) {
         if (enums == null) {
             return null;
         }
         return join(enums.stream().map(Enum::name).collect(Collectors.toList()));
     }
 
-    @Nullable
-    public static String joinEnums(Enum<?>... enums) {
+    @NonNull
+    public static String joinEnums(@NonNull Enum<?>... enums) {
         return join(Arrays.asList(enums));
     }
 
-    @Nullable
-    public static String join(Object... objects) {
+    @NonNull
+    public static String join(@NonNull Object... objects) {
         return join(Arrays.asList(objects));
     }
 

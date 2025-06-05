@@ -29,4 +29,13 @@ public final class WindDateFormatPatterns {
 
     public static final String YYYY = "yyyy";
 
+    public static final String YYYYMMDD = "yyyyMMdd";
+
+    public static final String YYYYMMDDHH = "yyyyMMddHH";
+
+    public static final String YYYYMMDDHHMM = "yyyyMMddHHmm";
+
+    public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
+
+
 }

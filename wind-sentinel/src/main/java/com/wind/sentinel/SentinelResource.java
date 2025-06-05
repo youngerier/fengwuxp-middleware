@@ -4,9 +4,11 @@ import com.alibaba.csp.sentinel.EntryType;
 import io.micrometer.core.instrument.Tag;
 
 import java.util.Collections;
+import java.util.List;
 
 /**
  * sentinel 流控资源定义
+ * 参见：https://github.com/alibaba/Sentinel/wiki/
  *
  * @author wuxp
  * @date 2024-03-07 15:24
@@ -37,6 +39,13 @@ public interface SentinelResource {
      * @return 请求来源
      */
     String getOrigin();
+
+    /**
+     * @return 资源参数
+     */
+    default List<Object> getArgs() {
+        return Collections.emptyList();
+    }
 
     /**
      * @return 资源需要额外采集的标签

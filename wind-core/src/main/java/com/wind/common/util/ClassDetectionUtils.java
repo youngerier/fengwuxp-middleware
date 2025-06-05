@@ -12,7 +12,6 @@ public final class ClassDetectionUtils {
         throw new AssertionError();
     }
 
-
     /**
      * 类是否存在
      *

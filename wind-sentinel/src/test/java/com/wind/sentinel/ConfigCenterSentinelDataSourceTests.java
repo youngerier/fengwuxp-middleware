@@ -38,7 +38,7 @@ class ConfigCenterSentinelDataSourceTests {
 
     static class MockConfigRepository implements ConfigRepository {
 
-        private final Map<ConfigDescriptor, ConfigListener> listeners = new HashMap<>();
+        private final Map<ConfigDescriptor, TextConfigListener> listeners = new HashMap<>();
 
         private final Map<ConfigDescriptor, Object> mockConfigs = new HashMap<>();
 
@@ -53,7 +53,7 @@ class ConfigCenterSentinelDataSourceTests {
         }
 
         @Override
-        public ConfigSubscription onChange(ConfigDescriptor descriptor, ConfigListener listener) {
+        public ConfigSubscription onChange(ConfigDescriptor descriptor, TextConfigListener listener) {
             listeners.put(descriptor, listener);
             return new ConfigSubscription() {
                 @Override

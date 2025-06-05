@@ -8,6 +8,7 @@ import com.wind.common.query.supports.Pagination;
 import com.wind.server.web.supports.ApiResp;
 import com.wind.server.web.supports.ImmutableWebApiResponse;
 import com.wind.trace.WindTracer;
+import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
 
@@ -21,8 +22,10 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public final class RestfulApiRespFactory {
 
+    private static final String UNKNOWN_ERROR = "unknown error";
+
     private static final AtomicReference<FriendlyExceptionMessageConverter> CONVERTER =
-            new AtomicReference<>(FriendlyExceptionMessageConverter.none());
+            new AtomicReference<>(FriendlyExceptionMessageConverter.defaults());
 
     private RestfulApiRespFactory() {
         throw new AssertionError();
@@ -95,8 +98,16 @@ public final class RestfulApiRespFactory {
         return of(HttpStatus.FORBIDDEN, data, DefaultExceptionCode.FORBIDDEN, errorMessage);
     }
 
+    public static <T> ApiResp<T> payloadToLarge() {
+        return payloadToLarge(DefaultExceptionCode.PAYLOAD_TOO_LARGE.getDesc());
+    }
+
+    public static <T> ApiResp<T> payloadToLarge(String errorMessage) {
+        return of(HttpStatus.PAYLOAD_TOO_LARGE, null, DefaultExceptionCode.PAYLOAD_TOO_LARGE, errorMessage);
+    }
+
     public static <T> ApiResp<T> toManyRequests() {
-        return of(HttpStatus.TOO_MANY_REQUESTS, null, DefaultExceptionCode.TO_MANY_REQUESTS, DefaultExceptionCode.TO_MANY_REQUESTS.getDesc());
+        return toManyRequests(DefaultExceptionCode.TO_MANY_REQUESTS.getDesc());
     }
 
     public static <T> ApiResp<T> toManyRequests(String errorMessage) {
@@ -106,7 +117,7 @@ public final class RestfulApiRespFactory {
     /*-------------------- business handle error 5xx -------------------*/
 
     public static <T> ApiResp<T> error() {
-        return error("请求处理出现错误");
+        return error(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
     }
 
     public static <T> ApiResp<T> error(String errorMessage) {
@@ -118,18 +129,23 @@ public final class RestfulApiRespFactory {
     }
 
     public static <T> ApiResp<T> error(T data, ExceptionCode code, String errorMessage) {
-        return of(HttpStatus.INTERNAL_SERVER_ERROR, data, code, errorMessage);
+        return of(HttpStatus.INTERNAL_SERVER_ERROR, data, code, errorMessage == null ? UNKNOWN_ERROR : errorMessage);
     }
 
     public static <T> ApiResp<T> withThrowable(Throwable throwable) {
-        String errorMessage = StringUtils.hasText(throwable.getMessage()) ? throwable.getMessage() : "unknown error";
+        String defaultMessage = StringUtils.hasText(throwable.getMessage()) ? throwable.getMessage() : UNKNOWN_ERROR;
+        String errorMessage = CONVERTER.get().convert(throwable, defaultMessage);
+        if (GlobalExceptionLogDecisionMaker.isSpringSecurityAuthenticationException(throwable)) {
+            // 401
+            return unAuthorized(errorMessage);
+        }
         if (throwable instanceof BaseException) {
             ExceptionCode code = ((BaseException) throwable).getCode();
             if (code instanceof DefaultExceptionCode) {
                 HttpStatus status = HttpStatus.resolve(Integer.parseInt(code.getCode()));
-                return of(status == null ? HttpStatus.INTERNAL_SERVER_ERROR : status, null, code, CONVERTER.get().convert(throwable, errorMessage));
+                return of(status == null ? HttpStatus.INTERNAL_SERVER_ERROR : status, null, code, errorMessage);
             }
-            return error(code, CONVERTER.get().convert(throwable, errorMessage));
+            return error(code, errorMessage);
         }
         return error(errorMessage);
     }

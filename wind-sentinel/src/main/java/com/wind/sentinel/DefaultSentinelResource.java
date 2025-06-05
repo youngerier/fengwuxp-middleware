@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author wuxp
  * @date 2024-03-07 15:44
@@ -24,6 +27,8 @@ public class DefaultSentinelResource implements SentinelResource {
     private String contextName;
 
     private String origin;
+
+    private List<Object> args = new ArrayList<>();
 
     private Iterable<Tag> metricsTags;
 }

@@ -27,22 +27,22 @@ public final class AuthenticationParameterEncryptor implements ApplicationListen
      * 加密配置
      */
     @VisibleForTesting
-    static final AtomicReference<KeyPair> KEY_PAIR = new AtomicReference<>();
+    static final AtomicReference<RasTextEncryptor> TEXT_ENCRYPTOR = new AtomicReference<>();
 
     public static String tryEncrypt(String content) {
-        KeyPair keyPair = KEY_PAIR.get();
-        if (keyPair == null) {
+        RasTextEncryptor encryptor = TEXT_ENCRYPTOR.get();
+        if (encryptor == null) {
             return content;
         }
-        return StringUtils.hasLength(content) ? RSAUtils.encryptAsText(content, keyPair.getPublic()) : content;
+        return StringUtils.hasLength(content) ? encryptor.encrypt(content) : content;
     }
 
     public static String tryDecrypt(String content) {
-        KeyPair keyPair = KEY_PAIR.get();
-        if (keyPair == null) {
+        RasTextEncryptor encryptor = TEXT_ENCRYPTOR.get();
+        if (encryptor == null) {
             return content;
         }
-        return StringUtils.hasLength(content) ? RSAUtils.decrypt(content, keyPair.getPrivate()) : content;
+        return StringUtils.hasLength(content) ? encryptor.decrypt(content) : content;
     }
 
     /**
@@ -71,7 +71,8 @@ public final class AuthenticationParameterEncryptor implements ApplicationListen
     public void onApplicationEvent(ApplicationStartedEvent event) {
         try {
             WindAuthenticationProperties properties = event.getApplicationContext().getBean(WindAuthenticationProperties.class);
-            KEY_PAIR.set(properties.getKeyPair());
+            KeyPair keyPair = properties.getKeyPair();
+            TEXT_ENCRYPTOR.set(RasTextEncryptor.ofPublicEncrypt(keyPair.getPublic(), keyPair.getPrivate()));
         } catch (BeansException e) {
             log.info("un enable authentication parameter crypto");
         }

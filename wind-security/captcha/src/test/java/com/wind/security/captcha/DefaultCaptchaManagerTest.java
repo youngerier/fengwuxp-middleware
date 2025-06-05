@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static com.wind.security.captcha.CaptchaI18nMessageKeys.CAPTCHA_GENERATE_MAX_LIMIT_OF_USER_BY_DAY;
+import static com.wind.security.captcha.DefaultCaptchaManager.ALLOW_USE_PREVIOUS_CAPTCHA_TYPES;
 
 class DefaultCaptchaManagerTest {
 
@@ -54,6 +55,9 @@ class DefaultCaptchaManagerTest {
             String owner = RandomStringUtils.randomAlphanumeric(12);
             Captcha captcha = captchaManager.generate(type, scene, owner);
             Assertions.assertNotNull(captcha);
+            if (ALLOW_USE_PREVIOUS_CAPTCHA_TYPES.contains(type)) {
+                captcha = captchaManager.generate(type, scene, owner);
+            }
             captchaManager.verify(captcha.getValue(), type, scene, captcha.getOwner());
             Assertions.assertNull(captchaManager.getCaptchaStorage().get(captcha.getType(), captcha.getUseScene(), captcha.getOwner()));
         }
@@ -108,8 +112,8 @@ class DefaultCaptchaManagerTest {
         Captcha captcha2 = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
         Captcha captcha3 = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
         Assertions.assertEquals(captcha1.getValue(), captcha2.getValue());
-        Assertions.assertEquals(captcha1.getValue(), captcha3.getValue());
-        captchaManager.verify(captcha1.getValue(), SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
+        Assertions.assertNotEquals(captcha1.getValue(), captcha3.getValue());
+        captchaManager.verify(captcha3.getValue(), SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
         Assertions.assertNull(captchaManager.getCaptchaStorage().get(captcha1.getType(), SimpleUseScene.LOGIN, owner));
     }
 

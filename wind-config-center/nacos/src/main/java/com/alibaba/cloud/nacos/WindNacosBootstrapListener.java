@@ -9,9 +9,9 @@ import com.alibaba.spring.context.config.DefaultConfigurationBeanBinder;
 import com.google.common.base.CaseFormat;
 import com.wind.common.WindConstants;
 import com.wind.common.exception.AssertUtils;
+import com.wind.configcenter.core.ConfigFunctionEvaluator;
 import com.wind.configcenter.core.ConfigRepository;
 import com.wind.nacos.NacosConfigRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
@@ -22,6 +22,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MapPropertySource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertyResolver;
+import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
 
@@ -29,7 +30,9 @@ import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Logger;
 
+import static org.springframework.cloud.bootstrap.BootstrapApplicationListener.BOOTSTRAP_PROPERTY_SOURCE_NAME;
 import static org.springframework.core.env.StandardEnvironment.SYSTEM_ENVIRONMENT_PROPERTY_SOURCE_NAME;
 import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME;
 
@@ -39,8 +42,9 @@ import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES
  * @author wuxp
  * @date 2023-10-18 13:16
  **/
-@Slf4j
 public class WindNacosBootstrapListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+
+    private static final Logger LOGGER = Logger.getLogger(WindNacosBootstrapListener.class.getName());
 
     static final AtomicReference<ConfigService> CONFIG_SERVICE = new AtomicReference<>();
 
@@ -50,11 +54,11 @@ public class WindNacosBootstrapListener implements ApplicationListener<Applicati
     public void onApplicationEvent(@Nonnull ApplicationEnvironmentPreparedEvent event) {
         String enable = event.getEnvironment().getProperty(NacosConfigProperties.PREFIX + ".enabled");
         if (Boolean.FALSE.toString().equals(enable)) {
-            log.info("un enable nacos");
+            LOGGER.info("un enable nacos");
             return;
         }
         if (CONFIG_SERVICE.get() == null) {
-            log.info("init nacos bean on bootstrap");
+            LOGGER.info("init nacos bean on bootstrap");
             NacosConfigProperties properties = createNacosProperties(event.getEnvironment());
             AssertUtils.notNull(properties, String.format("please check %s config", NacosConfigProperties.PREFIX));
             CONFIG_SERVICE.set(buildConfigService(properties));
@@ -79,6 +83,10 @@ public class WindNacosBootstrapListener implements ApplicationListener<Applicati
     }
 
     private NacosConfigProperties createNacosProperties(ConfigurableEnvironment environment) {
+        // 尝试解密
+        PropertySource<?> systemProperties = environment.getPropertySources().remove(SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
+        environment.getPropertySources().addAfter(BOOTSTRAP_PROPERTY_SOURCE_NAME, ConfigFunctionEvaluator.getInstance().eval(systemProperties));
+
         ConfigurationBeanBinder binder = new DefaultConfigurationBeanBinder();
         NacosConfigProperties result = new NacosConfigProperties();
         binder.bind(getNacosConfigs(environment), true, true, result);

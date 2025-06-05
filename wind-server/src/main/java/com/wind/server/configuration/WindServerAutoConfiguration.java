@@ -84,8 +84,7 @@ public class WindServerAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX + ".health.graceful-shutdown", name = "enabled", havingValue = "true",
-            matchIfMissing = true)
+    @ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX + ".health.graceful-shutdown", name = ENABLED_NAME, havingValue = TRUE)
     public GracefulShutdownHealthIndicator gracefulShutdownHealthIndicator() {
         return new GracefulShutdownHealthIndicator();
     }

@@ -1,8 +1,10 @@
 package com.wind.server.aop;
 
 import com.wind.common.WindConstants;
+import com.wind.common.WindHttpConstants;
 import com.wind.context.injection.MethodParameterInjector;
 import com.wind.script.auditlog.ScriptAuditLogRecorder;
+import com.wind.web.util.HttpServletRequestUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -41,6 +43,7 @@ public class WindControllerMethodInterceptor implements MethodInterceptor {
             return result;
         } catch (Throwable throwable) {
             log.error("请求方法: {} 异常， 参数: {}，message: {}", invocation.getMethod(), invocation.getArguments(), throwable.getMessage(), throwable);
+            HttpServletRequestUtils.requireContextRequest().setAttribute(WindHttpConstants.getRequestExceptionLogOutputMarkerAttributeName(throwable), true);
             recordOperationLog(invocation, null, throwable);
             throw throwable;
         }

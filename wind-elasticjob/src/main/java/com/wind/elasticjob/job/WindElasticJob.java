@@ -25,7 +25,7 @@ public interface WindElasticJob {
     String getName();
 
     /**
-     * @return 任务参数
+     * @return sharding items and sharding parameters.
      */
     default String getShardingItemParameters() {
         return WindConstants.EMPTY;
@@ -57,6 +57,13 @@ public interface WindElasticJob {
      * @return 故障转移
      */
     default boolean isFailover() {
+        return true;
+    }
+
+    /**
+     * @return 任务错过后是否重新执行
+     */
+    default boolean isMisFire() {
         return true;
     }
 }

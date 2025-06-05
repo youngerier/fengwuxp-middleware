@@ -2,6 +2,7 @@ package com.wind.api.core;
 
 import org.springframework.lang.Nullable;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
 /**
@@ -17,6 +18,7 @@ public interface ApiResponse<T> extends Serializable {
      *
      * @return 本次响应的数据
      */
+    @Nullable
     T getData();
 
     /**
@@ -29,6 +31,7 @@ public interface ApiResponse<T> extends Serializable {
     /**
      * @return 错误码
      */
+    @NotBlank
     String getErrorCode();
 
     /**
@@ -44,6 +47,6 @@ public interface ApiResponse<T> extends Serializable {
      *
      * @return traceId
      */
-    @Nullable
+    @NotBlank
     String getTraceId();
 }

@@ -9,6 +9,8 @@ import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.common.jul.WindJulLogFactory;
+import com.wind.configcenter.core.ConfigFunctionEvaluator;
 import com.wind.configcenter.core.ConfigRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +19,7 @@ import org.springframework.core.env.PropertySource;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * 从 nacos 中加载配置
@@ -27,6 +30,8 @@ import java.util.List;
 @AllArgsConstructor
 @Slf4j
 public class NacosConfigRepository implements ConfigRepository {
+
+    private static final Logger LOGGER = WindJulLogFactory.getLogger(NacosConfigRepository.class);
 
     private final ConfigService configService;
 
@@ -43,8 +48,11 @@ public class NacosConfigRepository implements ConfigRepository {
 
     @Override
     public String getTextConfig(ConfigDescriptor descriptor) {
+        LOGGER.info("get config content dataId = " + descriptor.getConfigId());
         try {
-            return configService.getConfig(descriptor.getConfigId(), descriptor.getGroup(), properties.getTimeout());
+            String result = configService.getConfig(descriptor.getConfigId(), descriptor.getGroup(), properties.getTimeout());
+            // 尝试执行配置的函数
+            return ConfigFunctionEvaluator.getInstance().eval(descriptor.getConfigId(), result);
         } catch (NacosException exception) {
             throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("load config：%s error", descriptor.getConfigId()), exception);
         }
@@ -59,19 +67,33 @@ public class NacosConfigRepository implements ConfigRepository {
     }
 
     @Override
-    public ConfigSubscription onChange(ConfigDescriptor descriptor, ConfigListener listener) {
+    public ConfigSubscription onChange(ConfigDescriptor descriptor, TextConfigListener listener) {
+        final AbstractListener wrapperListener = new AbstractListener() {
+            @Override
+            public void receiveConfigInfo(String content) {
+                listener.change(content);
+            }
+        };
+        return addListener(descriptor, wrapperListener);
+    }
+
+    @Override
+    public ConfigSubscription onChange(ConfigDescriptor descriptor, PropertyConfigListener listener) {
+        final AbstractListener wrapperListener = new AbstractListener() {
+            @Override
+            public void receiveConfigInfo(String content) {
+                listener.change(getPropertySources(descriptor, content));
+            }
+        };
+        return addListener(descriptor, wrapperListener);
+    }
+
+    private ConfigSubscription addListener(ConfigDescriptor descriptor, AbstractListener wrapperListener) {
         if (!descriptor.isRefreshable()) {
             log.warn("config unsupported refresh, dataId = {}，group = {}", descriptor.getConfigId(), descriptor.getGroup());
             return ConfigSubscription.empty(descriptor);
 
         }
-        final AbstractListener wrapperListener = new AbstractListener() {
-            @Override
-            public void receiveConfigInfo(String content) {
-                listener.change(content);
-                listener.change(getPropertySources(descriptor, content));
-            }
-        };
         try {
             configService.addListener(descriptor.getConfigId(), descriptor.getGroup(), wrapperListener);
         } catch (NacosException exception) {

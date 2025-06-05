@@ -5,8 +5,11 @@ import com.wind.common.util.StringJoinSplitUtils;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.lang.Nullable;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -25,7 +28,7 @@ public interface SystemConfigRepository extends SystemConfigStorage {
      * @return 配置值
      */
     @NotNull
-    default String requireConfig(String name) {
+    default String requireConfig(@NotBlank String name) {
         String result = getConfig(name);
         AssertUtils.notNull(result, () -> String.format("config %s not found", name));
         return result;
@@ -39,7 +42,7 @@ public interface SystemConfigRepository extends SystemConfigStorage {
      * @return 配置值
      */
     @Nullable
-    default <T> T getConfig(String name, Class<T> clazz) {
+    default <T> T getConfig(@NotBlank String name, @NotNull Class<T> clazz) {
         return getConfig(name, clazz, null);
     }
 
@@ -51,7 +54,7 @@ public interface SystemConfigRepository extends SystemConfigStorage {
      * @return 配置值
      */
     @Nullable
-    <T> T getConfig(String name, Class<T> targetType, T defaultValue);
+    <T> T getConfig(@NotBlank String name, @NotNull Class<T> targetType, T defaultValue);
 
     /**
      * 获取集合类型配置
@@ -61,7 +64,7 @@ public interface SystemConfigRepository extends SystemConfigStorage {
      * @return 配置值
      */
     @NotEmpty
-    <T> Set<T> getConfigs(String name, Class<T> targetType);
+    <T> Set<T> getConfigs(@NotBlank String name, @NotNull Class<T> targetType);
 
     /**
      * 获取集合类型配置
@@ -70,23 +73,23 @@ public interface SystemConfigRepository extends SystemConfigStorage {
      * @return 配置值
      */
     @NotEmpty
-    default Set<String> getConfigs(String name) {
+    default Set<String> getConfigs(@NotBlank String name) {
         String config = getConfig(name);
         return StringJoinSplitUtils.split(config);
     }
 
     @Nullable
-    default Boolean asBoolean(String name) {
+    default Boolean asBoolean(@NotBlank String name) {
         return getConfig(name, Boolean.TYPE);
     }
 
     @Nullable
-    default Integer asInt(String name) {
+    default Integer asInt(@NotBlank String name) {
         return getConfig(name, Integer.TYPE);
     }
 
     @Nullable
-    default Long asLong(String name) {
+    default Long asLong(@NotBlank String name) {
         return getConfig(name, Long.TYPE);
     }
 
@@ -98,7 +101,7 @@ public interface SystemConfigRepository extends SystemConfigStorage {
      * @return 配置值
      */
     @Nullable
-    <T> T getJsonConfig(String name, Class<T> targetType);
+    <T> T getJsonConfig(@NotBlank String name, @NotNull Class<T> targetType);
 
     /**
      * 获取 json 配置并转换
@@ -108,5 +111,18 @@ public interface SystemConfigRepository extends SystemConfigStorage {
      * @return 配置值
      */
     @Nullable
-    <T> T getJsonConfig(String name, ParameterizedTypeReference<T> targetType);
+    <T> T getJsonConfig(@NotBlank String name, @NotNull ParameterizedTypeReference<T> targetType);
+
+    /**
+     * 获取 json 配置并转换为 map 类型
+     *
+     * @param name 配置名称
+     * @return 配置值
+     */
+    @NotNull
+    default Map<String, Object> getJsonConfig(@NotBlank String name) {
+        Map<String, Object> result = getJsonConfig(name, new ParameterizedTypeReference<Map<String, Object>>() {
+        });
+        return result == null ? Collections.emptyMap() : result;
+    }
 }

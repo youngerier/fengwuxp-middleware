@@ -68,14 +68,20 @@ public interface ConfigRepository {
      * @param listener   监听配置
      * @return 配置订阅实例
      */
-    default ConfigSubscription onChange(ConfigDescriptor descriptor, ConfigListener listener) {
+    default ConfigSubscription onChange(ConfigDescriptor descriptor, TextConfigListener listener) {
         throw new UnsupportedOperationException("un support listen config");
     }
 
-    interface ConfigListener {
-        default void change(String config) {
+    default ConfigSubscription onChange(ConfigDescriptor descriptor, PropertyConfigListener listener) {
+        throw new UnsupportedOperationException("un support listen config");
+    }
 
-        }
+    interface TextConfigListener {
+
+        void change(String text);
+    }
+
+    interface PropertyConfigListener {
 
         void change(List<PropertySource<?>> configs);
     }

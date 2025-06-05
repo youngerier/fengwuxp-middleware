@@ -1,10 +1,12 @@
 package com.wind.server.web.exception;
 
 
+import com.wind.common.WindConstants;
 import com.wind.common.exception.BaseException;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.server.web.supports.ApiResp;
+import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -18,6 +20,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.validation.ConstraintViolation;
@@ -37,7 +41,8 @@ import static com.wind.common.WindConstants.WIND_SERVER_PROPERTIES_PREFIX;
  * @author wxup
  */
 @Slf4j
-@ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX, name = "enabled-global-exception", havingValue = "true", matchIfMissing = true)
+@ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX, name = "enabled-global-exception", havingValue = WindConstants.TRUE, matchIfMissing
+        = true)
 @RestControllerAdvice()
 @AllArgsConstructor
 public class DefaultGlobalExceptionHandler {
@@ -79,6 +84,24 @@ public class DefaultGlobalExceptionHandler {
     }
 
     /**
+     * 上传文件文件过大
+     */
+    @ExceptionHandler(value = MaxUploadSizeExceededException.class)
+    @ResponseBody
+    public ApiResp<Void> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException exception) {
+        return RestfulApiRespFactory.payloadToLarge();
+    }
+
+    /**
+     * 文件上传异常
+     */
+    @ExceptionHandler(value = MultipartException.class)
+    @ResponseBody
+    public ApiResp<Void> handleMultipartException(MultipartException exception) {
+        return RestfulApiRespFactory.badRequest(exception.getMessage());
+    }
+
+    /**
      * controller bind data 的异常
      */
     @ExceptionHandler(value = BindException.class)
@@ -92,14 +115,13 @@ public class DefaultGlobalExceptionHandler {
         return RestfulApiRespFactory.badRequest(String.format("%s#%s：%s", fieldError.getObjectName(), fieldError.getField(), message));
     }
 
-
     /**
-     * 404 的异常就会被这个方法捕获
+     * Not Found 异常处理
      */
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ApiResp<Void> handle404Error(Exception exception) {
+    public ApiResp<Void> handleNotFoundError(Exception exception) {
         return RestfulApiRespFactory.notFound(exception.getMessage());
     }
 
@@ -109,7 +131,9 @@ public class DefaultGlobalExceptionHandler {
     @ExceptionHandler(DuplicateKeyException.class)
     @ResponseBody
     public ApiResp<Void> duplicateKeyException(Exception exception) {
-        log.error("唯一键冲突", exception);
+        if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
+            log.error("唯一键冲突", exception);
+        }
         return RestfulApiRespFactory.error(SpringI18nMessageUtils.getMessage(DB_DUPLICATE_KEY_I18N_KEY, "数据已存在"));
     }
 
@@ -119,7 +143,9 @@ public class DefaultGlobalExceptionHandler {
     @ExceptionHandler(DataAccessException.class)
     @ResponseBody
     public ApiResp<Void> dataAccessException(Exception exception) {
-        log.error("数据操作异常", exception);
+        if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
+            log.error("数据操作异常", exception);
+        }
         return RestfulApiRespFactory.error(SpringI18nMessageUtils.getMessage(DB_ACCESS_DATA_I18N_KEY, "数据操作失败"));
     }
 
@@ -129,10 +155,11 @@ public class DefaultGlobalExceptionHandler {
     @ExceptionHandler({BaseException.class})
     @ResponseBody
     public ApiResp<Integer> handleBusinessServiceException(BaseException exception) {
-        log.error("业务异常，code = {}，errorMessage: {}", exception.getTextCode(), exception.getMessage(), exception);
+        if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
+            log.error("业务异常，code = {}，errorMessage: {}", exception.getTextCode(), exception.getMessage(), exception);
+        }
         return RestfulApiRespFactory.withThrowable(exception);
     }
-
 
     /**
      * 统一兜底异常处理，如果前面都没有捕获到，将进入该方法
@@ -141,7 +168,9 @@ public class DefaultGlobalExceptionHandler {
     @ResponseBody
     public ApiResp<Void> handleException(Exception exception) {
         Throwable throwable = exception;
-        log.error("捕获到异常: {}，errorMessage: {}", exception.getClass().getName(), exception.getMessage(), exception);
+        if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
+            log.error("捕获到异常: {}，errorMessage: {}", exception.getClass().getName(), exception.getMessage(), exception);
+        }
         if (throwable instanceof UndeclaredThrowableException) {
             // 获取真正的异常
             InvocationTargetException invocationTargetException =
@@ -150,4 +179,5 @@ public class DefaultGlobalExceptionHandler {
         }
         return RestfulApiRespFactory.error(throwable.getMessage());
     }
+
 }

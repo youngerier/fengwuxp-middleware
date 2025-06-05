@@ -8,7 +8,7 @@
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies -->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.7.16</version>
+        <version>2.7.18</version>
     </parent>
 
     <groupId>com.wind.middleware</groupId>
@@ -33,14 +33,15 @@
         <module>wind-archetype</module>
         <module>tools</module>
         <module>object-mask</module>
-        <module>script</module>
-        <module>sequence-generate</module>
+        <module>wind-script</module>
+        <module>wind-sequence</module>
         <module>tests</module>
         <module>wind-rocketmq</module>
+        <module>wind-websocket</module>
     </modules>
 
     <properties>
-        <revision>1.0.20-SNAPSHOT</revision>
+        <revision>1.0.29-SNAPSHOT</revision>
         <!--   占位使用     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
@@ -61,34 +62,43 @@
         <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
         <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
 
+        <spring-framework.version>5.3.39</spring-framework.version>
         <spring-boot.version>2.7.16</spring-boot.version>
-        <spring-cloud-commons.version>3.1.6</spring-cloud-commons.version>
-        <spring-cloud-albaba.version>2021.0.5.0</spring-cloud-albaba.version>
+        <spring-cloud-commons.version>3.1.9</spring-cloud-commons.version>
+        <spring-cloud-albaba.version>2021.0.6.2</spring-cloud-albaba.version>
         <rocketmq-spring-boot-starter.version>2.3.0</rocketmq-spring-boot-starter.version>
-        <sentinel.version>1.8.7</sentinel.version>
+        <sentinel.version>1.8.8</sentinel.version>
         <mysql.version>8.0.33</mysql.version>
-        <mybatis-flex.version>1.9.3</mybatis-flex.version>
+        <mybatis-flex.version>1.10.2</mybatis-flex.version>
         <mybatis.version>3.5.15</mybatis.version>
-        <commons-io.version>2.13.0</commons-io.version>
+        <commons-io.version>2.14.0</commons-io.version>
         <commons-lang3.version>3.10</commons-lang3.version>
         <commons-text.version>1.10.0</commons-text.version>
         <mapstruct.version>1.6.2</mapstruct.version>
         <redisson.version>3.36.0</redisson.version>
         <kryo.version>5.6.0</kryo.version>
-        <elasticjob.version>3.0.2</elasticjob.version>
+        <elasticjob.version>3.0.4</elasticjob.version>
         <dynamic-tp.version>1.1.7</dynamic-tp.version>
         <guava.version>32.0.1-jre</guava.version>
-        <fastjson2.version>2.0.49</fastjson2.version>
+        <fastjson2.version>2.0.53</fastjson2.version>
         <javet.version>3.1.2</javet.version>
         <google-zxing.version>3.5.2</google-zxing.version>
         <freemarker.version>2.3.32</freemarker.version>
         <logback-encoder.version>7.4</logback-encoder.version>
         <retrofit.version>2.9.0</retrofit.version>
+        <kafka.version>3.5.0</kafka.version>
+
+        <!-- fix -->
+        <kafka.version>3.8.0</kafka.version>
+        <logback.version>1.2.13</logback.version>
+        <jackson-bom.version>2.18.2</jackson-bom.version>
+        <zookeeper.version>3.9.3</zookeeper.version>
+        <snakeyaml.version>2.3</snakeyaml.version>
 
         <swagger-openapiv3.version>2.2.9</swagger-openapiv3.version>
         <springdoc-openapi-ui.version>1.7.0</springdoc-openapi-ui.version>
         <googleauth.version>1.5.0</googleauth.version>
-        <bcprov.version>1.77</bcprov.version>
+        <bcprov.version>1.80</bcprov.version>
         <json-path.version>2.9.0</json-path.version>
         <jetbrains-annotations.version>24.1.0</jetbrains-annotations.version>
         <podam.version>7.2.11.RELEASE</podam.version>
@@ -135,19 +145,19 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/com.mybatis-flex/mybatis-flex-dependencies -->
-            <dependency>
-                <groupId>com.mybatis-flex</groupId>
-                <artifactId>mybatis-flex-dependencies</artifactId>
-                <version>${mybatis-flex.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
             <!-- https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-alibaba-dependencies -->
             <dependency>
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
                 <version>${spring-cloud-albaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.mybatis-flex/mybatis-flex-dependencies -->
+            <dependency>
+                <groupId>com.mybatis-flex</groupId>
+                <artifactId>mybatis-flex-dependencies</artifactId>
+                <version>${mybatis-flex.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -264,7 +274,12 @@
             </dependency>
             <dependency>
                 <groupId>com.wind.middleware</groupId>
-                <artifactId>wind-sequence-generate</artifactId>
+                <artifactId>wind-sequence-core</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.middleware</groupId>
+                <artifactId>wind-sequence-jdbc</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -300,6 +315,11 @@
             <dependency>
                 <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-context-injection</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.middleware</groupId>
+                <artifactId>wind-websocket</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -446,6 +466,11 @@
                 <version>${elasticjob.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.shardingsphere.elasticjob</groupId>
+                <artifactId>elasticjob-lite-lifecycle</artifactId>
+                <version>${elasticjob.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.jetbrains</groupId>
                 <artifactId>annotations</artifactId>
                 <version>${jetbrains-annotations.version}</version>
@@ -512,6 +537,22 @@
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${json-path.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/org.apache.zookeeper/zookeeper -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper-jute</artifactId>
+                <version>${zookeeper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
             </dependency>
             <dependency>
                 <groupId>uk.co.jemos.podam</groupId>
