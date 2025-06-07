@@ -13,19 +13,12 @@
     <artifactId>wind-mybatis-flex-processor</artifactId>
     <packaging>jar</packaging>
 
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.mybatis-flex</groupId>
             <artifactId>mybatis-flex-annotation</artifactId>
         </dependency>
     </dependencies>
-
 
     <build>
         <resources>
