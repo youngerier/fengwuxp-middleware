@@ -19,9 +19,9 @@ import java.util.Collection;
  **/
 public class MaskingMessageConverter extends ClassicConverter {
 
-    public final static MaskRuleRegistry LOG_MASK_RULE_REGISTRY = new MaskRuleRegistry();
+    public static final MaskRuleRegistry LOG_MASK_RULE_REGISTRY = new MaskRuleRegistry();
 
-    private final static ObjectMaskPrinter MASKER = new ObjectMaskPrinter(LOG_MASK_RULE_REGISTRY);
+    private static final ObjectMaskPrinter MASKER = new ObjectMaskPrinter(LOG_MASK_RULE_REGISTRY);
 
     @Override
     public String convert(ILoggingEvent event) {
