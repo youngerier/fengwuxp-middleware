@@ -99,6 +99,7 @@
         <springdoc-openapi-ui.version>1.7.0</springdoc-openapi-ui.version>
         <googleauth.version>1.5.0</googleauth.version>
         <bcprov.version>1.80</bcprov.version>
+        <bucket4j.version>8.10.1</bucket4j.version>
         <json-path.version>2.9.0</json-path.version>
         <jetbrains-annotations.version>24.1.0</jetbrains-annotations.version>
         <podam.version>7.2.11.RELEASE</podam.version>
@@ -553,6 +554,17 @@
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.bucket4j/bucket4j_jdk8-core -->
+            <dependency>
+                <groupId>com.bucket4j</groupId>
+                <artifactId>bucket4j_jdk8-core</artifactId>
+                <version>${bucket4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.bucket4j</groupId>
+                <artifactId>bucket4j_jdk8-redis</artifactId>
+                <version>${bucket4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>uk.co.jemos.podam</groupId>

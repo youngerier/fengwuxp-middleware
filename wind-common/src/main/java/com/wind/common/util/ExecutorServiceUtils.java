@@ -1,10 +1,13 @@
 package com.wind.common.util;
 
+import com.wind.common.executor.RateLimitExecutorService;
+import com.wind.common.limit.WindExecutionLimiter;
 import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 
 import java.time.Duration;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -53,6 +56,17 @@ public final class ExecutorServiceUtils {
      */
     public static ThreadPoolExecutor newExecutor(String threadNamePrefix, int corePoolSize, int maximumPoolSize, int workQueueSize) {
         return newExecutor(threadNamePrefix, corePoolSize, maximumPoolSize, new ArrayBlockingQueue<>(workQueueSize));
+    }
+
+    /**
+     * 包装一个 {@link ExecutorService}，使其在提交任务是支持限流
+     *
+     * @param delegate 被代理的线程池
+     * @param limiter  限流器
+     * @return 包装后的线程池
+     */
+    public static ExecutorService limit(ExecutorService delegate, WindExecutionLimiter limiter) {
+        return new RateLimitExecutorService(delegate, limiter);
     }
 
     private static ThreadPoolExecutor newExecutor(String threadNamePrefix, int corePoolSize, int maximumPoolSize, BlockingQueue<Runnable> workQueue) {
