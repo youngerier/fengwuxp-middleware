@@ -1,5 +1,7 @@
 package com.wind.common.executor;
 
+import com.wind.common.exception.BaseException;
+import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.limit.WindExecutionLimiter;
 import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
@@ -16,12 +18,25 @@ import java.util.function.BiFunction;
  **/
 public final class Bucket4jTaskExecutionLimiterFactory {
 
-    private static final AtomicReference<BiFunction<String, Bandwidth, WindExecutionLimiter>> LIMITER_FACTORY =
+    static final AtomicReference<BiFunction<String, Bandwidth, WindExecutionLimiter>> LIMITER_FACTORY =
             new AtomicReference<>((name, limit) -> {
                 Bucket bucket = Bucket.builder()
                         .addLimit(limit)
                         .build();
-                return (resourceKey, args) -> bucket.tryConsume(1);
+
+                return (resourceKey, maxWait, args) -> {
+                    if (maxWait == null || maxWait.isZero()) {
+                       return bucket.tryConsume(1);
+                    } else {
+                        try {
+                            return bucket.asBlocking().tryConsume(1, maxWait);
+                        } catch (InterruptedException exception) {
+                            Thread.currentThread().interrupt();
+                            throw new BaseException(DefaultExceptionCode.COMMON_ERROR,
+                                    "limit rate task is interrupted, resourceK key = " + resourceKey, exception);
+                        }
+                    }
+                };
             });
 
     private Bucket4jTaskExecutionLimiterFactory() {

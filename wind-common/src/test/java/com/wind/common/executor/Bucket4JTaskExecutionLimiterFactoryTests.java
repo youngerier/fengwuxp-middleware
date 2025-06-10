@@ -26,6 +26,8 @@ class Bucket4JTaskExecutionLimiterFactoryTests {
                 .until(rateLimiter::tryAcquire);
         // 立即再试，应该失败（桶只有一个令牌）
         Assertions.assertFalse(rateLimiter.tryAcquire());
+        // 阻塞等待成功
+        Assertions.assertTrue(rateLimiter.tryAcquire(Duration.ofMillis(550)));
     }
 
     @Test
