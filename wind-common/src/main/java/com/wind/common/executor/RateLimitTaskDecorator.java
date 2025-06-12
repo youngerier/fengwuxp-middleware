@@ -31,24 +31,32 @@ public class RateLimitTaskDecorator implements TaskDecorator {
      *
      * @param taskName       任务名称
      * @param tokenPerSecond 每秒执行数
+     * @param maxWait        最大等待时间
      * @return 限流任务装饰器
      */
+    public static RateLimitTaskDecorator leaky(String taskName, int tokenPerSecond, Duration maxWait) {
+        return new RateLimitTaskDecorator(taskName, Bucket4jTaskExecutionLimiterFactory.leakyBucketWithSeconds(tokenPerSecond), maxWait);
+    }
+
     public static RateLimitTaskDecorator leaky(String taskName, int tokenPerSecond) {
-        return new RateLimitTaskDecorator(taskName, Bucket4jTaskExecutionLimiterFactory.leakyBucketWithSeconds(tokenPerSecond),
-                Duration.ofMillis(200));
+        return leaky(taskName, tokenPerSecond, Duration.ofMillis(500));
     }
 
     /**
-     * 创建限流任务装饰器（匀速执行），默认等待时间 200 毫秒
+     * 创建限流任务装饰器（令牌桶），默认等待时间 200 毫秒
      *
      * @param taskName       任务名称
      * @param capacity       容量
      * @param tokenPerSecond token 每秒填充数
+     * @param maxWait        最大等待时间
      * @return 限流任务装饰器
      */
+    public static RateLimitTaskDecorator token(String taskName, int capacity, int tokenPerSecond, Duration maxWait) {
+        return new RateLimitTaskDecorator(taskName, Bucket4jTaskExecutionLimiterFactory.tokenBucket(capacity, tokenPerSecond), maxWait);
+    }
+
     public static RateLimitTaskDecorator token(String taskName, int capacity, int tokenPerSecond) {
-        return new RateLimitTaskDecorator(taskName, Bucket4jTaskExecutionLimiterFactory.tokenBucket(capacity, tokenPerSecond),
-                Duration.ofMillis(200));
+        return token(taskName, capacity, tokenPerSecond, Duration.ofMillis(500));
     }
 
     @Override
