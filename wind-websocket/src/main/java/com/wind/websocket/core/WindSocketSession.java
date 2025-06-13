@@ -40,6 +40,14 @@ public interface WindSocketSession extends WindSocketSessionDescriptor {
     void removeUser(String userId);
 
     /**
+     * 判断用户是否在会话中
+     *
+     * @param userId 用户id
+     * @return if true 在会话中
+     */
+    boolean containsUser(String userId);
+
+    /**
      * 断开连接
      *
      * @param connectionId 连接 id
