@@ -46,11 +46,9 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
                     Temporal.class
             ));
 
-    public final static Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(ImmutableSet.of(
-            Date.class
-    ));
+    public static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(ImmutableSet.of(Date.class));
 
-    public final static Set<String> IGNORE_PACKAGES = new LinkedHashSet<>();
+    public static final Set<String> IGNORE_PACKAGES = new LinkedHashSet<>();
 
     static {
         IGNORE_PACKAGES.add("org.springframework.");
@@ -78,6 +76,7 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
         IGNORE_PACKAGES.add("reactor.");
         IGNORE_PACKAGES.add("org.reactivestreams");
         IGNORE_PACKAGES.add("io.reactivex.");
+        IGNORE_PACKAGES.add("com.zaxxer.hikari.");
     }
 
     /**
