@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
 import static com.wind.common.WindConstants.TRACE_ID_NAME;
@@ -32,7 +33,7 @@ public final class WindThreadTracer implements WindTracer {
     /**
      * 线程 trace context
      */
-    private static final ThreadLocal<Map<String, Object>> TRACE_CONTEXT = ThreadLocal.withInitial(HashMap::new);
+    private static final ThreadLocal<Map<String, Object>> TRACE_CONTEXT = ThreadLocal.withInitial(ConcurrentHashMap::new);
 
     @Override
     public void trace() {
@@ -67,8 +68,8 @@ public final class WindThreadTracer implements WindTracer {
 
     @Override
     public Map<String, Object> getContextVariables() {
-        // TODO copy context
-        return Collections.unmodifiableMap(nullSecurityGetVariables());
+        // 返回一个快照，避免外部遍历时内部修改引发 ConcurrentModificationException
+        return Collections.unmodifiableMap(new HashMap<>(nullSecurityGetVariables()));
     }
 
     @Override
@@ -98,7 +99,7 @@ public final class WindThreadTracer implements WindTracer {
     private Map<String, Object> nullSecurityGetVariables() {
         Map<String, Object> variables = TRACE_CONTEXT.get();
         if (variables == null) {
-            variables = new HashMap<>();
+            variables = new ConcurrentHashMap<>();
             TRACE_CONTEXT.set(variables);
         }
         return variables;
