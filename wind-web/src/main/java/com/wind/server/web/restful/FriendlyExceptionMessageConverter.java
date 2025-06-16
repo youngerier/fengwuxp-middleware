@@ -61,13 +61,13 @@ public interface FriendlyExceptionMessageConverter {
     static FriendlyExceptionMessageConverter i18n() {
         return throwable -> {
             if (throwable instanceof BaseException) {
-                MessagePlaceholder placeholder = ((BaseException) throwable).getMessagePlaceholder();
+                BaseException baseException = (BaseException) throwable;
+                if (Objects.equals(baseException.getCode(), DefaultExceptionCode.COMMON_FRIENDLY_ERROR)) {
+                    return SpringI18nMessageUtils.getMessage(baseException.getCode().getDesc());
+                }
+                MessagePlaceholder placeholder = baseException.getMessagePlaceholder();
                 if (placeholder != null) {
                     return SpringI18nMessageUtils.getMessage(placeholder.getPattern(), placeholder.getArgs());
-                }
-                ExceptionCode code = ((BaseException) throwable).getCode();
-                if (Objects.equals(code, DefaultExceptionCode.COMMON_FRIENDLY_ERROR)) {
-                    return SpringI18nMessageUtils.getMessage(code.getDesc());
                 }
             }
             return SpringI18nMessageUtils.getMessage(throwable.getMessage());
