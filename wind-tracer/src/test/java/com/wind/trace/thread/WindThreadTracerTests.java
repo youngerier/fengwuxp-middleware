@@ -46,6 +46,8 @@ class WindThreadTracerTests {
         HashMap<String, Object> contextVariables = new HashMap<>();
         contextVariables.put("key1", "1");
         contextVariables.put("key2", 2);
+        contextVariables.put("key3", null);
+        contextVariables.put(null, null);
         WindTracer.TRACER.trace("test001", contextVariables);
         Assertions.assertEquals("1", WindTracer.TRACER.getContextVariable("key1"));
         Assertions.assertEquals(2, (Integer) WindTracer.TRACER.getContextVariable("key2"));

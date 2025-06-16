@@ -74,11 +74,13 @@ public final class WindThreadTracer implements WindTracer {
 
     @Override
     public WritableContextVariables putVariable(String name, Object val) {
-        // TODO 待优化
-        nullSecurityGetVariables().put(name, val);
-        if (val instanceof String) {
-            // 字符传类型变量同步到 MDC 中
-            MDC.put(name, (String) val);
+        if (name != null && val != null) {
+            // TODO 待优化
+            nullSecurityGetVariables().put(name, val);
+            if (val instanceof String) {
+                // 字符传类型变量同步到 MDC 中
+                MDC.put(name, (String) val);
+            }
         }
         return this;
     }
