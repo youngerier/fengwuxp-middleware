@@ -5,6 +5,7 @@ import org.springframework.scheduling.concurrent.CustomizableThreadFactory;
 import java.time.Duration;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,7 @@ public final class ExecutorServiceUtils {
      * @param threadNamePrefix 线程池名称前缀
      * @return 线程池
      */
-    public static ThreadPoolExecutor single(String threadNamePrefix) {
+    public static ExecutorService single(String threadNamePrefix) {
         return single(threadNamePrefix, 128);
     }
 
@@ -38,7 +39,7 @@ public final class ExecutorServiceUtils {
      * @param workQueueSize    等待队列大小
      * @return 线程池
      */
-    public static ThreadPoolExecutor single(String threadNamePrefix, int workQueueSize) {
+    public static ExecutorService single(String threadNamePrefix, int workQueueSize) {
         return newExecutor(threadNamePrefix, 1, 1, workQueueSize);
     }
 
@@ -51,11 +52,11 @@ public final class ExecutorServiceUtils {
      * @param workQueueSize    等待队列大小 默认使用 {@link ArrayBlockingQueue}
      * @return 线程池
      */
-    public static ThreadPoolExecutor newExecutor(String threadNamePrefix, int corePoolSize, int maximumPoolSize, int workQueueSize) {
+    public static ExecutorService newExecutor(String threadNamePrefix, int corePoolSize, int maximumPoolSize, int workQueueSize) {
         return newExecutor(threadNamePrefix, corePoolSize, maximumPoolSize, new ArrayBlockingQueue<>(workQueueSize));
     }
 
-    private static ThreadPoolExecutor newExecutor(String threadNamePrefix, int corePoolSize, int maximumPoolSize, BlockingQueue<Runnable> workQueue) {
+    private static ExecutorService newExecutor(String threadNamePrefix, int corePoolSize, int maximumPoolSize, BlockingQueue<Runnable> workQueue) {
         return ExecutorBuilder.withThreadName(threadNamePrefix)
                 .corePoolSize(corePoolSize)
                 .maximumPoolSize(maximumPoolSize)
@@ -114,7 +115,7 @@ public final class ExecutorServiceUtils {
             return this;
         }
 
-        public ThreadPoolExecutor build() {
+        public ExecutorService build() {
             return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAlive.getSeconds(), TimeUnit.SECONDS, workQueue,
                     new CustomizableThreadFactory(threadNamePrefix), rejectedExecutionHandler);
         }
