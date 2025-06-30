@@ -281,9 +281,9 @@ public final class RetrofitClientFactory {
         }
 
         @Nullable
+        @SuppressWarnings({"rawtypes"})
         private static Object defaultResponseExtractor(Object data) {
-            if (data instanceof ApiResponse) {
-                ApiResponse<?> response = (ApiResponse<?>) data;
+            if (data instanceof ApiResponse response) {
                 if (log.isDebugEnabled()) {
                     log.debug("api response extractor, traceId = {}, errorMessage = {}", response.getTraceId(), response.getErrorMessage());
                 }
