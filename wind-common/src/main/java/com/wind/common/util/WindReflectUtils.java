@@ -1,13 +1,13 @@
 package com.wind.common.util;
 
 import com.wind.common.exception.AssertUtils;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.ObjectUtils;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
 /**
@@ -35,6 +36,11 @@ public final class WindReflectUtils {
     private static final Field[] EMPTY = new Field[0];
 
     private static final Map<Class<?>, List<Field>> FIELDS = new ConcurrentReferenceHashMap<>();
+
+    private static final Set<String> UNABLE_ACCESS_PACKAGES = new CopyOnWriteArraySet<>(
+            Arrays.asList("java.", "jdk.", "com.sun.", "sun.")
+    );
+
 
     /**
      * 根据注解查找 {@link Field}，会递归查找超类
@@ -51,7 +57,7 @@ public final class WindReflectUtils {
                 .stream()
                 .filter(field -> field.isAnnotationPresent(annotationClass))
                 .toArray(Field[]::new);
-        Field.setAccessible(result, true);
+        trySetAccessible(result);
         return result;
     }
 
@@ -74,7 +80,7 @@ public final class WindReflectUtils {
                 .filter(field -> names.contains(field.getName()))
                 .distinct()
                 .toArray(Field[]::new);
-        Field.setAccessible(result, true);
+        trySetAccessible(result);
         return result;
     }
 
@@ -127,6 +133,18 @@ public final class WindReflectUtils {
                 .collect(Collectors.toList());
     }
 
+    public static boolean makeAccessible(Field field) {
+        try {
+            if (isAccessibleClass(field.getDeclaringClass())) {
+                field.setAccessible(true);
+                return true;
+            }
+        } catch (Throwable ignored) {
+            // JDK 17/21 模块安全限制导致不能 setAccessible；忽略
+        }
+        return false;
+    }
+
     /**
      * 获取类的 方法列表
      *
@@ -137,6 +155,35 @@ public final class WindReflectUtils {
         AssertUtils.notNull(clazz, "argument clazz must not null");
         return clazz.getMethods();
     }
+
+    /**
+     * 获取字段的 getter 方法
+     *
+     * @param field 字段
+     * @return get 方法
+     */
+    public static Method findFieldGetMethod(Field field) {
+        Class<?> clazz = field.getDeclaringClass();
+        String fieldName = field.getName();
+        Class<?> fieldType = field.getType();
+        // 构建 getter 方法名
+        String capitalized = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+        String getterName = "get" + capitalized;
+        try {
+            return clazz.getMethod(getterName); // 只找 public 方法
+        } catch (NoSuchMethodException e) {
+            // fallback：尝试找 getXxx 形式（boolean 时 isXxx 可能找不到）
+            if (fieldType == boolean.class || fieldType == Boolean.class) {
+                try {
+                    return clazz.getMethod("is" + capitalized);
+                } catch (NoSuchMethodException ex) {
+                    return null;
+                }
+            }
+            return null;
+        }
+    }
+
 
     /**
      * 获取类的公有 getter 方法列表
@@ -221,5 +268,15 @@ public final class WindReflectUtils {
         return Arrays.stream(generics)
                 .map(ResolvableType::getType)
                 .toArray(Type[]::new);
+    }
+
+    private static void trySetAccessible(Field[] fields) {
+        for (Field field : fields) {
+            makeAccessible(field);
+        }
+    }
+
+    private static boolean isAccessibleClass(Class<?> clazz) {
+        return UNABLE_ACCESS_PACKAGES.stream().noneMatch(p -> clazz.getName().startsWith(p));
     }
 }
