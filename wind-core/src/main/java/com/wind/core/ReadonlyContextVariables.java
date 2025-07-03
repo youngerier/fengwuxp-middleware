@@ -4,6 +4,8 @@ import com.wind.common.exception.AssertUtils;
 import org.springframework.lang.Nullable;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -56,4 +58,15 @@ public interface ReadonlyContextVariables {
      */
     @Nullable
     Map<String, Object> getContextVariables();
+
+    @NotNull
+    static ReadonlyContextVariables empty() {
+        return Collections::emptyMap;
+    }
+
+    @NotNull
+    static ReadonlyContextVariables of(@NotNull Map<String, Object> contextVariables) {
+        AssertUtils.notNull(contextVariables, "argument contextVariables must not null");
+        return () -> contextVariables;
+    }
 }
