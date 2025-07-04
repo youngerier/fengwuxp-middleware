@@ -1,6 +1,7 @@
 package com.wind.websocket.core;
 
 import javax.validation.constraints.NotNull;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * websocket 客户端连接
@@ -11,20 +12,29 @@ import javax.validation.constraints.NotNull;
 public interface WindSocketClientClientConnection extends SocketClientConnectionDescriptor {
 
     /**
-     * 发送文本消息
+     * 发送文本消息 （同步发送）
      *
      * @param message 消息内容
      */
     default void sendText(@NotNull String message) {
-        send(message);
+        sendAsync(message);
     }
 
     /**
-     * 发送消息
+     * 发送消息 （同步发送）
      *
      * @param payload 消息负载
      */
-    void send(@NotNull Object payload);
+    default void sendAsync(@NotNull Object payload) {
+        send(payload).join();
+    }
+
+    /**
+     * 发送消息 （异步发送）
+     *
+     * @param payload 消息负载
+     */
+    CompletableFuture<Void> send(@NotNull Object payload);
 
     /**
      * 关闭连接

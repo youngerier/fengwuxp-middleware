@@ -1,6 +1,7 @@
 package com.wind.websocket.core;
 
 import javax.validation.constraints.NotNull;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * 远程路由连接，当 socket 是集群时，确认消息发送目标用户所在的真实节点，将消息路由到该节点。
@@ -24,5 +25,5 @@ public interface WindSocketRouteClientConnection extends WindSocketClientClientC
      * @param payload 消息负载
      */
     @Override
-    void send(Object payload);
+    CompletableFuture<Void> send(@NotNull Object payload);
 }
