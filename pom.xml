@@ -41,7 +41,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.30-SNAPSHOT</revision>
+        <revision>1.0.0</revision>
         <!--   占位使用     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
