@@ -31,11 +31,6 @@ import java.util.function.Function;
 @Slf4j
 public class ApiSignatureRequestInterceptor implements ClientHttpRequestInterceptor {
 
-    /**
-     * 需要 requestBody 参与签名的 Content-Type
-     */
-    private static final List<MediaType> SIGNE_CONTENT_TYPES = Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED);
-
     private final Function<HttpRequest, ApiSecretAccount> accountProvider;
 
     private final SignatureHttpHeaderNames headerNames;
@@ -53,9 +48,6 @@ public class ApiSignatureRequestInterceptor implements ClientHttpRequestIntercep
     @Override
     @NonNull
     public ClientHttpResponse intercept(@NonNull HttpRequest request, @NonNull byte[] body, @NonNull ClientHttpRequestExecution execution) throws IOException {
-        if (!SIGNE_CONTENT_TYPES.contains(request.getHeaders().getContentType())) {
-            return execution.execute(request, body);
-        }
         ApiSecretAccount account = accountProvider.apply(request);
         AssertUtils.notNull(account, "ApiSecretAccount must not null");
         ApiSignatureRequest.ApiSignatureRequestBuilder builder = ApiSignatureRequest.builder();

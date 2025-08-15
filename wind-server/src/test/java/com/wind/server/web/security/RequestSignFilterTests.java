@@ -54,7 +54,7 @@ class RequestSignFilterTests {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", uriComponents.getPath());
         uriComponents.getQueryParams().forEach((name, values) -> {
             if (!ObjectUtils.isEmpty(values)) {
-                request.setParameter(name, values.get(0));
+                request.setParameter(name, values.getFirst());
             }
         });
         byte[] requestBody = RandomStringUtils.randomAlphabetic(1000).getBytes(StandardCharsets.UTF_8);
@@ -63,7 +63,7 @@ class RequestSignFilterTests {
         interceptor.intercept(new ServletServerHttpRequest(request), requestBody, (r, body) -> {
             r.getHeaders().forEach((name, values) -> {
                 if (!ObjectUtils.isEmpty(values)) {
-                    request.addHeader(name, values.get(0));
+                    request.addHeader(name, values.getFirst());
                 }
             });
             return new MockClientHttpResponse(new byte[0], 200);
@@ -86,7 +86,7 @@ class RequestSignFilterTests {
                     request.addHeader(name, System.currentTimeMillis() - SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get() - 1);
                 } else {
                     if (!ObjectUtils.isEmpty(values)) {
-                        request.addHeader(name, values.get(0));
+                        request.addHeader(name, values.getFirst());
                     }
                 }
             });
