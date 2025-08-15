@@ -18,7 +18,7 @@ public class BaseException extends RuntimeException {
     @Serial
     private static final long serialVersionUID = 319556802147084526L;
 
-    private static final MessageFormatter MESSAGE_FORMATTER = MessageFormatter.java();
+    private static final MessageFormatter MESSAGE_FORMATTER = MessageFormatter.slf4j();
 
     private final ExceptionCode code;
 

@@ -9,6 +9,7 @@ import org.springframework.util.ObjectUtils;
  * @author wuxp
  * @date 2023-10-30 07:47
  **/
+@Deprecated
 public class SimpleMessageFormatter implements MessageFormatter {
 
     static final String DELIM_STR = "{}";

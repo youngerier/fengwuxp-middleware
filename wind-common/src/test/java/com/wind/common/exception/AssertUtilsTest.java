@@ -24,15 +24,14 @@ class AssertUtilsTest {
         AssertUtils.isAssignable(Map.class, ImmutableMap.class, "isAssignable error");
         AssertUtils.isInstanceOf(Map.class, ImmutableMap.of("1", "2"), "isInstanceOf error");
         AssertUtils.noNullElements(ImmutableSet.of("1", "2"), "noNullElements error");
-        BaseException exception = Assertions.assertThrows(BaseException.class, () -> AssertUtils.state(false, () -> BaseException.unAuthorized(
-                "stateException")));
+        BaseException exception = Assertions.assertThrows(BaseException.class, () -> AssertUtils.state(false, () -> BaseException.unAuthorized("stateException")));
         Assertions.assertEquals("stateException", exception.getMessage());
     }
 
     @Test
     void testMessageFormatter() {
         BaseException exception = Assertions.assertThrows(BaseException.class, () -> AssertUtils.isTrue(false
-                , "isTrue error {0}， test：{1}", "0", "1"));
+                , "isTrue error {}， test：{}", "0", "1"));
         Assertions.assertEquals("isTrue error 0， test：1", exception.getMessage());
     }
 

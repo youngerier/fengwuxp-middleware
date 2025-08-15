@@ -33,6 +33,7 @@ public interface MessageFormatter {
         return MessageFormat::format;
     }
 
+    @Deprecated
     static MessageFormatter simple() {
         return new SimpleMessageFormatter();
     }
@@ -43,6 +44,6 @@ public interface MessageFormatter {
      * @return MessageFormatter
      */
     static MessageFormatter slf4j() {
-        return (pattern, args) -> org.slf4j.helpers.MessageFormatter.format(pattern, args).getMessage();
+        return (pattern, args) -> org.slf4j.helpers.MessageFormatter.arrayFormat(pattern, args).getMessage();
     }
 }
