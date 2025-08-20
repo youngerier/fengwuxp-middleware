@@ -7,6 +7,9 @@ import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.server.web.supports.ApiResp;
 import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,8 +27,6 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.text.MessageFormat;
@@ -156,7 +157,7 @@ public class DefaultGlobalExceptionHandler {
     @ResponseBody
     public ApiResp<Integer> handleBusinessServiceException(BaseException exception) {
         if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
-            log.error("业务异常，code = {}，errorMessage: {}", exception.getTextCode(), exception.getMessage(), exception);
+            log.error("业务异常，code = {}，message: {}", exception.getTextCode(), exception.getMessage(), exception);
         }
         return RestfulApiRespFactory.withThrowable(exception);
     }
@@ -166,10 +167,11 @@ public class DefaultGlobalExceptionHandler {
      */
     @ExceptionHandler({Exception.class})
     @ResponseBody
-    public ApiResp<Void> handleException(Exception exception) {
+    public ApiResp<Void> handleException(Exception exception, HttpServletRequest request) {
         Throwable throwable = exception;
         if (GlobalExceptionLogDecisionMaker.requiresPrintErrorLog(exception)) {
-            log.error("捕获到异常: {}，errorMessage: {}", exception.getClass().getName(), exception.getMessage(), exception);
+            log.error("全局异常捕获 = {}, request target = {} {}, message = {}", exception.getClass().getName(), request.getMethod(), request.getRequestURI(),
+                    exception.getMessage(), exception);
         }
         if (throwable instanceof UndeclaredThrowableException th) {
             // 获取真正的异常

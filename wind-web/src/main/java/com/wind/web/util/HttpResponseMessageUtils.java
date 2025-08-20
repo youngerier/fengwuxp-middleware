@@ -4,10 +4,10 @@ import com.alibaba.fastjson2.JSON;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.server.web.supports.ApiResp;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
@@ -28,8 +28,28 @@ public final class HttpResponseMessageUtils {
     /**
      * 响应返回 json 数据
      *
+     * @param resp 响应内容
+     * @see org.springframework.boot.web.servlet.filter.OrderedRequestContextFilter;
+     */
+    public static void writeApiResp(ApiResp<?> resp) {
+        writeApiResp(HttpServletRequestUtils.requireContextResponse(), resp);
+    }
+
+    /**
+     * 响应返回 json 数据
+     *
+     * @param data 响应数据
+     * @see org.springframework.boot.web.servlet.filter.OrderedRequestContextFilter;
+     */
+    public static void writeJson(Object data) {
+        writeJson(HttpServletRequestUtils.requireContextResponse(), data);
+    }
+
+    /**
+     * 响应返回 json 数据
+     *
      * @param response http response
-     * @param resp     响应
+     * @param resp     响应内容
      */
     public static void writeApiResp(HttpServletResponse response, ApiResp<?> resp) {
         if (resp.getHttpStatus() != null) {
@@ -56,7 +76,7 @@ public final class HttpResponseMessageUtils {
      * @param data     响应数据
      */
     public static void writeJsonText(HttpServletResponse response, String data) {
-        if (response.isCommitted()){
+        if (response.isCommitted()) {
             log.warn("response is committed, ignore write json data");
             return;
         }
@@ -70,4 +90,6 @@ public final class HttpResponseMessageUtils {
             throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "response write error", e);
         }
     }
+
+
 }

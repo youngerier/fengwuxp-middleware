@@ -2,6 +2,7 @@ package com.wind.web.util;
 
 import com.wind.common.exception.AssertUtils;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
@@ -18,6 +19,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
  **/
 public final class HttpServletRequestUtils {
 
+    private static final String NOT_CURRENTLY_IN_WEB_SERVLET_CONTEXT = "not currently in web servlet context";
+
     private HttpServletRequestUtils() {
         throw new AssertionError();
     }
@@ -25,7 +28,7 @@ public final class HttpServletRequestUtils {
     @NotNull
     public static HttpServletRequest requireContextRequest() {
         HttpServletRequest result = getContextRequestOfNullable();
-        AssertUtils.notNull(result, "not currently in web servlet context");
+        AssertUtils.notNull(result, NOT_CURRENTLY_IN_WEB_SERVLET_CONTEXT);
         return result;
     }
 
@@ -42,7 +45,6 @@ public final class HttpServletRequestUtils {
         return requireRequestAttribute(name, requireContextRequest());
     }
 
-
     public static <T> T requireRequestAttribute(@NotBlank String name, @NotNull HttpServletRequest request) {
         T result = getRequestAttribute(name, request);
         AssertUtils.notNull(result, () -> String.format("attribute = %s must not null", name));
@@ -58,5 +60,21 @@ public final class HttpServletRequestUtils {
     @SuppressWarnings("unchecked")
     public static <T> T getRequestAttribute(String name, HttpServletRequest request) {
         return (T) request.getAttribute(name);
+    }
+
+    @NotNull
+    public static HttpServletResponse requireContextResponse() {
+        HttpServletResponse result = getContextResponseOfNullable();
+        AssertUtils.notNull(result, NOT_CURRENTLY_IN_WEB_SERVLET_CONTEXT);
+        return result;
+    }
+
+    @Nullable
+    public static HttpServletResponse getContextResponseOfNullable() {
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+        if (requestAttributes == null) {
+            return null;
+        }
+        return ((ServletRequestAttributes) requestAttributes).getResponse();
     }
 }
