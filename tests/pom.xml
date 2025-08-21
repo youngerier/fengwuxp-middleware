@@ -91,11 +91,11 @@
             <artifactId>wind-sequence-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.wind.client</groupId>
+            <groupId>com.wind.middleware</groupId>
             <artifactId>wind-restful</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.wind.client</groupId>
+            <groupId>com.wind.middleware</groupId>
             <artifactId>wind-retrofit</artifactId>
         </dependency>
         <dependency>
