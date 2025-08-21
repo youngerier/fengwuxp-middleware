@@ -23,8 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public final class SpringEventPublishUtils {
 
-    // TODO 使用 Dynamic-TP 监控执行
-    private static final ExecutorService EXECUTOR = ExecutorServiceUtils.newExecutor("Spring-Event-", 1, 2, 256);
+    private static final ExecutorService EXECUTOR = ExecutorServiceUtils.custom("spring-event-publish-", 1, 4, 256);
 
     private static final AtomicReference<ApplicationEventPublisher> PUBLISHER = new AtomicReference<>();
 
