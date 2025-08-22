@@ -13,8 +13,6 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <code.coverage.project.folder>${basedir}/../</code.coverage.project.folder>
-        <code.coverage.overall.data.folder>${basedir}/target/</code.coverage.overall.data.folder>
     </properties>
 
     <dependencies>
@@ -151,25 +149,7 @@
                             <goal>report-aggregate</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>../target/site/jacoco</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>merge-results</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>merge</goal>
-                        </goals>
-                        <configuration>
-                            <fileSets>
-                                <fileSet>
-                                    <directory>${code.coverage.project.folder}</directory>
-                                    <includes>
-                                        <include>**/target/jacoco.exec</include>
-                                    </includes>
-                                </fileSet>
-                            </fileSets>
-                            <destFile>${code.coverage.overall.data.folder}/aggregate.exec</destFile>
+                            <outputDirectory>${session.executionRootDirectory}/target/site/jacoco</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

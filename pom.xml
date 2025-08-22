@@ -571,11 +571,6 @@
                     <version>${maven-flatten-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco-maven-plugin.version}</version>
-                </plugin>
-                <plugin>
                     <groupId>pl.project13.maven</groupId>
                     <artifactId>git-commit-id-plugin</artifactId>
                     <version>${git-commit-id-plugin.version}</version>
@@ -584,6 +579,65 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-report-plugin</artifactId>
                     <version>${maven-surefire-report-plugin.version}</version>
+                </plugin>
+                <!-- jacoco agent for code coverage -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-maven-plugin.version}</version>
+                    <executions>
+                        <!-- 单测时附加 agent -->
+                        <execution>
+                            <id>prepare-unit-tests</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+
+                        <!-- 集成测试时附加 agent -->
+                        <execution>
+                            <id>prepare-agent</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <propertyName>jacocoCoverageAgent</propertyName>
+                            </configuration>
+                        </execution>
+
+                        <!-- 合并 exec 文件 -->
+                        <execution>
+                            <id>merge-results</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>merge</goal>
+                            </goals>
+                            <configuration>
+                                <fileSets>
+                                    <fileSet>
+                                        <!--suppress UnresolvedMavenProperty -->
+                                        <directory>${session.executionRootDirectory}</directory>
+                                        <includes>
+                                            <include>**/target/jacoco.exec</include>
+                                        </includes>
+                                    </fileSet>
+                                </fileSets>
+                                <destFile>${project.build.directory}/jacoco-aggregate.exec</destFile>
+                            </configuration>
+                        </execution>
+                        <!-- 生成聚合报告 -->
+                        <execution>
+                            <id>report-aggregate</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>report-aggregate</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}/site/jacoco</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -677,30 +731,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- jacoco agent for code coverage -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>prepare-unit-tests</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <!-- prepare agent before integration tests -->
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <phase>pre-integration-test</phase>
-                        <configuration>
-                            <propertyName>jacocoCoverageAgent</propertyName>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
@@ -715,36 +745,6 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>report-aggregate</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>report-aggregate</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>target/site/jacoco</outputDirectory>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>merge-results</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>merge</goal>
-                                </goals>
-                                <configuration>
-                                    <fileSets>
-                                        <fileSet>
-                                            <directory>target/</directory>
-                                            <includes>
-                                                <include>**/target/jacoco.exec</include>
-                                            </includes>
-                                        </fileSet>
-                                    </fileSets>
-                                    <destFile>target/aggregate.exec</destFile>
-                                </configuration>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
