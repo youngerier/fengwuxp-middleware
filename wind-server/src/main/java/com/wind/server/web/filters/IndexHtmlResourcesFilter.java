@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.util.StringJoinSplitUtils;
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -84,7 +85,7 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
         STATIC_RESOURCES.put(".ttc", "font/ttc");
     }
 
-    private static final Cache<String, HttpHeaders> HEADER_CACHES =
+    private static final Cache<@NotNull String, HttpHeaders> HEADER_CACHES =
             Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
 
     /**
@@ -166,7 +167,7 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
         /**
          * 资源缓存
          */
-        private final Cache<String, byte[]> resourcesCaches = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
+        private final Cache<@NotNull String, byte[]> resourcesCaches = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
 
         @Override
         public byte[] apply(String resourcePath) {
