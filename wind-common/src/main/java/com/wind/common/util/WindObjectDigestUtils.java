@@ -236,7 +236,6 @@ public final class WindObjectDigestUtils {
             case LocalTime localTime -> {
                 // 计算从当天零点（午夜）开始到该时间点的 纳秒数
                 return localTime.toNanoOfDay();
-                // 计算从当天零点（午夜）开始到该时间点的 纳秒数
             }
             default -> {
                 return accessor.getLong(ChronoField.MILLI_OF_DAY);
