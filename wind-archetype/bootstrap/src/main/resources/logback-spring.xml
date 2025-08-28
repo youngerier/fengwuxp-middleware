@@ -27,7 +27,7 @@
     <!-- 解决debug模式下循环发送的问题 -->
     <logger name="org.apache.http.impl.conn.Wire" level="WARN"/>
     <!--为了防止进程退出时，内存中的数据丢失，请加上此选项-->
-    <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
+    <shutdownHook class="ch.qos.logback.core.hook.DefaultShutdownHook"/>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <encoder>
