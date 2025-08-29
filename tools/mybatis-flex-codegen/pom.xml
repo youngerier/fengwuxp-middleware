@@ -13,6 +13,7 @@
 
     <artifactId>mybatis-flex-codegen</artifactId>
 
+
     <dependencies>
         <dependency>
             <groupId>com.wind.middleware</groupId>
@@ -39,19 +40,8 @@
             <artifactId>commons-io</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.wuxp.codegen</groupId>
-            <artifactId>wuxp-codegen-source-code-support</artifactId>
-            <version>${revision}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.reload4j</groupId>
-                    <artifactId>reload4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-reload4j</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>com.wind.tools</groupId>
+            <artifactId>wind-codegen-sources-supports</artifactId>
         </dependency>
     </dependencies>
 

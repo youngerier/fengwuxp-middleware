@@ -1,5 +1,2 @@
-#ApplicationListener
 org.springframework.context.ApplicationListener=\
-com.wind.nacos.WindNacosBootstrapListener
-
-
+com.wind.nacos.WindNacosBootstrapRegistryInitializer

@@ -6,9 +6,8 @@ import com.wind.script.auditlog.AuditLogRecorder;
 import com.wind.script.auditlog.ScriptAuditLogRecorder;
 import com.wind.server.actuate.health.GracefulShutdownHealthIndicator;
 import com.wind.server.aop.WindControllerMethodInterceptor;
-import com.wind.server.initialization.WindApplicationStartedListener;
 import com.wind.server.logging.WebAuditLogRecorder;
-import com.wind.server.web.exception.RespfulErrorAttributes;
+import com.wind.server.web.exception.RestfulErrorAttributes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 import org.springframework.aop.support.DefaultBeanFactoryPointcutAdvisor;
@@ -42,8 +41,8 @@ import static com.wind.common.WindConstants.WIND_SERVER_PROPERTIES_PREFIX;
 public class WindServerAutoConfiguration {
 
     @Bean
-    public RespfulErrorAttributes respfulErrorAttributes() {
-        return new RespfulErrorAttributes(new DefaultErrorAttributes());
+    public RestfulErrorAttributes restfulErrorAttributes() {
+        return new RestfulErrorAttributes(new DefaultErrorAttributes());
     }
 
     @Bean
@@ -87,11 +86,6 @@ public class WindServerAutoConfiguration {
     @ConditionalOnProperty(prefix = WIND_SERVER_PROPERTIES_PREFIX + ".health.graceful-shutdown", name = ENABLED_NAME, havingValue = TRUE)
     public GracefulShutdownHealthIndicator gracefulShutdownHealthIndicator() {
         return new GracefulShutdownHealthIndicator();
-    }
-
-    @Bean
-    public WindApplicationStartedListener windApplicationStartedListener() {
-        return new WindApplicationStartedListener();
     }
 
 }

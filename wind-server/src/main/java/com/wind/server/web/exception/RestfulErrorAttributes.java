@@ -16,6 +16,8 @@ import org.springframework.web.servlet.ModelAndView;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.Serial;
 import java.util.Map;
 
 /**
@@ -24,10 +26,11 @@ import java.util.Map;
  * @author wuxp
  * @date 2023-09-26 21:30
  **/
-public class RespfulErrorAttributes implements ErrorAttributes, HandlerExceptionResolver {
+public record RestfulErrorAttributes(DefaultErrorAttributes attributes) implements ErrorAttributes, HandlerExceptionResolver {
 
     public static final ExceptionCode WRAPPER_SPRING_HANDLE_ERROR = new ExceptionCode() {
 
+        @Serial
         private static final long serialVersionUID = -7482532827509230523L;
 
         @Override
@@ -40,12 +43,6 @@ public class RespfulErrorAttributes implements ErrorAttributes, HandlerException
             return "Spring 默认错误处理";
         }
     };
-
-    private final DefaultErrorAttributes attributes;
-
-    public RespfulErrorAttributes(DefaultErrorAttributes attributes) {
-        this.attributes = attributes;
-    }
 
     @Override
     public Throwable getError(WebRequest webRequest) {

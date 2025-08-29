@@ -7,6 +7,7 @@ import com.wind.security.authentication.AuthenticationTokenUserMap;
 import com.wind.security.authentication.WindAuthenticationProperties;
 import com.wind.security.authentication.jwt.DefaultJwtAuthenticationTokenCodecService;
 import com.wind.security.authentication.jwt.JwtProperties;
+import com.wind.security.crypto.AuthenticationParameterEncryptor;
 import com.wind.security.jwt.JwtTokenCodec;
 import com.wind.security.authority.SimpleSecurityAccessOperations;
 import com.wind.security.authority.WebRequestAuthorityLoader;
@@ -92,6 +93,11 @@ public class WindSecurityAutoConfiguration {
     @ConditionalOnBean({JwtTokenCodec.class, AuthenticationTokenUserMap.class})
     public AuthenticationTokenCodecService defaultAuthenticationTokenCodecService(JwtTokenCodec codec, AuthenticationTokenUserMap tokenUserMap) {
         return new DefaultJwtAuthenticationTokenCodecService(codec, tokenUserMap);
+    }
+
+    @Bean
+    public AuthenticationParameterEncryptor authenticationParameterEncryptor(){
+        return new AuthenticationParameterEncryptor();
     }
 }
 

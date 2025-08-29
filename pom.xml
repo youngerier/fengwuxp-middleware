@@ -41,7 +41,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.1-jdk21-SNAPSHOT</revision>
+        <revision>1.0.2-jdk21-SNAPSHOT</revision>
         <!--   测试相关     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
@@ -112,6 +112,11 @@
         <dependency>
             <groupId>jakarta.annotation</groupId>
             <artifactId>jakarta.annotation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context-indexer</artifactId>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -198,6 +203,11 @@
             <dependency>
                 <groupId>com.wind.tools</groupId>
                 <artifactId>mybatis-flex-codegen</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.tools</groupId>
+                <artifactId>wind-codegen-sources-supports</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

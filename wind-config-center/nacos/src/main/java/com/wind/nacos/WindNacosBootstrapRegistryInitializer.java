@@ -28,16 +28,17 @@ import static org.springframework.core.env.StandardEnvironment.SYSTEM_ENVIRONMEN
 import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME;
 
 /**
+ * TODO 待优化
  * 在 bootstrap 阶段向容器注入 nacos 相关 bean
  *
  * @author wuxp
  * @date 2023-10-18 13:16
  **/
-public class WindNacosBootstrapListener implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
+public class WindNacosBootstrapRegistryInitializer implements ApplicationListener<ApplicationEnvironmentPreparedEvent>, Ordered {
 
     public static final String NACOS_CONFIG_PREFIX = "spring.cloud.nacos.config";
 
-    private static final Logger LOGGER = Logger.getLogger(WindNacosBootstrapListener.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(WindNacosBootstrapRegistryInitializer.class.getName());
 
     static final AtomicReference<ConfigService> CONFIG_SERVICE = new AtomicReference<>();
 
