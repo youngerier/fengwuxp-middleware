@@ -9,7 +9,6 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.configcenter.core.ConfigFunctionEvaluator;
 import com.wind.configcenter.core.ConfigRepository;
 import jakarta.annotation.Nonnull;
-import org.springframework.aot.AotDetector;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
@@ -75,11 +74,11 @@ public class WindNacosBootstrapRegistryInitializer implements ApplicationListene
         loadNacosPropertySources(environment);
         NacosConfigProperties result = Binder.get(environment)
                 .bind(NACOS_CONFIG_PREFIX, NacosConfigProperties.class)
-                // 没有则返回一个空对象，兼容 AOT 阶段 TODO 待优化
+                // TODO 待优化 没有则返回一个空对象，兼容 process-aot 阶段
                 .orElseGet(NacosConfigProperties::new);
         result.setEnvironment(environment);
-        if (AotDetector.useGeneratedArtifacts()) {
-            // AOT 阶段忽略 nacos 配置初始化
+        if (result.getUsername() == null || result.getPassword() == null) {
+            // TODO process-aot 阶段，忽略 nacos 配置初始化
             return result;
         }
         result.init();
