@@ -8,6 +8,8 @@ import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
 import jakarta.validation.constraints.NotBlank;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,6 +26,7 @@ import java.util.Map;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ChatMessageContent implements WritableContextVariables, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 8540381989783804113L;
 
     private final ChatMessageContentType contentType;

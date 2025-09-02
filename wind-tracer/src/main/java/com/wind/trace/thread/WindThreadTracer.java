@@ -5,11 +5,10 @@ import com.wind.common.util.IpAddressUtils;
 import com.wind.core.WritableContextVariables;
 import com.wind.sequence.SequenceGenerator;
 import com.wind.trace.WindTracer;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.MDC;
 
-import jakarta.validation.constraints.NotNull;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -69,7 +68,7 @@ public final class WindThreadTracer implements WindTracer {
     @Override
     public Map<String, Object> getContextVariables() {
         // 返回一个快照，避免外部遍历时内部修改引发 ConcurrentModificationException
-        return Collections.unmodifiableMap(new HashMap<>(nullSecurityGetVariables()));
+        return Map.copyOf(nullSecurityGetVariables());
     }
 
     @Override
