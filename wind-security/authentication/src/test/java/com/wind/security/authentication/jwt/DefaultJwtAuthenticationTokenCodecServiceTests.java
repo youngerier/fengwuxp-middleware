@@ -26,7 +26,7 @@ class DefaultJwtAuthenticationTokenCodecServiceTests {
 
     @Test
     void testGenerateToken() {
-        WindAuthenticationToken token = tokenCodecService.generateToken(new WindAuthenticationUser(1L, RandomStringUtils.randomAlphabetic(12)));
+        WindAuthenticationToken token = tokenCodecService.generateToken(new WindAuthenticationUser(1L, RandomStringUtils.secure().nextAlphabetic(12)));
         WindAuthenticationToken parsed = tokenCodecService.parseAndValidateToken(token.tokenValue());
         Assertions.assertEquals(token.id(), parsed.id());
         Assertions.assertEquals(token.subject(), parsed.subject());
@@ -34,7 +34,7 @@ class DefaultJwtAuthenticationTokenCodecServiceTests {
 
     @Test
     void testParseAndValidateTokenWithException() {
-        WindAuthenticationToken token = tokenCodecService.generateToken(new WindAuthenticationUser(1L, RandomStringUtils.randomAlphabetic(12)));
+        WindAuthenticationToken token = tokenCodecService.generateToken(new WindAuthenticationUser(1L, RandomStringUtils.secure().nextAlphabetic(12)));
         tokenUserMap.removeTokenId(token.subject());
         BaseException exception = Assertions.assertThrows(BaseException.class, () -> tokenCodecService.parseAndValidateToken(token.tokenValue()));
         Assertions.assertEquals("invalid access token user", exception.getMessage());

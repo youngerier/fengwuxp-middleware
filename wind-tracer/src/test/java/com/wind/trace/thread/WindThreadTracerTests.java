@@ -69,7 +69,7 @@ class WindThreadTracerTests {
     void testTraceNewThreadCopy() throws Exception {
         Map<String, Object> contextVariables = new HashMap<>();
         contextVariables.put("a", "test");
-        WindTracer.TRACER.trace(RandomStringUtils.randomAlphabetic(32), contextVariables);
+        WindTracer.TRACER.trace(RandomStringUtils.secure().nextAlphabetic(32), contextVariables);
         String traceId = WindTracer.TRACER.getTraceId();
         Assertions.assertEquals(traceId, MDC.get(TRACE_ID_NAME));
         CountDownLatch downLatch = new CountDownLatch(1);

@@ -18,7 +18,7 @@ class RasTextEncryptorTests {
     void testOfPrivateEncrypt() {
         KeyPair keyPair = genKeyPir();
         RasTextEncryptor encryptor = RasTextEncryptor.ofPrivateEncrypt(keyPair.getPrivate(), keyPair.getPublic());
-        String text = RandomStringUtils.randomAlphabetic(32);
+        String text = RandomStringUtils.secure().nextAlphabetic(32);
         String encrypt = encryptor.encrypt(text);
         Assertions.assertEquals(text, encryptor.decrypt(encrypt));
         Assertions.assertEquals(text, RasTextEncryptor.ofPrivateEncrypt(null, keyPair.getPublic()).decrypt(encrypt));
@@ -28,7 +28,7 @@ class RasTextEncryptorTests {
     void testOfPublic() {
         KeyPair keyPair = genKeyPir();
         RasTextEncryptor encryptor = RasTextEncryptor.ofPublicEncrypt(keyPair.getPublic(), keyPair.getPrivate());
-        String text = RandomStringUtils.randomAlphabetic(32);
+        String text = RandomStringUtils.secure().nextAlphabetic(32);
         String encrypt = encryptor.encrypt(text);
         Assertions.assertEquals(text, encryptor.decrypt(encrypt));
         Assertions.assertEquals(text, RasTextEncryptor.ofPublicEncrypt(null, keyPair.getPrivate()).decrypt(encrypt));

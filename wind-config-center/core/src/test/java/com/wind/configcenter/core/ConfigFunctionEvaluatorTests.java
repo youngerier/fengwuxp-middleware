@@ -20,7 +20,7 @@ import java.util.Map;
  **/
 class ConfigFunctionEvaluatorTests {
 
-    private final TextEncryptor textEncryptor = new AesTextEncryptor(RandomStringUtils.randomAlphabetic(32), WindConstants.DEFAULT_TEXT);
+    private final TextEncryptor textEncryptor = new AesTextEncryptor(RandomStringUtils.secure().nextAlphabetic(32), WindConstants.DEFAULT_TEXT);
 
     private final ConfigFunctionEvaluator evaluator = new ConfigFunctionEvaluator(new ConfigFunctionRootObject(textEncryptor, key -> {
         if (key.contains("text")) {

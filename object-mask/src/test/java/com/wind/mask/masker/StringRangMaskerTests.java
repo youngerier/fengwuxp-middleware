@@ -31,7 +31,7 @@ public class StringRangMaskerTests {
     @Test
     void testLargeText() {
         int size = 10000;
-        String text = RandomStringUtils.randomAlphanumeric(size);
+        String text = RandomStringUtils.secure().nextAlphanumeric(size);
         Assertions.assertEquals(20 + MAX_MASK_SIZE, new StringRangMasker(10, size - 10).mask(text).length());
     }
 }

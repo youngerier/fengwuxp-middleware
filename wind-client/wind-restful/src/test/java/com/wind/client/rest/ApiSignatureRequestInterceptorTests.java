@@ -28,7 +28,7 @@ import java.util.Map;
  **/
 class ApiSignatureRequestInterceptorTests {
 
-    ApiSecretAccount secretAccount = ApiSecretAccount.hmacSha256(RandomStringUtils.randomAlphabetic(12), RandomStringUtils.randomAlphabetic(32));
+    ApiSecretAccount secretAccount = ApiSecretAccount.hmacSha256(RandomStringUtils.secure().nextAlphabetic(12), RandomStringUtils.secure().nextAlphabetic(32));
 
     @Test
     void testSha256() throws IOException {

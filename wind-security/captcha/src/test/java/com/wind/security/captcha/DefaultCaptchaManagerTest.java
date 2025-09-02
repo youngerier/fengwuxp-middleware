@@ -52,7 +52,7 @@ class DefaultCaptchaManagerTest {
 
     private void assertCaptchaPaas(Captcha.CaptchaType type) {
         for (Captcha.CaptchaUseScene scene : SimpleUseScene.values()) {
-            String owner = RandomStringUtils.randomAlphanumeric(12);
+            String owner = RandomStringUtils.secure().nextAlphanumeric(12);
             Captcha captcha = captchaManager.generate(type, scene, owner);
             Assertions.assertNotNull(captcha);
             if (ALLOW_USE_PREVIOUS_CAPTCHA_TYPES.contains(type)) {
@@ -80,7 +80,7 @@ class DefaultCaptchaManagerTest {
 
     @Test
     void testMobileCaptchaGenerateFlowControl() {
-        String owner = RandomStringUtils.randomAlphanumeric(11);
+        String owner = RandomStringUtils.secure().nextAlphanumeric(11);
         for (int i = 0; i < properties.getMobilePhone().getFlowControl().getSpeed(); i++) {
             Captcha captcha = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
             Assertions.assertNotNull(captcha);
@@ -93,7 +93,7 @@ class DefaultCaptchaManagerTest {
     @Test
     void testMobileCaptchaGenerateLimit() {
         properties.getMobilePhone().getFlowControl().setSpeed(100);
-        String owner = RandomStringUtils.randomAlphanumeric(11);
+        String owner = RandomStringUtils.secure().nextAlphanumeric(11);
         int maxAllowGenerateTimesOfUserByDay = properties.getMaxAllowGenerateTimesOfUserByDay(SimpleCaptchaType.MOBILE_PHONE);
         for (int i = 0; i < maxAllowGenerateTimesOfUserByDay; i++) {
             Captcha captcha = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
@@ -107,7 +107,7 @@ class DefaultCaptchaManagerTest {
     @Test
     void testMobileCaptchaGenerateRepeatedly() {
         // 测试多次发送，验证通过
-        String owner = RandomStringUtils.randomAlphanumeric(11);
+        String owner = RandomStringUtils.secure().nextAlphanumeric(11);
         Captcha captcha1 = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
         Captcha captcha2 = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
         Captcha captcha3 = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
@@ -119,10 +119,10 @@ class DefaultCaptchaManagerTest {
 
     private void assertCaptchaError(Captcha.CaptchaType type, int maxAllowVerificationTimes) {
         for (Captcha.CaptchaUseScene scene : SimpleUseScene.values()) {
-            String owner = RandomStringUtils.randomAlphanumeric(12);
+            String owner = RandomStringUtils.secure().nextAlphanumeric(12);
             Captcha captcha = captchaManager.generate(type, scene, owner);
             Assertions.assertNotNull(captcha);
-            String expected = RandomStringUtils.randomAlphanumeric(4);
+            String expected = RandomStringUtils.secure().nextAlphanumeric(4);
             BaseException exception = Assertions.assertThrows(BaseException.class, () -> captchaManager.verify(expected, type, scene, owner));
             Assertions.assertEquals(CaptchaI18nMessageKeys.getCaptchaVerityFailure(type), exception.getMessage());
             Captcha result = captchaManager.getCaptchaStorage().get(captcha.getType(), captcha.getUseScene(), owner);
