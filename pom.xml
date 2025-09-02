@@ -85,6 +85,7 @@
         <kafka.version>3.8.0</kafka.version>
         <datafaker.version>2.4.3</datafaker.version>
         <zookeeper.version>3.9.3</zookeeper.version>
+        <nacos.version>3.0.3</nacos.version>
 
         <swagger-openapiv3.version>2.2.31</swagger-openapiv3.version>
         <springdoc-openapi.version>2.8.9</springdoc-openapi.version>
@@ -184,6 +185,11 @@
                 <groupId>com.alibaba.csp</groupId>
                 <artifactId>sentinel-prometheus-metric-exporter</artifactId>
                 <version>${sentinel.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.nacos</groupId>
+                <artifactId>nacos-client</artifactId>
+                <version>${nacos.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mybatis</groupId>
