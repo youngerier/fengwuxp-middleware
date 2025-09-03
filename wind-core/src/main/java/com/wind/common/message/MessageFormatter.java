@@ -33,11 +33,6 @@ public interface MessageFormatter {
         return MessageFormat::format;
     }
 
-    @Deprecated
-    static MessageFormatter simple() {
-        return new SimpleMessageFormatter();
-    }
-
     /**
      * slf4j 消息格式化处理（沿用 {} 语法）
      *

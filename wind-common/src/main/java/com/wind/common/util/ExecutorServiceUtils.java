@@ -130,34 +130,6 @@ public final class ExecutorServiceUtils {
     }
 
     /**
-     * 创建线程池
-     *
-     * @param threadNamePrefix 线程池名称前缀
-     * @param corePoolSize     核心线程数
-     * @param maximumPoolSize  最大线程数
-     * @param workQueueSize    等待队列大小 默认使用 {@link ArrayBlockingQueue}
-     * @return 线程池
-     */
-    @Deprecated
-    public static ExecutorService newExecutor(String threadNamePrefix, int corePoolSize, int maximumPoolSize, int workQueueSize) {
-        return newExecutor(threadNamePrefix, corePoolSize, maximumPoolSize, new ArrayBlockingQueue<>(workQueueSize));
-    }
-
-    /**
-     * 创建线程池
-     *
-     * @param threadNamePrefix 线程池名称前缀
-     * @param corePoolSize     核心线程数
-     * @param maximumPoolSize  最大线程数
-     * @param workQueue        等待队列
-     * @return 线程池
-     */
-    @Deprecated
-    public static ExecutorService newExecutor(String threadNamePrefix, int corePoolSize, int maximumPoolSize, BlockingQueue<Runnable> workQueue) {
-        return custom(threadNamePrefix, corePoolSize, maximumPoolSize, workQueue);
-    }
-
-    /**
      * 创建线程池构建器
      *
      * @param threadNamePrefix 线程名前缀

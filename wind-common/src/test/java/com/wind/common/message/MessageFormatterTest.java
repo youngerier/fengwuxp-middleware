@@ -12,12 +12,6 @@ class MessageFormatterTest {
     }
 
     @Test
-    void testSimpleFormat() {
-        String result = MessageFormatter.simple().format("你好，我是：{}，来自 {}，今年 {} 岁， 很高兴认识{}", "张三", "东北", 22, "在座的各位同学");
-        Assertions.assertEquals("你好，我是：张三，来自 东北，今年 22 岁， 很高兴认识在座的各位同学", result);
-    }
-
-    @Test
     void testSlf4jFormat() {
         String result = MessageFormatter.slf4j().format("你好，我是：{}，来自 {}，今年 {} 岁， 很高兴认识 {}", "张三", "东北", 22, "在座的各位同学");
         Assertions.assertEquals("你好，我是：张三，来自 东北，今年 22 岁， 很高兴认识 在座的各位同学", result);
