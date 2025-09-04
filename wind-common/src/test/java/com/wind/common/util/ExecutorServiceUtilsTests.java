@@ -2,11 +2,13 @@ package com.wind.common.util;
 
 import com.wind.trace.WindTracer;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 
 import java.util.Arrays;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -42,6 +44,21 @@ class ExecutorServiceUtilsTests {
         for (Future<?> future : Arrays.asList(f1, f2)) {
             future.get();
         }
+    }
+
+    @Test
+    @Disabled
+    void testAutoShutdownOnJvmExit() throws Exception {
+        ExecutorService executorService = ExecutorServiceUtils.named("test-").shutdownOnJvmExit().build();
+        Future<?> future = executorService.submit(() -> {
+            try {
+                Thread.sleep(8 * 1000);
+            } catch (InterruptedException e) {
+                System.err.print("execute interrupted");
+            }
+        });
+        CompletableFuture.runAsync(() -> System.exit(-1));
+        future.get();
     }
 
 }

@@ -5,6 +5,7 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.trace.thread.TraceContextTask;
 import jakarta.validation.constraints.NotBlank;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.lang.NonNull;
@@ -32,6 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author wuxp
  * @date 2023-12-26 10:35
  **/
+@Slf4j
 public final class ExecutorServiceUtils {
 
     private static final int DEFAULT_WORK_QUEUE_SIZE = 128;
@@ -169,6 +171,11 @@ public final class ExecutorServiceUtils {
 
         private boolean useVirtualThreads = false;
 
+        /**
+         * 在 JVM 退出时关闭线程池
+         */
+        private boolean shutdownOnJvmExit = false;
+
         private ExecutorBuilder() {
         }
 
@@ -187,6 +194,10 @@ public final class ExecutorServiceUtils {
             return this;
         }
 
+        public ExecutorBuilder workQueueSize(int workQueue) {
+            return workQueue(new ArrayBlockingQueue<>(workQueue));
+        }
+
         public ExecutorBuilder workQueue(BlockingQueue<Runnable> workQueue) {
             this.workQueue = workQueue;
             return this;
@@ -202,18 +213,22 @@ public final class ExecutorServiceUtils {
             return this;
         }
 
+        public ExecutorBuilder shutdownOnJvmExit() {
+            this.shutdownOnJvmExit = true;
+            return this;
+        }
+
         /**
          * 创建线程池
          *
          * @return 线程池 （ThreadPoolExecutor）
          */
         public ExecutorService buildExecutor() {
-            if (useVirtualThreads) {
-                ExecutorService executorService = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name(threadNamePrefix, 0).factory());
-                return new DecoratingExecutorServiceWrapper(executorService, VirtualThreadMdcTaskDecorator.composite(threadNamePrefix, TASK_DECORATOR.get()));
+            ExecutorService result = createExecutor();
+            if (shutdownOnJvmExit) {
+                registerShutdownHook(threadNamePrefix, result);
             }
-            return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAlive.getSeconds(), TimeUnit.SECONDS, workQueue,
-                    new CustomizableThreadFactory(threadNamePrefix), rejectedExecutionHandler);
+            return result;
         }
 
         /**
@@ -237,6 +252,43 @@ public final class ExecutorServiceUtils {
                 decorator = VirtualThreadMdcTaskDecorator.composite(threadNamePrefix, decorator);
             }
             return new DecoratingExecutorServiceWrapper(buildExecutor(), decorator);
+        }
+
+        private ExecutorService createExecutor() {
+            if (useVirtualThreads) {
+                ExecutorService executorService = Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name(threadNamePrefix, 0).factory());
+                return new DecoratingExecutorServiceWrapper(executorService, VirtualThreadMdcTaskDecorator.composite(threadNamePrefix, TASK_DECORATOR.get()));
+            }
+            return new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAlive.getSeconds(), TimeUnit.SECONDS, workQueue,
+                    new CustomizableThreadFactory(threadNamePrefix), rejectedExecutionHandler);
+        }
+
+        private static void registerShutdownHook(String threadNamePrefix, ExecutorService executor) {
+            String name = threadNamePrefix.endsWith("-") ? threadNamePrefix.substring(0, threadNamePrefix.length() - 1) : threadNamePrefix;
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                log.debug("jvm exit hook, shutdown executor = {}", name);
+                gracefulShutdown(executor);
+            }, "executor-shutdown-hook-" + name));
+        }
+    }
+
+    /**
+     * 优雅关闭线程池
+     *
+     * @param executor 线程池
+     */
+    public static void gracefulShutdown(ExecutorService executor) {
+        if (executor.isShutdown() || executor.isTerminated()) {
+            return;
+        }
+        try {
+            executor.shutdown();
+            if (!executor.awaitTermination(7500, TimeUnit.MILLISECONDS)) {
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 
