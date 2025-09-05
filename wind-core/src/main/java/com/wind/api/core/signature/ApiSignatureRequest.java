@@ -148,11 +148,12 @@ public class ApiSignatureRequest {
     }
 
     @VisibleForTesting
-    static Map<String, List<String>> parseQueryParamsAsMap(String queryString) {
+    static Map<String, List<String>> parseQueryParamsAsMap(@NotNull String queryString) {
         Map<String, List<String>> result = new HashMap<>();
         if (StringUtils.hasText(queryString)) {
             String[] parts = decodeQueryString(queryString).split(WindConstants.AND);
             for (String part : parts) {
+                // key=value, split 后为 [key,value], value 可能没有值
                 String[] keyValues = part.split(WindConstants.EQ, 2);
                 String key = keyValues[0];
                 List<String> values = result.get(key);
