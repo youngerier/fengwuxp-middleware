@@ -74,9 +74,9 @@ public class OkHttpApiSignatureRequestInterceptor implements Interceptor {
         requestBuilder.addHeader(headerNames.getSign(), sign);
         log.debug("api sign object = {} , sign = {}", request, sign);
         Response result = chain.proceed(requestBuilder.build());
-        if (result.code() >= 400 && result.code() <= 500) {
-            log.debug("sign Debug-Sign-Content = {}", result.headers().get("Debug-Sign-Content"));
-            log.debug("sign Debug-Sign-Query = {}", result.headers().get("Debug-Sign-Query"));
+        if (result.code() >= 400 && result.code() < 500) {
+            log.debug("response sign Debug-Sign-Content = {}", result.headers().get("Debug-Sign-Content"));
+            log.debug("response sign Debug-Sign-Query = {}", result.headers().get("Debug-Sign-Query"));
         }
         return result;
     }
