@@ -39,6 +39,9 @@ public class JavaEntityParser {
         result.setName(classType.getSimpleName())
                 .setComment(StringUtils.hasLength(desc) || optional.isEmpty() ? desc : getCommentByTag(optional.get()))
                 .setFields(fields);
+        if (result.getComment() != null) {
+            result.setComment(result.getComment().replace("表", ""));
+        }
         return result;
     }
 
