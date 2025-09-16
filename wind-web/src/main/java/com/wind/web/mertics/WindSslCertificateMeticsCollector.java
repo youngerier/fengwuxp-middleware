@@ -3,7 +3,6 @@ package com.wind.web.mertics;
 import com.wind.common.WindConstants;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.net.ssl.SSLSession;
@@ -21,9 +20,8 @@ import java.util.function.Supplier;
  * @author wuxp
  * @date 2025-09-15 16:54
  **/
-@AllArgsConstructor
 @Slf4j
-public class WindSslCertificateMeticsCollector {
+public record WindSslCertificateMeticsCollector(MeterRegistry meterRegistry, Supplier<Collection<String>> hostsSupplier) {
 
     private static final String DEFAULT_PORT = "443";
 
@@ -38,10 +36,6 @@ public class WindSslCertificateMeticsCollector {
     private static final String METRIC_GROUP_NAME = "domain.ssl.certificate.status";
 
     private static final String METRIC_DESCRIPTION = "SSL certificate remaining valid days";
-
-    private final MeterRegistry meterRegistry;
-
-    private final Supplier<Collection<String>> hostsSupplier;
 
     /**
      * 采集 ssl 证书指标信息
@@ -70,7 +64,7 @@ public class WindSslCertificateMeticsCollector {
                             .register(meterRegistry);
                 }
             } catch (Exception exception) {
-                log.error("Domain ssl metric collect error, host = {}, message = {}", host, exception.getMessage());
+                log.warn("Domain ssl metric collect error, host = {}, message = {}", host, exception.getMessage());
                 // 失败时也可以暴露为状态 -1
                 Gauge.builder(METRIC_GROUP_NAME, () -> -1)
                         .description(METRIC_DESCRIPTION)
