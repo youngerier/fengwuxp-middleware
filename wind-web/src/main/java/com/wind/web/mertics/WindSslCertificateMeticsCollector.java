@@ -59,7 +59,7 @@ public class WindSslCertificateMeticsCollector {
                     Instant notAfter = cert.getNotAfter().toInstant();
                     long availableDays = Instant.now().until(notAfter, ChronoUnit.DAYS);
                     String status = availableDays > 0 ? "VALID" : "EXPIRED";
-                    log.info("SSL Metric - Host = {}, Subject = {}, Status= {}, DaysLeft = {}", host, cert.getSubjectX500Principal(), status, availableDays);
+                    log.info("Domain ssl metric collect, host = {}, subject = {}, status= {}, availableDays = {}", host, cert.getSubjectX500Principal(), status, availableDays);
                     // 用标签区分域名和状态
                     Gauge.builder(METRIC_GROUP_NAME, () -> availableDays)
                             .description(METRIC_DESCRIPTION)
@@ -70,7 +70,7 @@ public class WindSslCertificateMeticsCollector {
                             .register(meterRegistry);
                 }
             } catch (Exception exception) {
-                log.error("SSL Metric - Host =  {}, message = {}", host, exception.getMessage());
+                log.error("Domain ssl metric collect error, host = {}, message = {}", host, exception.getMessage());
                 // 失败时也可以暴露为状态 -1
                 Gauge.builder(METRIC_GROUP_NAME, () -> -1)
                         .description(METRIC_DESCRIPTION)
