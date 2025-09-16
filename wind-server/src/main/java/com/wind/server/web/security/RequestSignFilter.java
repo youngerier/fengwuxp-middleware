@@ -115,9 +115,9 @@ public class RequestSignFilter implements Filter, Ordered {
 
         if (!ServiceInfoUtils.isOnline()) {
             // 线下环境返回服务端的签名字符串，方便客户端排查签名错误
-            response.addHeader(headerNames.getDebugSignContent(), signatureRequest.getSignTextForDigest());
-            if (StringUtils.hasText(signatureRequest.getQueryString())) {
-                response.addHeader(headerNames.getDebugSignQuery(), signatureRequest.getQueryString());
+            response.addHeader(headerNames.getDebugSignContent(), signatureRequest.getSignText(account.getSigner()));
+            if (StringUtils.hasText(signatureRequest.queryString())) {
+                response.addHeader(headerNames.getDebugSignQuery(), signatureRequest.queryString());
             }
         }
         log.error("sign verify error, signature request = {}", signatureRequest);

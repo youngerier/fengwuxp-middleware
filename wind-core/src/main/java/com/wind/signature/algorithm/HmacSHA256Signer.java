@@ -18,7 +18,7 @@ import java.util.Base64;
  */
 public final class HmacSHA256Signer {
 
-    private static final String ALGORITHM = "HmacSHA256";
+    public static final String ALGORITHM_NAME = "HmacSHA256";
 
     private HmacSHA256Signer() {
         throw new AssertionError();
@@ -33,9 +33,9 @@ public final class HmacSHA256Signer {
      */
     public static String sign(String signText, String secretKey) {
         try {
-            Mac mac = Mac.getInstance(ALGORITHM);
+            Mac mac = Mac.getInstance(ALGORITHM_NAME);
             byte[] appSecretBytes = secretKey.getBytes(StandardCharsets.UTF_8);
-            mac.init(new SecretKeySpec(appSecretBytes, 0, appSecretBytes.length, ALGORITHM));
+            mac.init(new SecretKeySpec(appSecretBytes, 0, appSecretBytes.length, ALGORITHM_NAME));
             byte[] md5Result = mac.doFinal(signText.getBytes(StandardCharsets.UTF_8));
             return Base64.getEncoder().encodeToString(md5Result);
         } catch (NoSuchAlgorithmException | InvalidKeyException exception) {

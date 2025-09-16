@@ -17,8 +17,6 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -64,8 +62,8 @@ public class ApiSignatureRequestInterceptor implements ClientHttpRequestIntercep
         if (StringUtils.hasText(account.getSecretKeyVersion())) {
             request.getHeaders().add(headerNames.getSecretVersion(), account.getSecretKeyVersion());
         }
-        request.getHeaders().add(headerNames.getTimestamp(), signatureRequest.getTimestamp());
-        request.getHeaders().add(headerNames.getNonce(), signatureRequest.getNonce());
+        request.getHeaders().add(headerNames.getTimestamp(), signatureRequest.timestamp());
+        request.getHeaders().add(headerNames.getNonce(), signatureRequest.nonce());
         String sign = account.getSigner().sign(signatureRequest, account.getSecretKey());
         request.getHeaders().add(headerNames.getSign(), sign);
         if (log.isDebugEnabled()) {

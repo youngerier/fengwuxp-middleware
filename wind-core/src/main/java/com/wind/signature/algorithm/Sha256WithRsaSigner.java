@@ -22,9 +22,9 @@ import java.util.Base64;
  **/
 public final class Sha256WithRsaSigner {
 
-    private static final String KEY_ALGORITHM = "RSA";
+    public static final String ALGORITHM_NAME = "SHA256WithRSA";
 
-    private static final String SIGNATURE_ALGORITHM = "SHA256WithRSA";
+    private static final String KEY_ALGORITHM = "RSA";
 
     private Sha256WithRsaSigner() {
         throw new AssertionError();
@@ -44,7 +44,7 @@ public final class Sha256WithRsaSigner {
             // 指定加密算法
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
             // 用私钥对信息生成数字签名
-            Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
+            Signature signature = Signature.getInstance(ALGORITHM_NAME);
             signature.initSign(keyFactory.generatePrivate(keySpec));
             signature.update(signText.getBytes());
             return Base64.getEncoder().encodeToString(signature.sign());
@@ -68,7 +68,7 @@ public final class Sha256WithRsaSigner {
         try {
             // 指定加密算法
             KeyFactory keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
-            Signature signature = Signature.getInstance(SIGNATURE_ALGORITHM);
+            Signature signature = Signature.getInstance(ALGORITHM_NAME);
             signature.initVerify(keyFactory.generatePublic(keySpec));
             signature.update(signText.getBytes());
             // 验证签名是否正常

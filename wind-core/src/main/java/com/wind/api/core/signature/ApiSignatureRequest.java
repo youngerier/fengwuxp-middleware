@@ -5,8 +5,6 @@ import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.Data;
-import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 import org.springframework.lang.Nullable;
 import org.springframework.util.DigestUtils;
@@ -20,21 +18,26 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
  * API 签名加签对象
  *
+ * @param method      http 请求方法
+ * @param requestPath http 请求 path，不包含查询参数和域名
+ * @param nonce       32 位字符串
+ * @param timestamp   时间戳
+ * @param queryString 请求查询字符串
+ * @param requestBody 请求体
  * @author wuxp
  * @date 2023-10-18 22:08
  * @see <a href="https://juejin.cn/post/6844904034453864462#heading-2">http请求中加号被替换为空格？源码背后的秘密</a>
  */
-@Data
-@Getter
 @Builder
 @FieldNameConstants
-public class ApiSignatureRequest {
+public record ApiSignatureRequest(String method, String requestPath, String nonce, String timestamp, String queryString, String requestBody) {
 
     /**
      * 需要 requestBody 参与签名的 Content-Type
@@ -43,37 +46,7 @@ public class ApiSignatureRequest {
 
     private static final String MD5_TAG = "Md5";
 
-    /**
-     * http 请求方法
-     */
-    private final String method;
-
-    /**
-     * http 请求 path，不包含查询参数和域名
-     */
-    private final String requestPath;
-
-    /**
-     * 32 位字符串
-     */
-    private final String nonce;
-
-    /**
-     * 时间戳
-     */
-    private final String timestamp;
-
-    /**
-     * 请求查询字符串
-     */
-    private final String queryString;
-
-    /**
-     * 请求体
-     */
-    private final String requestBody;
-
-    private ApiSignatureRequest(String method, String requestPath, String nonce, String timestamp, String queryString, String requestBody) {
+    public ApiSignatureRequest(String method, String requestPath, String nonce, String timestamp, String queryString, String requestBody) {
         AssertUtils.hasText(method, "method must not empty");
         AssertUtils.notNull(requestPath, "requestPath must not null");
         AssertUtils.hasText(nonce, "nonce must not empty");
@@ -88,9 +61,19 @@ public class ApiSignatureRequest {
     }
 
     /**
+     * 根据签名算法获取签名字符串
+     *
+     * @param algorithm 签名算法
+     * @return 签名字符串
+     */
+    public String getSignText(ApiSignAlgorithm algorithm) {
+        return Objects.equals(algorithm, ApiSignAlgorithm.SHA256_WITH_RSA) ? getSignTextForSha256WithRsa() : getSignTextForDigest();
+    }
+
+    /**
      * @return 获取摘要签名字符串
      */
-    public String getSignTextForDigest() {
+    String getSignTextForDigest() {
         StringBuilder result = new StringBuilder()
                 .append(Fields.method).append(WindConstants.EQ).append(method).append(WindConstants.AND)
                 .append(Fields.requestPath).append(WindConstants.EQ).append(requestPath).append(WindConstants.AND)
@@ -114,7 +97,7 @@ public class ApiSignatureRequest {
     /**
      * @return 获取 Sha256WithRsa 签名字符串
      */
-    public String getSignTextForSha256WithRsa() {
+    String getSignTextForSha256WithRsa() {
         return method + WindConstants.SPACE + requestPath + WindConstants.LF +
                 timestamp + WindConstants.LF +
                 nonce + WindConstants.LF +

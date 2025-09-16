@@ -68,8 +68,8 @@ public class OkHttpApiSignatureRequestInterceptor implements Interceptor {
         if (StringUtils.hasText(account.getSecretKeyVersion())) {
             requestBuilder.addHeader(headerNames.getSecretVersion(), account.getSecretKeyVersion());
         }
-        requestBuilder.addHeader(headerNames.getTimestamp(), signatureRequest.getTimestamp());
-        requestBuilder.addHeader(headerNames.getNonce(), signatureRequest.getNonce());
+        requestBuilder.addHeader(headerNames.getTimestamp(), signatureRequest.timestamp());
+        requestBuilder.addHeader(headerNames.getNonce(), signatureRequest.nonce());
         String sign = account.getSigner().sign(signatureRequest, account.getSecretKey());
         requestBuilder.addHeader(headerNames.getSign(), sign);
         log.debug("api sign object = {} , sign = {}", request, sign);

@@ -34,11 +34,11 @@ class ApiSignerTests {
 
     private static ApiSignatureRequest copyAndReplaceSecretRequest(ApiSignatureRequest signatureRequest) {
         return ApiSignatureRequest.builder()
-                .method(signatureRequest.getMethod())
-                .requestPath(signatureRequest.getRequestPath())
-                .timestamp(signatureRequest.getTimestamp())
-                .nonce(signatureRequest.getNonce())
-                .requestBody(signatureRequest.getRequestBody())
+                .method(signatureRequest.method())
+                .requestPath(signatureRequest.requestPath())
+                .timestamp(signatureRequest.timestamp())
+                .nonce(signatureRequest.nonce())
+                .requestBody(signatureRequest.requestBody())
                 .build();
     }
 
