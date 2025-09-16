@@ -23,7 +23,7 @@ class WindSslCertificateMeticsCollectorTests {
     @Test
     void testGetHostSslCertificateInfo(){
         WindSslCertificateMeticsCollector.HostSslCertificateInfo info = collector.getHostSslCertificateInfo("www.baidu.com");
-        log.info("info = {}", info);
+        Assertions.assertEquals("CN=baidu.com,O=Beijing Baidu Netcom Science Technology Co.\\, Ltd,L=beijing,ST=beijing,C=CN", info.subject());
     }
 
     @Test
