@@ -129,7 +129,7 @@ public final class JwtTokenCodec {
      */
     public WindAuthenticationToken encoding(WindAuthenticationUser user, @Nullable Duration ttl) {
         Jwt jwt = jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader,
-                        newJwtBuilder(String.valueOf(user.getId()), ttl == null ? effectiveTime : ttl)
+                        newJwtBuilder(String.valueOf(user.id()), ttl == null ? effectiveTime : ttl)
                                 .claim(AUTHENTICATION_VARIABLE_NAME, user)
                                 .id(genJti(user))
                                 .build()

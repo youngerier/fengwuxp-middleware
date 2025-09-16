@@ -3,6 +3,7 @@ package com.wind.server.i18n;
 import com.wind.common.exception.AssertUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotEmpty;
 import org.apache.tomcat.util.http.parser.AcceptLanguage;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.lang.NonNull;
@@ -28,7 +29,7 @@ public class WindAcceptI18nHeaderLocaleResolver implements LocaleResolver {
 
     private final List<String> headerNames;
 
-    public WindAcceptI18nHeaderLocaleResolver(List<String> headerNames, Locale defaultLocale) {
+    public WindAcceptI18nHeaderLocaleResolver(@NotEmpty List<String> headerNames, @NotNull Locale defaultLocale) {
         AssertUtils.notNull(defaultLocale, "argument defaultLocale must not null");
         AssertUtils.notEmpty(headerNames, "argument headerNames must not empty");
         this.headerNames = headerNames;
@@ -63,12 +64,11 @@ public class WindAcceptI18nHeaderLocaleResolver implements LocaleResolver {
                 .orElse(null);
     }
 
-    @Nullable
     private Locale parseLocale(String value) {
         if (StringUtils.hasText(value)) {
             try {
                 List<AcceptLanguage> acceptLanguages = AcceptLanguage.parse(new StringReader(value));
-                return CollectionUtils.isEmpty(acceptLanguages) ? defaultLocale : acceptLanguages.get(0).getLocale();
+                return CollectionUtils.isEmpty(acceptLanguages) ? defaultLocale : acceptLanguages.getFirst().getLocale();
             } catch (IOException e) {
                 // Mal-formed headers are ignore. Do the same in the unlikely event
                 // of an IOException.

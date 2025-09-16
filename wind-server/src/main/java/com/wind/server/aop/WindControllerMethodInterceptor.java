@@ -5,12 +5,11 @@ import com.wind.common.WindHttpConstants;
 import com.wind.context.injection.MethodParameterInjector;
 import com.wind.script.auditlog.ScriptAuditLogRecorder;
 import com.wind.web.util.HttpServletRequestUtils;
-import lombok.AllArgsConstructor;
+import jakarta.annotation.Nonnull;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
-import jakarta.annotation.Nonnull;
 import java.lang.reflect.Method;
 
 /**
@@ -20,12 +19,7 @@ import java.lang.reflect.Method;
  * @date 2023-10-25 10:00
  **/
 @Slf4j
-@AllArgsConstructor
-public class WindControllerMethodInterceptor implements MethodInterceptor {
-
-    private final ScriptAuditLogRecorder auditLogRecorder;
-
-    private final MethodParameterInjector methodParameterInjector;
+public record WindControllerMethodInterceptor(ScriptAuditLogRecorder auditLogRecorder, MethodParameterInjector methodParameterInjector) implements MethodInterceptor {
 
     @Override
     public Object invoke(@Nonnull MethodInvocation invocation) throws Throwable {

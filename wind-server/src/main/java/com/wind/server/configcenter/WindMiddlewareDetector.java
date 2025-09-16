@@ -15,7 +15,7 @@ import java.util.Set;
  **/
 public final class WindMiddlewareDetector {
 
-    private final static Set<WindMiddlewareType> MIDDLEWARE_TYPES = new HashSet<>();
+    private static final Set<WindMiddlewareType> MIDDLEWARE_TYPES = new HashSet<>();
 
     static {
         detection();

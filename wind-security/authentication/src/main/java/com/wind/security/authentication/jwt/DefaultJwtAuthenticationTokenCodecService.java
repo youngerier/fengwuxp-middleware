@@ -36,7 +36,7 @@ public class DefaultJwtAuthenticationTokenCodecService implements Authentication
     @Override
     public WindAuthenticationToken generateToken(WindAuthenticationUser user, Duration ttl) {
         WindAuthenticationToken result = jwtTokenCodec.encoding(user, ttl);
-        userTokenMap.put(String.valueOf(user.getId()), result.id());
+        userTokenMap.put(String.valueOf(user.id()), result.id());
         return result;
     }
 

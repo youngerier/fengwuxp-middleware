@@ -2,8 +2,6 @@ package com.wind.security.authentication;
 
 import com.wind.common.exception.AssertUtils;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.lang.Nullable;
 
 import java.io.Serial;
@@ -14,30 +12,16 @@ import java.util.Map;
 /**
  * Authentication User
  *
+ * @param id         用户 id
+ * @param userName   用户名
+ * @param attributes 用户属性
  * @author wuxp
  * @date 2023-10-26 12:49
- **/
-@AllArgsConstructor
-@Getter
-public class WindAuthenticationUser implements Serializable {
+ */
+public record WindAuthenticationUser(String id, String userName, Map<String, Object> attributes) implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -7270843983936135796L;
-
-    /**
-     * 用户 id
-     */
-    private final String id;
-
-    /**
-     * 用户名
-     */
-    private final String userName;
-
-    /**
-     * 用户属性
-     */
-    private final Map<String, Object> attributes;
 
     public WindAuthenticationUser(Long id, String userName) {
         this(String.valueOf(id), userName);
@@ -54,6 +38,16 @@ public class WindAuthenticationUser implements Serializable {
      */
     public Long getIdAsLong() {
         return Long.parseLong(id);
+    }
+
+    @Deprecated
+    public String getId() {
+        return id;
+    }
+
+    @Deprecated
+    public String getUserName() {
+        return userName;
     }
 
     @Nullable
