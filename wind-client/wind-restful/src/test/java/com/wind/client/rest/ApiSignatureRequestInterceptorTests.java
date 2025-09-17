@@ -2,7 +2,6 @@ package com.wind.client.rest;
 
 import com.wind.api.core.signature.ApiSecretAccount;
 import com.wind.api.core.signature.SignatureHttpHeaderNames;
-import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.lang.NonNull;
-import org.springframework.lang.NonNullApi;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -35,7 +33,7 @@ class ApiSignatureRequestInterceptorTests {
         ApiSignatureRequestInterceptor interceptor = new ApiSignatureRequestInterceptor(httpRequest -> secretAccount);
         ClientHttpResponse response = interceptor.intercept(mockHttpRequest(), new byte[0], mockExecution());
         HttpHeaders headers = response.getHeaders();
-        String sign = new SignatureHttpHeaderNames(null).getSign();
+        String sign = new SignatureHttpHeaderNames(null).sign();
         Assertions.assertNotNull(headers.get(sign));
     }
 

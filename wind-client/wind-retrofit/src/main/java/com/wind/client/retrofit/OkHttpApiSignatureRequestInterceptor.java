@@ -2,6 +2,7 @@ package com.wind.client.retrofit;
 
 import com.wind.api.core.signature.ApiSecretAccount;
 import com.wind.api.core.signature.ApiSignatureRequest;
+import com.wind.api.core.signature.SignatureConstants;
 import com.wind.api.core.signature.SignatureHttpHeaderNames;
 import com.wind.common.exception.AssertUtils;
 import com.wind.sequence.SequenceGenerator;
@@ -64,19 +65,19 @@ public class OkHttpApiSignatureRequestInterceptor implements Interceptor {
         }
         ApiSignatureRequest signatureRequest = builder.build();
         Request.Builder requestBuilder = request.newBuilder();
-        requestBuilder.addHeader(headerNames.getAccessId(), account.getAccessId());
+        requestBuilder.addHeader(headerNames.accessId(), account.getAccessId());
         if (StringUtils.hasText(account.getSecretKeyVersion())) {
-            requestBuilder.addHeader(headerNames.getSecretVersion(), account.getSecretKeyVersion());
+            requestBuilder.addHeader(headerNames.secretVersion(), account.getSecretKeyVersion());
         }
-        requestBuilder.addHeader(headerNames.getTimestamp(), signatureRequest.timestamp());
-        requestBuilder.addHeader(headerNames.getNonce(), signatureRequest.nonce());
+        requestBuilder.addHeader(headerNames.timestamp(), signatureRequest.timestamp());
+        requestBuilder.addHeader(headerNames.nonce(), signatureRequest.nonce());
         String sign = account.getSigner().sign(signatureRequest, account.getSecretKey());
-        requestBuilder.addHeader(headerNames.getSign(), sign);
+        requestBuilder.addHeader(headerNames.sign(), sign);
         log.debug("api sign object = {} , sign = {}", request, sign);
         Response result = chain.proceed(requestBuilder.build());
         if (result.code() >= 400 && result.code() < 500) {
-            log.debug("response sign Debug-Sign-Content = {}", result.headers().get("Debug-Sign-Content"));
-            log.debug("response sign Debug-Sign-Query = {}", result.headers().get("Debug-Sign-Query"));
+            log.debug("response sign Debug-Sign-Content = {}", result.headers().get(SignatureConstants.DEBUG_SIGN_CONTENT_HEADER_NAME));
+            log.debug("response sign Debug-Sign-Query = {}", result.headers().get(SignatureConstants.DEBUG_SIGN_QUERY_HEADER_NAME));
         }
         return result;
     }

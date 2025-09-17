@@ -1,8 +1,6 @@
 package com.wind.api.core.signature;
 
 import com.wind.common.WindConstants;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.springframework.util.StringUtils;
 
 /**
@@ -11,23 +9,7 @@ import org.springframework.util.StringUtils;
  * @author wuxp
  * @date 2023-10-22 08:24
  **/
-@Getter
-@AllArgsConstructor
-public final class SignatureHttpHeaderNames {
-
-    final String nonce;
-
-    final String timestamp;
-
-    final String accessId;
-
-    final String secretVersion;
-
-    final String sign;
-
-    final String debugSignContent;
-
-    final String debugSignQuery;
+public record SignatureHttpHeaderNames(String nonce, String timestamp, String accessId, String secretVersion, String sign, String debugSignContent, String debugSignQuery) {
 
     public SignatureHttpHeaderNames() {
         this(WindConstants.WIND);

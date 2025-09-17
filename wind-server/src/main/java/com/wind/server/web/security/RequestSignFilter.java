@@ -72,7 +72,7 @@ public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretA
         }
 
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        String accessId = request.getHeader(headerNames.getAccessId());
+        String accessId = request.getHeader(headerNames.accessId());
         if (!StringUtils.hasText(accessId)) {
             badRequest(response, "request access key must not empty");
             return;
@@ -80,17 +80,17 @@ public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretA
 
         boolean signRequireBody = ApiSignatureRequest.signRequireRequestBody(request.getContentType());
         HttpServletRequest httpRequest = signRequireBody ? new RepeatableReadRequestWrapper(request) : request;
-        if (isInvalidTimestamp(request.getHeader(headerNames.getTimestamp()))) {
+        if (isInvalidTimestamp(request.getHeader(headerNames.timestamp()))) {
             badRequest(response, SIGAN_VERIFY_ERROR_MESSAGE);
             return;
         }
         ApiSignatureRequest signatureRequest = buildSignatureRequest(httpRequest, signRequireBody);
-        String requestSign = request.getHeader(headerNames.getSign());
+        String requestSign = request.getHeader(headerNames.sign());
 
         // 使用访问标识和秘钥版本号加载秘钥账号
-        ApiSecretAccount account = apiSecretAccountProvider.apply(accessId, request.getHeader(headerNames.getSecretVersion()));
+        ApiSecretAccount account = apiSecretAccountProvider.apply(accessId, request.getHeader(headerNames.secretVersion()));
         if (account == null) {
-            badRequest(response, String.format("please check %s, %s request header", headerNames.getAccessId(), headerNames.getSecretVersion()));
+            badRequest(response, String.format("please check %s, %s request header", headerNames.accessId(), headerNames.secretVersion()));
             return;
         }
         if (account.getSigner().verify(signatureRequest, account.getSecretKey(), requestSign)) {
@@ -102,9 +102,9 @@ public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretA
 
         if (!ServiceInfoUtils.isOnline()) {
             // 线下环境返回服务端的签名字符串，方便客户端排查签名错误
-            response.addHeader(headerNames.getDebugSignContent(), signatureRequest.getSignText(account.getSigner()));
+            response.addHeader(headerNames.debugSignContent(), signatureRequest.getSignText(account.getSigner()));
             if (StringUtils.hasText(signatureRequest.queryString())) {
-                response.addHeader(headerNames.getDebugSignQuery(), signatureRequest.queryString());
+                response.addHeader(headerNames.debugSignQuery(), signatureRequest.queryString());
             }
         }
         log.error("sign verify error, signature request = {}", signatureRequest);
@@ -134,8 +134,8 @@ public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretA
                 // 仅在存在查询字符串时才设置，避免获取到表单参数
                 .method(request.getMethod().toUpperCase())
                 // TODO 随机串的验证
-                .nonce(request.getHeader(headerNames.getNonce()))
-                .timestamp(request.getHeader(headerNames.getTimestamp()));
+                .nonce(request.getHeader(headerNames.nonce()))
+                .timestamp(request.getHeader(headerNames.timestamp()));
         if (requiredBody) {
             result.requestBody(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8));
         }
