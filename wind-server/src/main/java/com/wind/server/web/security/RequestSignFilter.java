@@ -11,7 +11,13 @@ import com.wind.server.servlet.RepeatableReadRequestWrapper;
 import com.wind.server.web.filters.WindWebFilterOrdered;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.web.util.HttpResponseMessageUtils;
-import lombok.AllArgsConstructor;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
@@ -21,13 +27,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 
-import jakarta.servlet.Filter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -39,11 +38,13 @@ import java.util.function.BiFunction;
  * 接口请求验签
  * 参见：https://www.yuque.com/suiyuerufeng-akjad/wind/zl1ygpq3pitl00qp
  *
+ * @param ignoreRequestMatchers 忽略接口验签的请求匹配器
+ * @param enable                是否启用
  * @author wuxp
  */
 @Slf4j
-@AllArgsConstructor
-public class RequestSignFilter implements Filter, Ordered {
+public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretAccountProvider apiSecretAccountProvider, Collection<RequestMatcher> ignoreRequestMatchers,
+                                boolean enable) implements Filter, Ordered {
 
     /**
      * 签名时间戳 5 分钟内有效
@@ -51,20 +52,6 @@ public class RequestSignFilter implements Filter, Ordered {
     public static final AtomicLong SIGNATURE_TIMESTAMP_VALIDITY_PERIOD = new AtomicLong(5 * 60 * 1000L);
 
     private static final String SIGAN_VERIFY_ERROR_MESSAGE = "sign verify error";
-
-    private final SignatureHttpHeaderNames headerNames;
-
-    private final ApiSecretAccountProvider apiSecretAccountProvider;
-
-    /**
-     * 忽略接口验签的请求匹配器
-     */
-    private final Collection<RequestMatcher> ignoreRequestMatchers;
-
-    /**
-     * 是否启用
-     */
-    private final boolean enable;
 
     public RequestSignFilter(ApiSecretAccountProvider accountProvider, Collection<RequestMatcher> ignoreRequestMatchers, boolean enable) {
         this(new SignatureHttpHeaderNames(), accountProvider, ignoreRequestMatchers, enable);
