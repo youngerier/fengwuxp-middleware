@@ -67,8 +67,17 @@ public class RateLimitTaskDecorator implements TaskDecorator {
                 log.debug("execute rate limit decorate task, name = {}", taskName);
                 runnable.run();
             } else {
-                throw new BaseException(DefaultExceptionCode.TO_MANY_REQUESTS, "task name  = " + taskName + " rate limit exceeded");
+                throw new BaseException(DefaultExceptionCode.TO_MANY_REQUESTS, "task name  = %s rate limit exceeded".formatted(taskName));
             }
         };
+    }
+
+    /**
+     * 以限流的方式执行任务
+     *
+     * @param runnable 执行的函数
+     */
+    public void execute(@NonNull Runnable runnable) {
+        decorate(runnable).run();
     }
 }
