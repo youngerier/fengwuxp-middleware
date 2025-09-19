@@ -48,8 +48,10 @@ public interface FriendlyExceptionMessageConverter {
                 if (Objects.equals(code, DefaultExceptionCode.COMMON_FRIENDLY_ERROR)) {
                     return code.getDesc();
                 }
+                return throwable.getMessage();
             }
-            return throwable.getMessage();
+            // 非业务异常统一返回通用错误提示语
+            return DefaultExceptionCode.COMMON_FRIENDLY_ERROR.getDesc();
         };
     }
 
