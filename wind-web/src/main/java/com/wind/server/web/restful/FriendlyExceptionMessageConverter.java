@@ -71,7 +71,12 @@ public interface FriendlyExceptionMessageConverter {
                     return SpringI18nMessageUtils.getMessage(placeholder.getPattern(), placeholder.getArgs());
                 }
             }
-            return SpringI18nMessageUtils.getMessage(throwable.getMessage());
+            String result = SpringI18nMessageUtils.getMessage(throwable.getMessage());
+            if (Objects.equals(result, throwable.getMessage())){
+                // 未获取到国际化消息，则返回通用错误提示语
+                return SpringI18nMessageUtils.getMessage( DefaultExceptionCode.COMMON_FRIENDLY_ERROR.getDesc());
+            }
+            return result;
         };
     }
 }
