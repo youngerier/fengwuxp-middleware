@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.util.StringJoinSplitUtils;
 import lombok.AllArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,11 +18,11 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.annotation.Nonnull;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Nonnull;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.Map;
@@ -84,7 +85,7 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
         STATIC_RESOURCES.put(".ttc", "font/ttc");
     }
 
-    private static final Cache<String, HttpHeaders> HEADER_CACHES =
+    private static final Cache<@NotNull String, HttpHeaders> HEADER_CACHES =
             Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
 
     /**
@@ -166,7 +167,7 @@ public class IndexHtmlResourcesFilter extends OncePerRequestFilter {
         /**
          * 资源缓存
          */
-        private final Cache<String, byte[]> resourcesCaches = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
+        private final Cache<@NotNull String, byte[]> resourcesCaches = Caffeine.newBuilder().expireAfterWrite(Duration.ofDays(1)).maximumSize(200).build();
 
         @Override
         public byte[] apply(String resourcePath) {

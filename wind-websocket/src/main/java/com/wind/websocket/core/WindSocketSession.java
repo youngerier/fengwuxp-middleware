@@ -2,12 +2,13 @@ package com.wind.websocket.core;
 
 import com.wind.common.exception.AssertUtils;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * web socket session，用于聚合一组用户，管理用户的连接，便于用户在会话内相互通信
@@ -38,6 +39,14 @@ public interface WindSocketSession extends WindSocketSessionDescriptor {
      * @param userId 用户
      */
     void removeUser(String userId);
+
+    /**
+     * 判断用户是否在会话中
+     *
+     * @param userId 用户id
+     * @return if true 在会话中
+     */
+    boolean containsUser(String userId);
 
     /**
      * 断开连接
@@ -87,12 +96,23 @@ public interface WindSocketSession extends WindSocketSessionDescriptor {
     boolean isUserOnline(@NotNull String userId);
 
     /**
-     * 在会话中广播消息
+     * 在会话中广播消息（同步发送）
      *
      * @param payload         将消息广播给所有在线用户
      * @param excludedUserIds 排除广播的用户
      */
-    void broadcast(@NotNull Object payload, @NotNull Collection<String> excludedUserIds);
+    default void broadcastSync(@NotNull Object payload, @NotNull Collection<String> excludedUserIds) {
+        broadcast(payload, excludedUserIds).join();
+    }
+
+    /**
+     * 在会话中广播消息 （异步发送）
+     *
+     * @param payload         将消息广播给所有在线用户
+     * @param excludedUserIds 排除广播的用户
+     * @return 异步结果
+     */
+    CompletableFuture<Void> broadcast(@NotNull Object payload, @NotNull Collection<String> excludedUserIds);
 
     /**
      * 在会话中广播消息

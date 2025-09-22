@@ -16,14 +16,14 @@ import com.wind.client.retrofit.converter.JacksonConverterFactory;
 import com.wind.client.retrofit.converter.JacksonResponseCallAdapterFactory;
 import com.wind.common.exception.ApiClientException;
 import com.wind.common.exception.AssertUtils;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.lang.Nullable;
 import retrofit2.Retrofit;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -31,7 +31,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static com.wind.common.WindDateFormatPatterns.HH_MM_SS;
 import static com.wind.common.WindDateFormatPatterns.YYYY_MM_DD;
@@ -54,6 +56,7 @@ import static com.wind.common.WindDateFormatPatterns.YYYY_MM_DD_HH_MM_SS;
  * @author wuxp
  * @date 2024-02-27 11:32
  **/
+@Slf4j
 public final class RetrofitClientFactory {
 
     private final Retrofit retrofit;
@@ -126,6 +129,11 @@ public final class RetrofitClientFactory {
          */
         private int connectTimeoutSeconds = 5;
 
+        /**
+         * 响应结果提取器，默认为 {@link ImmutableApiResponse}
+         */
+        private Function<Object, Object> responseExtractor = RetrofitClientFactoryBuilder::defaultResponseExtractor;
+
         public RetrofitClientFactoryBuilder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
             return this;
@@ -172,6 +180,11 @@ public final class RetrofitClientFactory {
             return this;
         }
 
+        public RetrofitClientFactoryBuilder responseExtractor(Function<Object, Object> responseExtractor) {
+            this.responseExtractor = responseExtractor;
+            return this;
+        }
+
         /**
          * 创建默认风格 API RetrofitClientFactory
          *
@@ -198,10 +211,8 @@ public final class RetrofitClientFactory {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(baseUrl)
                     .client(httpClient)
-                    .addCallAdapterFactory(new JacksonResponseCallAdapterFactory(objectMapper, ImmutableApiResponse.class,
-                            RetrofitClientFactoryBuilder::defaultResponseExtractor))
-                    .addConverterFactory(new JacksonConverterFactory(objectMapper, ImmutableApiResponse.class,
-                            RetrofitClientFactoryBuilder::defaultResponseExtractor))
+                    .addCallAdapterFactory(new JacksonResponseCallAdapterFactory(objectMapper, ImmutableApiResponse.class, responseExtractor))
+                    .addConverterFactory(new JacksonConverterFactory(objectMapper, ImmutableApiResponse.class, responseExtractor))
                     .build();
 
             return new RetrofitClientFactory(retrofit);
@@ -219,16 +230,12 @@ public final class RetrofitClientFactory {
                 if (language != null) {
                     // 添加国际化请求头
                     builder.interceptors()
-                            .add(new Interceptor() {
-                                @NotNull
-                                @Override
-                                public Response intercept(@NotNull Interceptor.Chain chain) throws IOException {
-                                    Request request = chain.request()
-                                            .newBuilder()
-                                            .addHeader("Accept-Language", language.toLanguageTag())
-                                            .build();
-                                    return chain.proceed(request);
-                                }
+                            .add(chain -> {
+                                Request request = chain.request()
+                                        .newBuilder()
+                                        .addHeader("Accept-Language", language.toLanguageTag())
+                                        .build();
+                                return chain.proceed(request);
                             });
                 }
                 httpClient = builder.build();
@@ -268,12 +275,15 @@ public final class RetrofitClientFactory {
             return result;
         }
 
-        @NotNull
+        @Nullable
+        @SuppressWarnings({"rawtypes"})
         private static Object defaultResponseExtractor(Object data) {
-            if (data instanceof ApiResponse) {
-                ApiResponse<?> response = (ApiResponse<?>) data;
+            if (data instanceof ApiResponse response) {
+                if (log.isDebugEnabled()) {
+                    log.debug("api response extractor, traceId = {}, errorMessage = {}", response.getTraceId(), response.getErrorMessage());
+                }
                 AssertUtils.state(response.isSuccess(), () -> new ApiClientException(response, response.getErrorMessage()));
-                return response.getData();
+                return Objects.requireNonNull(response.getData());
             }
             return data;
         }

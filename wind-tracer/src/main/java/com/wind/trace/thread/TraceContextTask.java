@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.lang.NonNull;
 
+import java.util.Collections;
 import java.util.Map;
 
 /**
@@ -17,44 +18,74 @@ import java.util.Map;
 @Slf4j
 public abstract class TraceContextTask implements TaskDecorator {
 
+    private final boolean printExceptionLog;
+
+    protected TraceContextTask(boolean printExceptionLog) {
+        this.printExceptionLog = printExceptionLog;
+    }
+
+    protected TraceContextTask() {
+        // 默认不输出异常日志，由任务处理者输出
+        this(false);
+    }
+
     @Override
     @NonNull
     public Runnable decorate(@NonNull Runnable task) {
         AssertUtils.notNull(task, "argument task must not null");
         // 获取当前线程的上下文
-        Map<String, Object> contextVariables = WindTracer.TRACER.getContextVariables();
+        Map<String, Object> middlewareContext = WindTracer.TRACER.getContextVariables();
+        Map<String, Object> businessContextVariables = copyContextVariables();
         return () -> {
             try {
                 if (log.isDebugEnabled()) {
-                    log.debug("task decorate, trace context: {}", contextVariables);
+                    log.debug("task decorate, trace context: {}", middlewareContext);
                 }
-                traceContext();
                 // 线程切换，复制上下文 ，traceId 也在 contextVariables 中
-                WindTracer.TRACER.trace(null, contextVariables);
+                WindTracer.TRACER.trace(null, middlewareContext);
+                traceContextVariables(businessContextVariables);
                 task.run();
+            } catch (Throwable throwable) {
+                if (printExceptionLog) {
+                    log.error("execute task exception, message = {}", throwable.getMessage(), throwable);
+                }
+                throw throwable;
             } finally {
                 if (log.isDebugEnabled()) {
                     log.debug("task decorate, clear trace context");
                 }
                 // 清除线程上下文
                 WindTracer.TRACER.clear();
-                clearContext();
+                clearContextVariables();
             }
         };
     }
 
     /**
-     * 自定义的 trace
+     * 复制当前线程的上下文
+     *
+     * @return 上下文变量
      */
-    protected void traceContext() {
-        // 子类自行实现
+    protected Map<String, Object> copyContextVariables() {
+        return Collections.emptyMap();
     }
 
     /**
-     * 自定义的 clear context
+     * 线程切换，复制上下文 ，traceId 也在 contextVariables 中
+     *
+     * @param contextVariables 上下文
      */
-    protected void clearContext() {
-        // 子类自行实现
+    protected void traceContextVariables(Map<String, Object> contextVariables) {
+        if (log.isDebugEnabled()) {
+            log.debug("task decorate, trace contextVariables = {}", contextVariables);
+        }
+    }
+
+    /**
+     * 清除线程上下文
+     */
+    protected void clearContextVariables() {
+
     }
 
     public static TaskDecorator of() {

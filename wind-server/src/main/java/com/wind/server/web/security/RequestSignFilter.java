@@ -11,7 +11,13 @@ import com.wind.server.servlet.RepeatableReadRequestWrapper;
 import com.wind.server.web.filters.WindWebFilterOrdered;
 import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.web.util.HttpResponseMessageUtils;
-import lombok.AllArgsConstructor;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
@@ -21,13 +27,6 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -39,11 +38,13 @@ import java.util.function.BiFunction;
  * 接口请求验签
  * 参见：https://www.yuque.com/suiyuerufeng-akjad/wind/zl1ygpq3pitl00qp
  *
+ * @param ignoreRequestMatchers 忽略接口验签的请求匹配器
+ * @param enable                是否启用
  * @author wuxp
  */
 @Slf4j
-@AllArgsConstructor
-public class RequestSignFilter implements Filter, Ordered {
+public record RequestSignFilter(SignatureHttpHeaderNames headerNames, ApiSecretAccountProvider apiSecretAccountProvider, Collection<RequestMatcher> ignoreRequestMatchers,
+                                boolean enable) implements Filter, Ordered {
 
     /**
      * 签名时间戳 5 分钟内有效
@@ -51,20 +52,6 @@ public class RequestSignFilter implements Filter, Ordered {
     public static final AtomicLong SIGNATURE_TIMESTAMP_VALIDITY_PERIOD = new AtomicLong(5 * 60 * 1000L);
 
     private static final String SIGAN_VERIFY_ERROR_MESSAGE = "sign verify error";
-
-    private final SignatureHttpHeaderNames headerNames;
-
-    private final ApiSecretAccountProvider apiSecretAccountProvider;
-
-    /**
-     * 忽略接口验签的请求匹配器
-     */
-    private final Collection<RequestMatcher> ignoreRequestMatchers;
-
-    /**
-     * 是否启用
-     */
-    private final boolean enable;
 
     public RequestSignFilter(ApiSecretAccountProvider accountProvider, Collection<RequestMatcher> ignoreRequestMatchers, boolean enable) {
         this(new SignatureHttpHeaderNames(), accountProvider, ignoreRequestMatchers, enable);
@@ -85,7 +72,7 @@ public class RequestSignFilter implements Filter, Ordered {
         }
 
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        String accessId = request.getHeader(headerNames.getAccessId());
+        String accessId = request.getHeader(headerNames.accessId());
         if (!StringUtils.hasText(accessId)) {
             badRequest(response, "request access key must not empty");
             return;
@@ -93,17 +80,17 @@ public class RequestSignFilter implements Filter, Ordered {
 
         boolean signRequireBody = ApiSignatureRequest.signRequireRequestBody(request.getContentType());
         HttpServletRequest httpRequest = signRequireBody ? new RepeatableReadRequestWrapper(request) : request;
-        if (isInvalidTimestamp(request.getHeader(headerNames.getTimestamp()))) {
+        if (isInvalidTimestamp(request.getHeader(headerNames.timestamp()))) {
             badRequest(response, SIGAN_VERIFY_ERROR_MESSAGE);
             return;
         }
         ApiSignatureRequest signatureRequest = buildSignatureRequest(httpRequest, signRequireBody);
-        String requestSign = request.getHeader(headerNames.getSign());
+        String requestSign = request.getHeader(headerNames.sign());
 
         // 使用访问标识和秘钥版本号加载秘钥账号
-        ApiSecretAccount account = apiSecretAccountProvider.apply(accessId, request.getHeader(headerNames.getSecretVersion()));
+        ApiSecretAccount account = apiSecretAccountProvider.apply(accessId, request.getHeader(headerNames.secretVersion()));
         if (account == null) {
-            badRequest(response, String.format("please check %s, %s request header", headerNames.getAccessId(), headerNames.getSecretVersion()));
+            badRequest(response, String.format("please check %s, %s request header", headerNames.accessId(), headerNames.secretVersion()));
             return;
         }
         if (account.getSigner().verify(signatureRequest, account.getSecretKey(), requestSign)) {
@@ -115,9 +102,9 @@ public class RequestSignFilter implements Filter, Ordered {
 
         if (!ServiceInfoUtils.isOnline()) {
             // 线下环境返回服务端的签名字符串，方便客户端排查签名错误
-            response.addHeader(headerNames.getDebugSignContent(), signatureRequest.getSignTextForDigest());
-            if (StringUtils.hasText(signatureRequest.getQueryString())) {
-                response.addHeader(headerNames.getDebugSignQuery(), signatureRequest.getQueryString());
+            response.addHeader(headerNames.debugSignContent(), signatureRequest.getSignText(account.getSigner()));
+            if (StringUtils.hasText(signatureRequest.queryString())) {
+                response.addHeader(headerNames.debugSignQuery(), signatureRequest.queryString());
             }
         }
         log.error("sign verify error, signature request = {}", signatureRequest);
@@ -147,8 +134,8 @@ public class RequestSignFilter implements Filter, Ordered {
                 // 仅在存在查询字符串时才设置，避免获取到表单参数
                 .method(request.getMethod().toUpperCase())
                 // TODO 随机串的验证
-                .nonce(request.getHeader(headerNames.getNonce()))
-                .timestamp(request.getHeader(headerNames.getTimestamp()));
+                .nonce(request.getHeader(headerNames.nonce()))
+                .timestamp(request.getHeader(headerNames.timestamp()));
         if (requiredBody) {
             result.requestBody(StreamUtils.copyToString(request.getInputStream(), StandardCharsets.UTF_8));
         }

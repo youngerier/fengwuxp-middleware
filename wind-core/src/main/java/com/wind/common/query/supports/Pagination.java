@@ -4,7 +4,7 @@ package com.wind.common.query.supports;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotNull;
 import java.beans.Transient;
 import java.io.Serializable;
 import java.util.Collections;
@@ -69,7 +69,7 @@ public interface Pagination<T> extends Serializable {
 
     static <E> Pagination<E> of(List<E> records, AbstractPageQuery<?> query) {
         // 不关心总数的情况
-        return of(records, query, 0);
+        return of(records, query, -1);
     }
 
     static <E> Pagination<E> of(List<E> records, AbstractPageQuery<?> query, long total) {
@@ -78,7 +78,7 @@ public interface Pagination<T> extends Serializable {
 
     static <E> Pagination<E> of(List<E> records, int queryPage, int querySize) {
         // 不关心总数的情况
-        return of(records, queryPage, querySize, QueryType.QUERY_RESET, 0);
+        return of(records, queryPage, querySize, QueryType.QUERY_RESET, -1);
     }
 
     static <E> Pagination<E> of(List<E> records, int queryPage, int querySize, QueryType queryType, long total) {

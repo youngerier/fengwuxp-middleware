@@ -3,6 +3,7 @@ package com.wind.server.configuration;
 import com.wind.server.web.filters.IndexHtmlResourcesFilter;
 import com.wind.server.web.filters.WindWebFilterOrdered;
 import com.wind.web.trace.TraceFilter;
+import jakarta.servlet.DispatcherType;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.filter.RequestContextFilter;
 
+import java.util.EnumSet;
 import java.util.function.Function;
 
 import static com.wind.common.WindConstants.ENABLED_NAME;
@@ -42,6 +44,9 @@ public class WebFilterConfiguration {
         filter.setOrder(WindWebFilterOrdered.REQUEST_CONTEXT.getOrder());
         result.setFilter(filter);
         result.setOrder(WindWebFilterOrdered.REQUEST_CONTEXT.getOrder());
+        // 支持异步请求
+        result.setAsyncSupported(true);
+        result.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC, DispatcherType.ERROR));
         return result;
     }
 
@@ -51,6 +56,10 @@ public class WebFilterConfiguration {
         FilterRegistrationBean<TraceFilter> result = new FilterRegistrationBean<>();
         result.setFilter(new TraceFilter());
         result.setOrder(WindWebFilterOrdered.TRACE_FILTER.getOrder());
+        // 支持异步请求
+        result.setAsyncSupported(true);
+        // 同时处理 REQUEST / ASYNC / ERROR
+        result.setDispatcherTypes(EnumSet.of(DispatcherType.REQUEST, DispatcherType.ASYNC, DispatcherType.ERROR));
         return result;
     }
 

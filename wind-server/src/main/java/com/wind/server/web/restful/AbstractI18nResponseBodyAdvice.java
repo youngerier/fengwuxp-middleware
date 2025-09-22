@@ -17,8 +17,8 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import javax.annotation.Nonnull;
-import javax.validation.constraints.NotNull;
+import jakarta.annotation.Nonnull;
+import jakarta.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Locale;
@@ -57,8 +57,8 @@ public abstract class AbstractI18nResponseBodyAdvice implements ResponseBodyAdvi
     public Object beforeBodyWrite(Object body, @Nonnull MethodParameter returnType, @Nonnull MediaType selectedContentType,
                                   @Nonnull Class selectedConverterType, @Nonnull ServerHttpRequest request,
                                   @Nonnull ServerHttpResponse response) {
-        if (body instanceof ApiResp) {
-            handleReturnValueI18n(((ApiResp<?>) body).getData());
+        if (body instanceof ApiResp<?> resp) {
+            handleReturnValueI18n(resp.getData());
         }
         return body;
     }

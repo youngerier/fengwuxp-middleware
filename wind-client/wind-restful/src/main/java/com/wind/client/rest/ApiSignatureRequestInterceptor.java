@@ -17,24 +17,17 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
 /**
- * 接口请求签名加签请求拦截器
- * 参见：https://www.yuque.com/suiyuerufeng-akjad/wind/zl1ygpq3pitl00qp
+ * 接口请求签名加签请求拦截器，对 application/json 和 application/x-www-form-urlencoded 请求进行签名加签
+ * 详情参见：https://www.yuque.com/suiyuerufeng-akjad/wind/zl1ygpq3pitl00qp
  *
  * @author wuxp
  * @date 2024-02-21 15:45
  **/
 @Slf4j
 public class ApiSignatureRequestInterceptor implements ClientHttpRequestInterceptor {
-
-    /**
-     * 需要 requestBody 参与签名的 Content-Type
-     */
-    private static final List<MediaType> SIGNE_CONTENT_TYPES = Arrays.asList(MediaType.APPLICATION_JSON, MediaType.APPLICATION_FORM_URLENCODED);
 
     private final Function<HttpRequest, ApiSecretAccount> accountProvider;
 
@@ -56,7 +49,7 @@ public class ApiSignatureRequestInterceptor implements ClientHttpRequestIntercep
         ApiSecretAccount account = accountProvider.apply(request);
         AssertUtils.notNull(account, "ApiSecretAccount must not null");
         ApiSignatureRequest.ApiSignatureRequestBuilder builder = ApiSignatureRequest.builder();
-        builder.method(request.getMethodValue())
+        builder.method(request.getMethod().name())
                 .requestPath(request.getURI().getPath())
                 .nonce(SequenceGenerator.randomAlphanumeric(32))
                 .timestamp(String.valueOf(System.currentTimeMillis()))
@@ -65,16 +58,16 @@ public class ApiSignatureRequestInterceptor implements ClientHttpRequestIntercep
             builder.requestBody(new String(body, StandardCharsets.UTF_8));
         }
         ApiSignatureRequest signatureRequest = builder.build();
-        request.getHeaders().add(headerNames.getAccessId(), account.getAccessId());
+        request.getHeaders().add(headerNames.accessId(), account.getAccessId());
         if (StringUtils.hasText(account.getSecretKeyVersion())) {
-            request.getHeaders().add(headerNames.getSecretVersion(), account.getSecretKeyVersion());
+            request.getHeaders().add(headerNames.secretVersion(), account.getSecretKeyVersion());
         }
-        request.getHeaders().add(headerNames.getTimestamp(), signatureRequest.getTimestamp());
-        request.getHeaders().add(headerNames.getNonce(), signatureRequest.getNonce());
+        request.getHeaders().add(headerNames.timestamp(), signatureRequest.timestamp());
+        request.getHeaders().add(headerNames.nonce(), signatureRequest.nonce());
         String sign = account.getSigner().sign(signatureRequest, account.getSecretKey());
-        request.getHeaders().add(headerNames.getSign(), sign);
+        request.getHeaders().add(headerNames.sign(), sign);
         if (log.isDebugEnabled()) {
-            log.debug("api sign object = {} , sign = {}", request, sign);
+            log.debug("api sign request = {} , sign = {}", request, sign);
         }
         return execution.execute(request, body);
     }

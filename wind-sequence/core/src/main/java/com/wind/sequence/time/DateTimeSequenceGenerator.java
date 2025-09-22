@@ -1,8 +1,10 @@
 package com.wind.sequence.time;
 
+import com.wind.common.exception.AssertUtils;
 import com.wind.sequence.SequenceGenerator;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -35,7 +37,7 @@ public class DateTimeSequenceGenerator implements SequenceGenerator {
      * @return 序列号生成器
      */
     public static SequenceGenerator year(SequenceGenerator generator) {
-        return new DateTimeSequenceGenerator(SequenceTimeScopeType.YEAR, generator);
+        return of(SequenceTimeScopeType.YEAR, generator);
     }
 
     /**
@@ -45,7 +47,7 @@ public class DateTimeSequenceGenerator implements SequenceGenerator {
      * @return 序列号生成器
      */
     public static SequenceGenerator month(SequenceGenerator generator) {
-        return new DateTimeSequenceGenerator(SequenceTimeScopeType.MONTH, generator);
+        return of(SequenceTimeScopeType.MONTH, generator);
     }
 
     /**
@@ -55,7 +57,7 @@ public class DateTimeSequenceGenerator implements SequenceGenerator {
      * @return 序列号生成器
      */
     public static SequenceGenerator day(SequenceGenerator generator) {
-        return new DateTimeSequenceGenerator(SequenceTimeScopeType.DAY, generator);
+        return of(SequenceTimeScopeType.DAY, generator);
     }
 
     /**
@@ -65,7 +67,7 @@ public class DateTimeSequenceGenerator implements SequenceGenerator {
      * @return 序列号生成器
      */
     public static SequenceGenerator hour(SequenceGenerator generator) {
-        return new DateTimeSequenceGenerator(SequenceTimeScopeType.HOUR, generator);
+        return of(SequenceTimeScopeType.HOUR, generator);
     }
 
     /**
@@ -75,7 +77,7 @@ public class DateTimeSequenceGenerator implements SequenceGenerator {
      * @return 序列号生成器
      */
     public static SequenceGenerator minute(SequenceGenerator generator) {
-        return new DateTimeSequenceGenerator(SequenceTimeScopeType.MINUTE, generator);
+        return of(SequenceTimeScopeType.MINUTE, generator);
     }
 
     /**
@@ -85,6 +87,12 @@ public class DateTimeSequenceGenerator implements SequenceGenerator {
      * @return 序列号生成器
      */
     public static SequenceGenerator seconds(SequenceGenerator generator) {
-        return new DateTimeSequenceGenerator(SequenceTimeScopeType.SECONDS, generator);
+        return of(SequenceTimeScopeType.SECONDS, generator);
+    }
+
+    public static SequenceGenerator of(@NotNull SequenceTimeScopeType scope, @NotNull SequenceGenerator generator) {
+        AssertUtils.notNull(scope, "argument scope must not null");
+        AssertUtils.notNull(generator, "argument generator must not null");
+        return new DateTimeSequenceGenerator(scope, generator);
     }
 }

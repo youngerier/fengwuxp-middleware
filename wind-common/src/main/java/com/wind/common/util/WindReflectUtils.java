@@ -1,13 +1,13 @@
 package com.wind.common.util;
 
 import com.wind.common.exception.AssertUtils;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.core.ResolvableType;
 import org.springframework.util.ConcurrentReferenceHashMap;
-import org.springframework.util.ObjectUtils;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -51,7 +51,7 @@ public final class WindReflectUtils {
                 .stream()
                 .filter(field -> field.isAnnotationPresent(annotationClass))
                 .toArray(Field[]::new);
-        Field.setAccessible(result, true);
+        trySetAccessible(result);
         return result;
     }
 
@@ -74,7 +74,7 @@ public final class WindReflectUtils {
                 .filter(field -> names.contains(field.getName()))
                 .distinct()
                 .toArray(Field[]::new);
-        Field.setAccessible(result, true);
+        trySetAccessible(result);
         return result;
     }
 
@@ -139,6 +139,35 @@ public final class WindReflectUtils {
     }
 
     /**
+     * 获取字段的 getter 方法
+     *
+     * @param field 字段
+     * @return get 方法
+     */
+    public static Method findFieldGetMethod(Field field) {
+        Class<?> clazz = field.getDeclaringClass();
+        String fieldName = field.getName();
+        Class<?> fieldType = field.getType();
+        // 构建 getter 方法名
+        String capitalized = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
+        String getterName = "get" + capitalized;
+        try {
+            return clazz.getMethod(getterName); // 只找 public 方法
+        } catch (NoSuchMethodException e) {
+            // fallback：尝试找 getXxx 形式（boolean 时 isXxx 可能找不到）
+            if (fieldType == boolean.class || fieldType == Boolean.class) {
+                try {
+                    return clazz.getMethod("is" + capitalized);
+                } catch (NoSuchMethodException ex) {
+                    return null;
+                }
+            }
+            return null;
+        }
+    }
+
+
+    /**
      * 获取类的公有 getter 方法列表
      *
      * @param clazz 类类型
@@ -199,27 +228,86 @@ public final class WindReflectUtils {
     /**
      * 解析对象继承的超类或实现的接口上设置的泛型
      *
-     * @param bean 对象
+     * @param bean        对象
+     * @param supperClass 指定的接口或超类，如果不为空，则只获取指定超类或接口上的泛型
      * @return 父类或者接口上设置的泛型
      */
-    public static Type[] resolveSuperGenericType(@NotNull Object bean) {
+    public static Type[] resolveSuperGenericType(@NotNull Object bean, @Nullable Class<?> supperClass) {
         AssertUtils.notNull(bean, "argument bean must not null");
         Class<?> targetClass = AopUtils.getTargetClass(bean);
-        ResolvableType resolvableType = ResolvableType.forClass(targetClass);
-        ResolvableType superType = resolvableType.getSuperType();
-        ResolvableType[] generics = null;
-        if (superType.getRawClass() == Object.class) {
-            ResolvableType[] interfaces = resolvableType.getInterfaces();
-            if (ObjectUtils.isEmpty(interfaces)) {
-                return new Type[0];
+
+        ResolvableType matchType;
+        if (supperClass != null) {
+            matchType = findGenericTypeRecursive(ResolvableType.forClass(targetClass), supperClass);
+            if (matchType == null) {
+                throw new IllegalArgumentException(targetClass.getName() + " 未实现或继承 " + supperClass.getName());
             }
-            generics = interfaces[0].getGenerics();
         } else {
-            generics = superType.getGenerics();
+            // 未指定 supperClass，优先找直接父类，如果父类是 Object 就取第一个接口
+            ResolvableType resolvableType = ResolvableType.forClass(targetClass);
+            ResolvableType superType = resolvableType.getSuperType();
+            if (superType != ResolvableType.NONE && superType.getRawClass() != Object.class) {
+                matchType = superType;
+            } else {
+                ResolvableType[] interfaces = resolvableType.getInterfaces();
+                matchType = (interfaces.length > 0) ? interfaces[0] : null;
+            }
         }
+
+        if (matchType == null) {
+            return new Type[0];
+        }
+
+        ResolvableType[] generics = matchType.getGenerics();
         AssertUtils.notEmpty(generics, () -> targetClass.getName() + " 未设置泛型");
         return Arrays.stream(generics)
                 .map(ResolvableType::getType)
                 .toArray(Type[]::new);
+    }
+
+    /**
+     * 解析对象继承的超类或实现的接口上设置的泛型
+     *
+     * @param bean 对象
+     * @return 父类或者接口上设置的所有泛型
+     */
+    public static Type[] resolveSuperGenericType(@NotNull Object bean) {
+        return resolveSuperGenericType(bean, null);
+    }
+
+    /**
+     * 递归查找继承链/接口树上指定 supperClass 对应的 ResolvableType
+     */
+    @Nullable
+    private static ResolvableType findGenericTypeRecursive(ResolvableType type, Class<?> supperClass) {
+        if (type == ResolvableType.NONE) {
+            return null;
+        }
+        Class<?> rawClass = type.getRawClass();
+        if (rawClass != null && supperClass.equals(rawClass)) {
+            return type;
+        }
+
+        // 先递归查找父类
+        ResolvableType superType = type.getSuperType();
+        ResolvableType result = findGenericTypeRecursive(superType, supperClass);
+        if (result != null) {
+            return result;
+        }
+
+        // 再递归查找接口
+        for (ResolvableType iface : type.getInterfaces()) {
+            result = findGenericTypeRecursive(iface, supperClass);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
+    }
+
+    private static void trySetAccessible(Field[] fields) {
+        for (Field field : fields) {
+            field.trySetAccessible();
+        }
     }
 }

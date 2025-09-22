@@ -15,15 +15,14 @@ import com.wind.server.web.restful.RestfulApiRespFactory;
 import com.wind.web.util.HttpResponseMessageUtils;
 import com.wind.web.util.HttpServletRequestUtils;
 import io.micrometer.core.instrument.Tags;
-import lombok.AllArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.VisibleForTesting;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -35,8 +34,8 @@ import java.util.function.Function;
  * @date 2024-03-07 17:28
  **/
 @Slf4j
-@AllArgsConstructor
-public class SentinelWebInterceptor implements HandlerInterceptor {
+public record SentinelWebInterceptor(Function<HttpServletRequest, SentinelResource> resourceProvider, SentinelBlockExceptionHandler blockExceptionHandler,
+                                     String entryAttributeName) implements HandlerInterceptor {
 
     @VisibleForTesting
     static final String DEFAULT_SENTINEL_ENTRY_ATTRIBUTE_NAME = SentinelWebInterceptor.class.getName() + ".entry";
@@ -45,12 +44,6 @@ public class SentinelWebInterceptor implements HandlerInterceptor {
         // 增加自定义的指标收集器
         MetricExtensionProvider.addMetricExtension(new SentinelMetricsCollector(SentinelResourcesType.HTTP_API.getTypeName()));
     }
-
-    private final Function<HttpServletRequest, SentinelResource> resourceProvider;
-
-    private final SentinelBlockExceptionHandler blockExceptionHandler;
-
-    private final String entryAttributeName;
 
     public SentinelWebInterceptor(Function<HttpServletRequest, SentinelResource> resourceProvider, String entryAttributeName) {
         this(resourceProvider, SentinelWebInterceptor::defaultHandleBlockException, entryAttributeName);

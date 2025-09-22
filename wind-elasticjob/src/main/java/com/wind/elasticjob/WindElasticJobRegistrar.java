@@ -53,10 +53,15 @@ public class WindElasticJobRegistrar {
         bootstraps.forEach(ScheduleJobBootstrap::shutdown);
     }
 
-    private void registerJob(WindElasticJob job) {
+    /**
+     * 注册任务
+     *
+     * @param job 任务
+     */
+    public void registerJob(WindElasticJob job) {
         String profilesActive = ServiceInfoUtils.getSpringProfilesActive();
         if (job.getIgnoreEnvs().contains(profilesActive)) {
-            log.info("elastic job = {} ignore register,spring profiles active = {}", profilesActive, job.getName());
+            log.info("elastic job = {} ignore register, spring profiles active = {}", profilesActive, job.getName());
         } else {
             ScheduleJobBootstrap bootstrap = new ScheduleJobBootstrap(registryCenter, (ElasticJob) job, createJobConfiguration(job));
             bootstrap.schedule();

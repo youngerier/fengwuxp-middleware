@@ -13,19 +13,9 @@
 
     <properties>
         <maven.deploy.skip>true</maven.deploy.skip>
-        <code.coverage.project.folder>${basedir}/../</code.coverage.project.folder>
-        <code.coverage.overall.data.folder>${basedir}/target/</code.coverage.overall.data.folder>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.wind.tools</groupId>
-            <artifactId>mybatis-plus-annotation-processor</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.wind.tools</groupId>
-            <artifactId>wind-mybatis-flex-processor</artifactId>
-        </dependency>
         <dependency>
             <groupId>com.wind.middleware</groupId>
             <artifactId>logback-kafka-appender</artifactId>
@@ -80,6 +70,10 @@
         </dependency>
         <dependency>
             <groupId>com.wind.security</groupId>
+            <artifactId>wind-security-jwt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.wind.security</groupId>
             <artifactId>wind-security-mfa</artifactId>
         </dependency>
         <dependency>
@@ -91,11 +85,11 @@
             <artifactId>wind-sequence-jdbc</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.wind.client</groupId>
+            <groupId>com.wind.middleware</groupId>
             <artifactId>wind-restful</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.wind.client</groupId>
+            <groupId>com.wind.middleware</groupId>
             <artifactId>wind-retrofit</artifactId>
         </dependency>
         <dependency>
@@ -155,25 +149,7 @@
                             <goal>report-aggregate</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>../target/site/jacoco</outputDirectory>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>merge-results</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>merge</goal>
-                        </goals>
-                        <configuration>
-                            <fileSets>
-                                <fileSet>
-                                    <directory>${code.coverage.project.folder}</directory>
-                                    <includes>
-                                        <include>**/target/jacoco.exec</include>
-                                    </includes>
-                                </fileSet>
-                            </fileSets>
-                            <destFile>${code.coverage.overall.data.folder}/aggregate.exec</destFile>
+                            <outputDirectory>${session.executionRootDirectory}/target/site/jacoco</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

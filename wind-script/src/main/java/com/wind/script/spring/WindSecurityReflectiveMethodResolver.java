@@ -29,6 +29,7 @@ public final class WindSecurityReflectiveMethodResolver extends ReflectiveMethod
             "java.util.Date",
             "java.time.LocalDate",
             "java.time.LocalDateTime",
+            "java.time.LocalTime",
             "java.util.Collection",
             "java.util.List",
             "java.util.Set",

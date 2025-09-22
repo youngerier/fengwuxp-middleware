@@ -1,8 +1,8 @@
 package com.wind.websocket.core;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import java.util.Map;
 
 /**
@@ -11,7 +11,7 @@ import java.util.Map;
  * @author wuxp
  * @date 2025-05-30 10:41
  **/
-public interface WindSocketSessionManager {
+public interface WindSocketSessionManager extends WindSocketSessionStatusOperations {
 
     /**
      * 创建会话
@@ -39,9 +39,9 @@ public interface WindSocketSessionManager {
      * @param name      会话名称
      * @return 会话
      */
-   default WindSocketSession createSession(@Null String sessionId, @Null String name){
-       return createSession(sessionId, name, null);
-   }
+    default WindSocketSession createSession(@Null String sessionId, @Null String name) {
+        return createSession(sessionId, name, null);
+    }
 
     /**
      * 创建会话
@@ -69,13 +69,6 @@ public interface WindSocketSessionManager {
      */
     @NotNull
     WindSocketSession getSession(@NotBlank String sessionId);
-
-    /**
-     * 销毁一个会话
-     *
-     * @param sessionId 会话 id
-     */
-    void destroySession(@NotBlank String sessionId);
 
     /**
      * 判断会话是否存在

@@ -1,3 +1,0 @@
-# Auto Configure
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.wind.security.captcha.configuration.CaptchaAutoConfiguration

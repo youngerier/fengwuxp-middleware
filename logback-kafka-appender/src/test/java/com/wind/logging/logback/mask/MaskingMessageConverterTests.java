@@ -55,9 +55,9 @@ class MaskingMessageConverterTests {
     @Test
     void testException() {
         try {
-            JSONArray objects = JSON.parseArray("[" + RandomStringUtils.randomAlphabetic(2000) + "]");
+            JSONArray objects = JSON.parseArray("[" + RandomStringUtils.secure().nextAlphabetic(2000) + "]");
         } catch (Exception exception) {
-            LOG.error("test info  = {},parse json error, message  = {}", RandomStringUtils.randomAlphabetic(200), exception.getMessage(), exception);
+            LOG.error("test info  = {},parse json error, message  = {}", RandomStringUtils.secure().nextAlphabetic(200), exception.getMessage(), exception);
         }
     }
 

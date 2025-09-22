@@ -29,8 +29,8 @@ import static com.wind.server.web.security.RequestSignFilter.SIGNATURE_TIMESTAMP
  **/
 class RequestSignFilterTests {
 
-    private final ApiSecretAccount secretAccount = ApiSecretAccount.hmacSha256(RandomStringUtils.randomAlphabetic(12),
-            RandomStringUtils.randomAlphabetic(32));
+    private final ApiSecretAccount secretAccount = ApiSecretAccount.hmacSha256(RandomStringUtils.secure().nextAlphabetic(12),
+            RandomStringUtils.secure().nextAlphabetic(32));
 
     private RequestSignFilter signFilter;
 
@@ -54,16 +54,16 @@ class RequestSignFilterTests {
         MockHttpServletRequest request = new MockHttpServletRequest("POST", uriComponents.getPath());
         uriComponents.getQueryParams().forEach((name, values) -> {
             if (!ObjectUtils.isEmpty(values)) {
-                request.setParameter(name, values.get(0));
+                request.setParameter(name, values.getFirst());
             }
         });
-        byte[] requestBody = RandomStringUtils.randomAlphabetic(1000).getBytes(StandardCharsets.UTF_8);
+        byte[] requestBody = RandomStringUtils.secure().nextAlphabetic(1000).getBytes(StandardCharsets.UTF_8);
         request.setContent(requestBody);
         ApiSignatureRequestInterceptor interceptor = new ApiSignatureRequestInterceptor(httpRequest -> secretAccount);
         interceptor.intercept(new ServletServerHttpRequest(request), requestBody, (r, body) -> {
             r.getHeaders().forEach((name, values) -> {
                 if (!ObjectUtils.isEmpty(values)) {
-                    request.addHeader(name, values.get(0));
+                    request.addHeader(name, values.getFirst());
                 }
             });
             return new MockClientHttpResponse(new byte[0], 200);
@@ -77,7 +77,7 @@ class RequestSignFilterTests {
     void testSignExpire() throws Exception {
         UriComponents uriComponents = UriComponentsBuilder.fromUriString("https://www.example.com/api/v1/examples?a=2&b=20&name=张三").build();
         MockHttpServletRequest request = new MockHttpServletRequest("POST", uriComponents.getPath());
-        byte[] requestBody = RandomStringUtils.randomAlphabetic(1000).getBytes(StandardCharsets.UTF_8);
+        byte[] requestBody = RandomStringUtils.secure().nextAlphabetic(1000).getBytes(StandardCharsets.UTF_8);
         request.setContent(requestBody);
         ApiSignatureRequestInterceptor interceptor = new ApiSignatureRequestInterceptor(httpRequest -> secretAccount);
         interceptor.intercept(new ServletServerHttpRequest(request), requestBody, (r, body) -> {
@@ -86,7 +86,7 @@ class RequestSignFilterTests {
                     request.addHeader(name, System.currentTimeMillis() - SIGNATURE_TIMESTAMP_VALIDITY_PERIOD.get() - 1);
                 } else {
                     if (!ObjectUtils.isEmpty(values)) {
-                        request.addHeader(name, values.get(0));
+                        request.addHeader(name, values.getFirst());
                     }
                 }
             });

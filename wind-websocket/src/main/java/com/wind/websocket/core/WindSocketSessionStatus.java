@@ -14,7 +14,7 @@ public enum WindSocketSessionStatus implements DescriptiveEnum {
 
     ACTIVE("活动中"),
 
-    DISABLED("已禁用"),
+    SUSPENDED("挂起"),
 
     DELETED("已删除");
 

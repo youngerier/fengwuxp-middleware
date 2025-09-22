@@ -2,8 +2,10 @@ package com.wind.server.i18n;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.wind.common.WindConstants;
 import com.wind.configcenter.core.ConfigRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.support.AbstractResourceBasedMessageSource;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertyResolver;
@@ -11,7 +13,7 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.PropertySourcesPropertyResolver;
 import org.springframework.lang.Nullable;
 
-import javax.annotation.Nonnull;
+import jakarta.annotation.Nonnull;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Locale;
@@ -38,7 +40,7 @@ public class WindI18nMessageSource extends AbstractResourceBasedMessageSource {
 
     private final Map<Locale, PropertyResolver> localPropertyResolvers;
 
-    private final Cache<String, MessageFormat> messageFormatCache;
+    private final Cache<@NotNull String, MessageFormat> messageFormatCache;
 
     public WindI18nMessageSource(ConfigRepository repository, WindMessageSourceProperties properties) {
         this.repository = repository;
@@ -96,12 +98,36 @@ public class WindI18nMessageSource extends AbstractResourceBasedMessageSource {
         return messageFormatCache.get(key, k -> {
             String message = resolveCodeWithoutArguments(code, locale);
             if (message == null) {
+                String text = convertSlf4jPlaceholders(code);
                 // 如果 code 中有占位符，直接返回 MessageFormat
-                return code.contains("{0}") ? new MessageFormat(code, locale) : null;
+                return text.contains("{0}") ? new MessageFormat(text, locale) : null;
             }
-            return new MessageFormat(message, locale);
+            // 转换 Slf4j {} 格式为 MessageFormat {0}、{1}...
+            String convertedMessage = convertSlf4jPlaceholders(message);
+            return new MessageFormat(convertedMessage, locale);
         });
     }
 
+    /**
+     * 将 Slf4j {} 占位符 转为 MessageFormat 占位符 {0}, {1}, ...
+     */
+    private String convertSlf4jPlaceholders(String text) {
+        if (!text.contains("{}")) {
+            return text;
+        }
+        StringBuilder sb = new StringBuilder();
+        int index = 0;
+        int argIndex = 0;
+        while (index < text.length()) {
+            int bracePos = text.indexOf("{}", index);
+            if (bracePos == -1) {
+                sb.append(text.substring(index));
+                break;
+            }
+            sb.append(text, index, bracePos).append(WindConstants.DELIM_START).append(argIndex++).append(WindConstants.DELIM_END);
+            index = bracePos + 2;
+        }
+        return sb.toString();
+    }
 
 }

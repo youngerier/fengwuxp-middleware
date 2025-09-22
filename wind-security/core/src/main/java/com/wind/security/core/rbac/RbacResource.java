@@ -6,10 +6,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * rbac 资源定义
@@ -67,7 +71,17 @@ public interface RbacResource extends Serializable {
          *
          * @return 权限列表
          */
-        Set<String> getPermissions();
+        @NotNull
+        default Set<String> getPermissionsIds() {
+            Set<Permission> permissions = getPermissions();
+            return permissions == null ? Collections.emptySet() : permissions
+                    .stream()
+                    .map(Permission::getId)
+                    .collect(Collectors.toSet());
+        }
+
+        @NotNull
+        Set<RbacResource.Permission> getPermissions();
 
         /**
          * 创建一个不可变的角色对象
@@ -77,7 +91,7 @@ public interface RbacResource extends Serializable {
          * @param permissions 权限值
          * @return 角色
          */
-        static Role immutable(String id, String name, Set<String> permissions) {
+        static Role immutable(String id, String name, Set<RbacResource.Permission> permissions) {
             return new ImmutableRole(id, name, permissions);
         }
     }
@@ -128,6 +142,7 @@ public interface RbacResource extends Serializable {
     @EqualsAndHashCode(of = "id")
     class ImmutablePermission implements RbacResource.Permission {
 
+        @Serial
         private static final long serialVersionUID = 6255678473411919964L;
 
         /**
@@ -159,6 +174,7 @@ public interface RbacResource extends Serializable {
     @EqualsAndHashCode(of = "id")
     class ImmutableRole implements RbacResource.Role {
 
+        @Serial
         private static final long serialVersionUID = -6791142921724321619L;
 
         /**
@@ -174,7 +190,7 @@ public interface RbacResource extends Serializable {
         /**
          * 权限内容
          */
-        private final Set<String> permissions;
+        private final Set<RbacResource.Permission> permissions;
 
         /**
          * 为了给序列化框架使用，提供一个空构造

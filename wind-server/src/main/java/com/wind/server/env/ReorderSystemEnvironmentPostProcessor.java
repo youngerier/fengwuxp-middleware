@@ -1,5 +1,6 @@
 package com.wind.server.env;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.Ordered;
@@ -14,6 +15,7 @@ import org.springframework.core.env.StandardEnvironment;
  * @author wuxp
  * @date 2023-10-08 07:23
  **/
+@Slf4j
 public class ReorderSystemEnvironmentPostProcessor implements EnvironmentPostProcessor, Ordered {
 
     @Override
@@ -21,6 +23,7 @@ public class ReorderSystemEnvironmentPostProcessor implements EnvironmentPostPro
         MutablePropertySources propertySources = environment.getPropertySources();
         PropertySource<?> systemProperties = propertySources.remove(StandardEnvironment.SYSTEM_PROPERTIES_PROPERTY_SOURCE_NAME);
         if (systemProperties != null) {
+            log.info("调整系统配置为最高优先级");
             propertySources.addFirst(systemProperties);
         }
     }

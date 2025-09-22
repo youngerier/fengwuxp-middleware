@@ -5,10 +5,8 @@ import com.wind.common.WindConstants;
 import com.wind.common.enums.ConfigFileType;
 import com.wind.common.enums.WindMiddlewareType;
 import com.wind.common.exception.AssertUtils;
-import com.wind.common.jul.WindJulLogFactory;
 import com.wind.configcenter.core.ConfigRepository;
 import com.wind.configcenter.core.ConfigRepository.ConfigDescriptor;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.CompositePropertySource;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -24,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import static com.wind.common.WindConstants.SPRING_APPLICATION_NAME;
@@ -40,15 +37,8 @@ import static com.wind.common.WindConstants.WIND_SERVER_USED_MIDDLEWARE;
  * @author wuxp
  * @date 2023-10-15 12:30
  **/
-@AllArgsConstructor
 @Slf4j
-public class WindPropertySourceLoader {
-
-    private static final Logger LOGGER = WindJulLogFactory.getLogger(WindPropertySourceLoader.class);
-
-    private final ConfigRepository repository;
-
-    private final WindConfigCenterProperties properties;
+public record WindPropertySourceLoader(ConfigRepository repository, WindConfigCenterProperties properties) {
 
     /**
      * 加载全局配置
@@ -56,6 +46,7 @@ public class WindPropertySourceLoader {
      * @param environment spring environment
      */
     public void loadGlobalConfigs(ConfigurableEnvironment environment) {
+        log.info("begin load global configs");
         CompositePropertySource globalProperties = new CompositePropertySource(WindConstants.GLOBAL_CONFIG_NAME);
         ConfigDescriptor descriptor = ConfigDescriptor.immutable(WindConstants.GLOBAL_CONFIG_NAME, WindConstants.GLOBAL_CONFIG_GROUP);
         List<PropertySource<?>> configs = repository.getConfigs(descriptor);

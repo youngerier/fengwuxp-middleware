@@ -8,7 +8,7 @@
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-dependencies -->
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
-        <version>2.7.18</version>
+        <version>3.5.5</version>
     </parent>
 
     <groupId>com.wind.middleware</groupId>
@@ -41,68 +41,59 @@
     </modules>
 
     <properties>
-        <revision>1.0.29-SNAPSHOT</revision>
-        <!--   占位使用     -->
+        <revision>1.0.1-jdk21-SNAPSHOT</revision>
+        <!--   测试相关     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
         <tests.reuse.forks/>
+        <test.ignore.failure>true</test.ignore.failure>
 
-        <!--1.8编译参数 保留方法名称-->
-        <java.version>1.8</java.version>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <maven-source-plugin.attach>false</maven-source-plugin.attach>
 
         <maven-flatten-plugin.version>1.5.0</maven-flatten-plugin.version>
-        <maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
-        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
-        <maven-deploy-plugin.version>3.1.0</maven-deploy-plugin.version>
-        <maven-source-plugin.version>3.3.0</maven-source-plugin.version>
-        <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
+        <maven-surefire-report-plugin.version>3.5.3</maven-surefire-report-plugin.version>
+        <jacoco-maven-plugin.version>0.8.13</jacoco-maven-plugin.version>
+        <git-commit-id-plugin.version>4.9.10</git-commit-id-plugin.version>
 
-        <spring-framework.version>5.3.39</spring-framework.version>
-        <spring-boot.version>2.7.16</spring-boot.version>
-        <spring-cloud-commons.version>3.1.9</spring-cloud-commons.version>
-        <spring-cloud-albaba.version>2021.0.6.2</spring-cloud-albaba.version>
-        <rocketmq-spring-boot-starter.version>2.3.0</rocketmq-spring-boot-starter.version>
+        <spring-boot.version>3.5.0</spring-boot.version>
+        <spring-cloud-commons.version>4.3.0</spring-cloud-commons.version>
+        <spring-cloud-albaba.version>2023.0.3.3</spring-cloud-albaba.version>
+        <rocketmq-spring-boot-starter.version>2.3.3</rocketmq-spring-boot-starter.version>
         <sentinel.version>1.8.8</sentinel.version>
-        <mysql.version>8.0.33</mysql.version>
-        <mybatis-flex.version>1.10.2</mybatis-flex.version>
-        <mybatis.version>3.5.15</mybatis.version>
+        <mybatis-flex.version>1.10.9</mybatis-flex.version>
+        <mybatis.version>3.5.19</mybatis.version>
         <commons-io.version>2.14.0</commons-io.version>
-        <commons-lang3.version>3.10</commons-lang3.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <commons-text.version>1.10.0</commons-text.version>
-        <mapstruct.version>1.6.2</mapstruct.version>
-        <redisson.version>3.36.0</redisson.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <redisson.version>3.50.0</redisson.version>
         <kryo.version>5.6.0</kryo.version>
         <elasticjob.version>3.0.4</elasticjob.version>
-        <dynamic-tp.version>1.1.7</dynamic-tp.version>
+        <dynamic-tp.version>1.2.2-x</dynamic-tp.version>
         <guava.version>32.0.1-jre</guava.version>
         <fastjson2.version>2.0.53</fastjson2.version>
-        <javet.version>3.1.2</javet.version>
+        <javet.version>4.0.0</javet.version>
         <google-zxing.version>3.5.2</google-zxing.version>
-        <freemarker.version>2.3.32</freemarker.version>
-        <logback-encoder.version>7.4</logback-encoder.version>
-        <retrofit.version>2.9.0</retrofit.version>
-        <kafka.version>3.5.0</kafka.version>
-
-        <!-- fix -->
+        <logback-encoder.version>8.1</logback-encoder.version>
+        <okhttp.version>4.12.0</okhttp.version>
+        <retrofit.version>3.0.0</retrofit.version>
         <kafka.version>3.8.0</kafka.version>
-        <logback.version>1.2.13</logback.version>
-        <jackson-bom.version>2.18.2</jackson-bom.version>
+        <datafaker.version>2.4.3</datafaker.version>
         <zookeeper.version>3.9.3</zookeeper.version>
-        <snakeyaml.version>2.3</snakeyaml.version>
+        <nacos.version>3.0.3</nacos.version>
 
-        <swagger-openapiv3.version>2.2.9</swagger-openapiv3.version>
-        <springdoc-openapi-ui.version>1.7.0</springdoc-openapi-ui.version>
+        <swagger-openapiv3.version>2.2.36</swagger-openapiv3.version>
+        <springdoc-openapi.version>2.8.12</springdoc-openapi.version>
         <googleauth.version>1.5.0</googleauth.version>
-        <bcprov.version>1.80</bcprov.version>
+        <bucket4j.version>8.10.1</bucket4j.version>
         <json-path.version>2.9.0</json-path.version>
-        <jetbrains-annotations.version>24.1.0</jetbrains-annotations.version>
-        <podam.version>7.2.11.RELEASE</podam.version>
-        <awaitility.version>4.2.0</awaitility.version>
+        <jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
+        <podam.version>8.0.2.RELEASE</podam.version>
         <junit-platform-surefire-provider.version>1.3.2</junit-platform-surefire-provider.version>
     </properties>
 
@@ -116,8 +107,12 @@
             <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -127,6 +122,7 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.mockito</groupId>
@@ -161,6 +157,34 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-bom</artifactId>
+                <version>${okhttp.version}</version>
+                <type>pom</type>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-bom</artifactId>
+                <version>${springdoc-openapi.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-core-jakarta</artifactId>
+                <version>${swagger-openapiv3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-annotations-jakarta</artifactId>
+                <version>${swagger-openapiv3.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.swagger.core.v3</groupId>
+                <artifactId>swagger-models</artifactId>
+                <version>${swagger-openapiv3.version}</version>
+            </dependency>
             <!-- https://mvnrepository.com/artifact/org.apache.rocketmq/rocketmq-spring-boot-starter -->
             <dependency>
                 <groupId>org.apache.rocketmq</groupId>
@@ -173,14 +197,14 @@
                 <version>${sentinel.version}</version>
             </dependency>
             <dependency>
+                <groupId>com.alibaba.nacos</groupId>
+                <artifactId>nacos-client</artifactId>
+                <version>${nacos.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis</artifactId>
                 <version>${mybatis.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.wind.tools</groupId>
-                <artifactId>mybatis-plus-annotation-processor</artifactId>
-                <version>${revision}</version>
             </dependency>
             <dependency>
                 <groupId>com.wind.tools</groupId>
@@ -190,6 +214,11 @@
             <dependency>
                 <groupId>com.wind.tools</groupId>
                 <artifactId>mybatis-flex-codegen</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.tools</groupId>
+                <artifactId>wind-codegen-sources-supports</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
@@ -269,6 +298,11 @@
             </dependency>
             <dependency>
                 <groupId>com.wind.security</groupId>
+                <artifactId>wind-security-jwt</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.wind.security</groupId>
                 <artifactId>wind-security-mfa</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -283,12 +317,12 @@
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>com.wind.client</groupId>
+                <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-restful</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>com.wind.client</groupId>
+                <groupId>com.wind.middleware</groupId>
                 <artifactId>wind-retrofit</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -342,30 +376,15 @@
                 <groupId>org.redisson</groupId>
                 <artifactId>redisson-spring-boot-starter</artifactId>
                 <version>${redisson.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.redisson</groupId>
-                        <artifactId>redisson</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.redisson</groupId>
-                        <artifactId>redisson-spring-data-33</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.redisson</groupId>
-                <artifactId>redisson-spring-data-27</artifactId>
+                <artifactId>redisson-spring-data-35</artifactId>
                 <version>${redisson.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mapstruct</groupId>
                 <artifactId>mapstruct</artifactId>
-                <version>${mapstruct.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.mapstruct</groupId>
-                <artifactId>mapstruct-jdk8</artifactId>
                 <version>${mapstruct.version}</version>
             </dependency>
             <dependency>
@@ -423,12 +442,6 @@
                 <artifactId>javet-macos</artifactId>
                 <version>${javet.version}</version>
                 <optional>true</optional>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.freemarker/freemarker -->
-            <dependency>
-                <groupId>org.freemarker</groupId>
-                <artifactId>freemarker</artifactId>
-                <version>${freemarker.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.logstash.logback</groupId>
@@ -513,27 +526,6 @@
                 <version>${googleauth.version}</version>
             </dependency>
             <dependency>
-                <groupId>io.swagger.core.v3</groupId>
-                <artifactId>swagger-annotations</artifactId>
-                <version>${swagger-openapiv3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-ui</artifactId>
-                <version>${springdoc-openapi-ui.version}</version>
-            </dependency>
-            <!-- https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk18on -->
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-jdk18on</artifactId>
-                <version>${bcprov.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.bouncycastle</groupId>
-                <artifactId>bcprov-ext-jdk18on</artifactId>
-                <version>${bcprov.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>com.jayway.jsonpath</groupId>
                 <artifactId>json-path</artifactId>
                 <version>${json-path.version}</version>
@@ -554,6 +546,23 @@
                 <artifactId>snakeyaml</artifactId>
                 <version>${snakeyaml.version}</version>
             </dependency>
+            <!-- https://mvnrepository.com/artifact/net.datafaker/datafaker -->
+            <dependency>
+                <groupId>net.datafaker</groupId>
+                <artifactId>datafaker</artifactId>
+                <version>${datafaker.version}</version>
+            </dependency>
+            <!-- https://mvnrepository.com/artifact/com.bucket4j/bucket4j-core -->
+            <dependency>
+                <groupId>com.bucket4j</groupId>
+                <artifactId>bucket4j-core</artifactId>
+                <version>${bucket4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.bucket4j</groupId>
+                <artifactId>bucket4j-redis</artifactId>
+                <version>${bucket4j.version}</version>
+            </dependency>
             <dependency>
                 <groupId>uk.co.jemos.podam</groupId>
                 <artifactId>podam</artifactId>
@@ -573,29 +582,78 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>${maven-resources-plugin.version}</version>
-                </plugin>
-                <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
                     <version>${maven-flatten-plugin.version}</version>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${maven-source-plugin.version}</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.jacoco</groupId>
-                    <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>${jacoco-maven-plugin.version}</version>
+                    <groupId>pl.project13.maven</groupId>
+                    <artifactId>git-commit-id-plugin</artifactId>
+                    <version>${git-commit-id-plugin.version}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>${maven-surefire-plugin.version}</version>
+                    <version>${maven-surefire-report-plugin.version}</version>
+                </plugin>
+                <!-- jacoco agent for code coverage -->
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco-maven-plugin.version}</version>
+                    <executions>
+                        <!-- 单测时附加 agent -->
+                        <execution>
+                            <id>prepare-unit-tests</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+
+                        <!-- 集成测试时附加 agent -->
+                        <execution>
+                            <id>prepare-agent</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                            <configuration>
+                                <propertyName>jacocoCoverageAgent</propertyName>
+                            </configuration>
+                        </execution>
+
+                        <!-- 合并 exec 文件 -->
+                        <execution>
+                            <id>merge-results</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>merge</goal>
+                            </goals>
+                            <configuration>
+                                <fileSets>
+                                    <fileSet>
+                                        <!--suppress UnresolvedMavenProperty -->
+                                        <directory>${session.executionRootDirectory}</directory>
+                                        <includes>
+                                            <include>**/target/jacoco.exec</include>
+                                        </includes>
+                                    </fileSet>
+                                </fileSets>
+                                <destFile>${project.build.directory}/jacoco-aggregate.exec</destFile>
+                            </configuration>
+                        </execution>
+                        <!-- 生成聚合报告 -->
+                        <execution>
+                            <id>report-aggregate</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>report-aggregate</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}/site/jacoco</outputDirectory>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -604,10 +662,18 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <debug>true</debug>
+                    <!--  编译时保留方法名称  -->
+                    <parameters>true</parameters>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                    <release>${java.version}</release>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
+                <inherited>true</inherited>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -629,6 +695,7 @@
                         </property>
                     </systemPropertyVariables>
                     <forkCount>${tests.fork.count}</forkCount>
+                    <testFailureIgnore>${test.ignore.failure}</testFailureIgnore>
                 </configuration>
                 <dependencies>
                     <dependency>
@@ -675,30 +742,7 @@
                             or prepare-agent-integration goals, before the actual tests are run. This sets a property named argLine which
                             points to the JaCoCo agent, later passed as a JVM argument to the test runner -->
                             <argLine>${jacoco-coverage-agent}</argLine>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- jacoco agent for code coverage -->
-            <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>prepare-unit-tests</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                    </execution>
-                    <!-- prepare agent before integration tests -->
-                    <execution>
-                        <id>prepare-agent</id>
-                        <goals>
-                            <goal>prepare-agent</goal>
-                        </goals>
-                        <phase>pre-integration-test</phase>
-                        <configuration>
-                            <propertyName>jacocoCoverageAgent</propertyName>
+                            <testFailureIgnore>${test.ignore.failure}</testFailureIgnore>
                         </configuration>
                     </execution>
                 </executions>
@@ -707,16 +751,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>编译时保留方法参数名称</id>
-            <activation>
-                <jdk>1.8</jdk>
-            </activation>
-            <properties>
-                <!--1.8编译参数-保留方法名称-->
-                <compilerArgument>-parameters</compilerArgument>
-            </properties>
-        </profile>
         <profile>
             <id>测试覆盖率采集</id>
             <activation>
@@ -727,36 +761,6 @@
                     <plugin>
                         <groupId>org.jacoco</groupId>
                         <artifactId>jacoco-maven-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>report-aggregate</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>report-aggregate</goal>
-                                </goals>
-                                <configuration>
-                                    <outputDirectory>target/site/jacoco</outputDirectory>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>merge-results</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>merge</goal>
-                                </goals>
-                                <configuration>
-                                    <fileSets>
-                                        <fileSet>
-                                            <directory>target/</directory>
-                                            <includes>
-                                                <include>**/target/jacoco.exec</include>
-                                            </includes>
-                                        </fileSet>
-                                    </fileSets>
-                                    <destFile>target/aggregate.exec</destFile>
-                                </configuration>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
@@ -821,18 +825,6 @@
                                 </goals>
                             </execution>
                         </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <debug>true</debug>
-                            <compilerArgument>${compilerArgument}</compilerArgument>
-                            <source>${java.version}</source>
-                            <target>${java.version}</target>
-                            <encoding>UTF-8</encoding>
-                        </configuration>
-                        <inherited>true</inherited>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -906,6 +898,7 @@
             </build>
         </profile>
     </profiles>
+
 
     <organization>
         <name>Wuxp</name>

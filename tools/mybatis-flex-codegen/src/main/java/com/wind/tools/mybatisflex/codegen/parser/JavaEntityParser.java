@@ -7,8 +7,8 @@ import com.github.javaparser.ast.nodeTypes.NodeWithJavadoc;
 import com.github.javaparser.javadoc.Javadoc;
 import com.wind.common.WindConstants;
 import com.wind.common.util.WindReflectUtils;
+import com.wind.tools.codegen.SourceCodeProvider;
 import com.wind.tools.mybatisflex.codegen.model.GenCodeInfo;
-import com.wuxp.codegen.SourceCodeProvider;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
@@ -20,7 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @author wuxp
@@ -36,10 +35,13 @@ public class JavaEntityParser {
         List<GenCodeInfo.FieldInfo> fields = Arrays.stream(getClassFields(classType))
                 .filter(field -> !Modifier.isStatic(field.getModifiers()))
                 .map(this::buildField)
-                .collect(Collectors.toList());
+                .toList();
         result.setName(classType.getSimpleName())
-                .setComment(StringUtils.hasLength(desc) || !optional.isPresent() ? desc : getCommentByTag(optional.get()))
+                .setComment(StringUtils.hasLength(desc) || optional.isEmpty() ? desc : getCommentByTag(optional.get()))
                 .setFields(fields);
+        if (result.getComment() != null) {
+            result.setComment(result.getComment().replace("表", ""));
+        }
         return result;
     }
 

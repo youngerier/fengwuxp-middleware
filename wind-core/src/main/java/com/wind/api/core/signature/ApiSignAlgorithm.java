@@ -19,7 +19,7 @@ public enum ApiSignAlgorithm implements ApiSigner {
      * 摘要签名
      * 参见：https://www.yuque.com/suiyuerufeng-akjad/wind/qal4b72cxw84cu6g
      */
-    HMAC_SHA256("HmacSHA256", new ApiSigner() {
+    HMAC_SHA256(HmacSHA256Signer.ALGORITHM_NAME, new ApiSigner() {
         /**
          * 签名验证
          *
@@ -42,7 +42,7 @@ public enum ApiSignAlgorithm implements ApiSigner {
     /**
      * 参见：https://www.yuque.com/suiyuerufeng-akjad/wind/qal4b72cxw84cu6g
      */
-    SHA256_WITH_RSA("SHA256WithRSA", new ApiSigner() {
+    SHA256_WITH_RSA(Sha256WithRsaSigner.ALGORITHM_NAME, new ApiSigner() {
 
         @Override
         public String sign(ApiSignatureRequest request, String privateKey) {

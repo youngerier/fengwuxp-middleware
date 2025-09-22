@@ -5,6 +5,7 @@ import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.exception.ExceptionCode;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.common.message.MessagePlaceholder;
+import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import org.springframework.lang.Nullable;
 
 import java.util.Objects;
@@ -43,13 +44,18 @@ public interface FriendlyExceptionMessageConverter {
      */
     static FriendlyExceptionMessageConverter defaults() {
         return throwable -> {
-            if (throwable instanceof BaseException) {
-                ExceptionCode code = ((BaseException) throwable).getCode();
+            if (throwable instanceof BaseException baseException) {
+                ExceptionCode code = baseException.getCode();
                 if (Objects.equals(code, DefaultExceptionCode.COMMON_FRIENDLY_ERROR)) {
                     return code.getDesc();
                 }
+                return throwable.getMessage();
             }
-            return throwable.getMessage();
+            if (GlobalExceptionLogDecisionMaker.isSpringSecurityException(throwable)) {
+                return throwable.getMessage();
+            }
+            // 非业务异常统一返回通用错误提示语
+            return DefaultExceptionCode.COMMON_FRIENDLY_ERROR.getDesc();
         };
     }
 
@@ -60,17 +66,24 @@ public interface FriendlyExceptionMessageConverter {
      */
     static FriendlyExceptionMessageConverter i18n() {
         return throwable -> {
-            if (throwable instanceof BaseException) {
-                MessagePlaceholder placeholder = ((BaseException) throwable).getMessagePlaceholder();
+            if (throwable instanceof BaseException baseException) {
+                if (Objects.equals(baseException.getCode(), DefaultExceptionCode.COMMON_FRIENDLY_ERROR)) {
+                    return SpringI18nMessageUtils.getMessage(baseException.getCode().getDesc());
+                }
+                MessagePlaceholder placeholder = baseException.getMessagePlaceholder();
                 if (placeholder != null) {
                     return SpringI18nMessageUtils.getMessage(placeholder.getPattern(), placeholder.getArgs());
                 }
-                ExceptionCode code = ((BaseException) throwable).getCode();
-                if (Objects.equals(code, DefaultExceptionCode.COMMON_FRIENDLY_ERROR)) {
-                    return SpringI18nMessageUtils.getMessage(code.getDesc());
-                }
             }
-            return SpringI18nMessageUtils.getMessage(throwable.getMessage());
+            if (GlobalExceptionLogDecisionMaker.isSpringSecurityException(throwable)) {
+                return SpringI18nMessageUtils.getMessage(throwable.getMessage());
+            }
+            String result = SpringI18nMessageUtils.getMessage(throwable.getMessage());
+            if (Objects.equals(result, throwable.getMessage())) {
+                // 未获取到国际化消息，则返回通用错误提示语
+                return SpringI18nMessageUtils.getMessage(DefaultExceptionCode.COMMON_FRIENDLY_ERROR.getDesc());
+            }
+            return result;
         };
     }
 }

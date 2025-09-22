@@ -5,15 +5,17 @@ import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.StringUtils;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -86,8 +88,25 @@ public final class WindObjectDigestUtils {
      */
     public static String sha256WithNames(@NotNull Object target, @NotEmpty Collection<String> fieldNames, @Nullable String prefix) {
         AssertUtils.notNull(target, "argument target must not null");
+        String content = tryGenSha256Text(target);
+        if (content != null) {
+            return prefix == null ? DigestUtils.sha256Hex(content) : DigestUtils.sha256Hex(prefix + content);
+        }
         AssertUtils.notEmpty(fieldNames, "argument fieldNames must not empty");
-        return DigestUtils.sha256Hex(genSha256Text(target, fieldNames, prefix, WindConstants.LF));
+        return DigestUtils.sha256Hex(genSha256TextWithObject(target, fieldNames, prefix, WindConstants.LF));
+    }
+
+    private static String tryGenSha256Text(Object target) {
+        if (ClassUtils.isPrimitiveOrWrapper(target.getClass())
+                || target.getClass().isArray()
+                || target instanceof Number
+                || target instanceof CharSequence
+                || target instanceof TemporalAccessor
+                || target instanceof Collection<?>
+                || target instanceof Map<?, ?>) {
+            return getValueText(target);
+        }
+        return null;
     }
 
     private static List<String> getObjectFieldNames(Object target) {
@@ -96,24 +115,29 @@ public final class WindObjectDigestUtils {
     }
 
     @VisibleForTesting()
-    static String genSha256Text(Object target, Collection<String> fieldNames, String prefix, String joiner) {
+    static String genSha256TextWithObject(Object target, Collection<String> fieldNames, String prefix, String joiner) {
         // TODO 性能优化
         Field[] fields = WindReflectUtils.findFields(target.getClass(), fieldNames);
-        Field.setAccessible(fields, true);
         Map<String, Field> fieldMaps = Arrays.stream(fields).collect(Collectors.toMap(Field::getName, Function.identity()));
         StringBuilder result = new StringBuilder();
         if (StringUtils.hasText(prefix)) {
             result.append(WindConstants.COLON).append(prefix);
         }
-        List<String> sortedNames = fieldNames.stream().sorted().collect(Collectors.toList());
+        List<String> sortedNames = fieldNames.stream().sorted().toList();
         for (String name : sortedNames) {
             Field field = fieldMaps.get(name);
             AssertUtils.notNull(field, String.format("field name = %s not found", name));
             try {
-                result.append(name).append(WindConstants.EQ)
-                        .append(getValueText(field.get(target)))
-                        .append(joiner);
-            } catch (IllegalAccessException exception) {
+                Object val;
+                if (field.trySetAccessible()) {
+                    val = field.get(target);
+                } else {
+                    Method method = WindReflectUtils.findFieldGetMethod(field);
+                    AssertUtils.notNull(method, () -> String.format("not find get method, field = %s#%s", field.getDeclaringClass().getName(), field.getName()));
+                    val = method.invoke(target);
+                }
+                result.append(name).append(WindConstants.EQ).append(getValueText(val)).append(joiner);
+            } catch (IllegalAccessException | InvocationTargetException exception) {
                 throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("get object value error, name = %s", name), exception);
             }
         }
@@ -125,60 +149,72 @@ public final class WindObjectDigestUtils {
         if (val == null) {
             return WindConstants.EMPTY;
         }
-        if (ClassUtils.isPrimitiveOrWrapper(val.getClass())
-                || val.getClass().isEnum()
-                || val instanceof CharSequence) {
+        if (ClassUtils.isPrimitiveOrWrapper(val.getClass()) || val.getClass().isEnum() || val instanceof CharSequence) {
             // 基础数据类型，枚举，字符串
             return String.valueOf(val);
-        } else if (val instanceof Date) {
+        } else if (val instanceof Date date) {
             // 获取毫秒数
-            return String.valueOf(((Date) val).getTime());
-        } else if (val instanceof TemporalAccessor) {
+            return String.valueOf(date.getTime());
+        } else if (val instanceof TemporalAccessor temporal) {
             // 获取时间戳
-            return String.valueOf(getTemporalAccessorTimestamp((TemporalAccessor) val));
+            return String.valueOf(getTemporalAccessorTimestamp(temporal));
         } else if (val.getClass().isArray()) {
-            if (ClassUtils.isPrimitiveArray(val.getClass())) {
-                // 基础数据类型数组
-                if (val.getClass().getComponentType() == byte.class) {
-                    return Arrays.toString((byte[]) val);
-                } else if (val.getClass().getComponentType() == short.class) {
-                    return Arrays.toString((short[]) val);
-                } else if (val.getClass().getComponentType() == int.class) {
-                    return Arrays.toString((int[]) val);
-                } else if (val.getClass().getComponentType() == long.class) {
-                    return Arrays.toString((long[]) val);
-                } else if (val.getClass().getComponentType() == float.class) {
-                    return Arrays.toString((float[]) val);
-                } else if (val.getClass().getComponentType() == double.class) {
-                    return Arrays.toString((double[]) val);
-                } else if (val.getClass().getComponentType() == boolean.class) {
-                    return Arrays.toString((boolean[]) val);
-                } else {
-                    return Arrays.toString((char[]) val);
-                }
+            return joinArrayAsText(val);
+        } else if (val instanceof Collection<?> collection) {
+            return joinCollectionAsText(collection);
+        } else if (val instanceof Map<?, ?> map) {
+            return joinMapAsText(map);
+        } else if (val instanceof Number) {
+            // 数值类型
+            return String.valueOf(val);
+        } else {
+            // 对象类型
+            return String.format("%s%s%s", WindConstants.DELIM_START, genSha256TextWithObject(val, getObjectFieldNames(val), null, WindConstants.AND), WindConstants.DELIM_END);
+        }
+    }
+
+    private static String joinMapAsText(Map<?, ?> map) {
+        return String.format("%s%s%s", WindConstants.DELIM_START, getMapText(map), WindConstants.DELIM_END);
+    }
+
+    private static String joinCollectionAsText(Collection<?> collection) {
+        // 集合类型
+        return collection.stream()
+                .map(WindObjectDigestUtils::getValueText)
+                .collect(Collectors.joining(WindConstants.COMMA));
+    }
+
+    private static String joinArrayAsText(Object val) {
+        if (ClassUtils.isPrimitiveArray(val.getClass())) {
+            // 基础数据类型数组
+            if (val.getClass().getComponentType() == byte.class) {
+                return Arrays.toString((byte[]) val);
+            } else if (val.getClass().getComponentType() == short.class) {
+                return Arrays.toString((short[]) val);
+            } else if (val.getClass().getComponentType() == int.class) {
+                return Arrays.toString((int[]) val);
+            } else if (val.getClass().getComponentType() == long.class) {
+                return Arrays.toString((long[]) val);
+            } else if (val.getClass().getComponentType() == float.class) {
+                return Arrays.toString((float[]) val);
+            } else if (val.getClass().getComponentType() == double.class) {
+                return Arrays.toString((double[]) val);
+            } else if (val.getClass().getComponentType() == boolean.class) {
+                return Arrays.toString((boolean[]) val);
             } else {
-                // 数组
-                return Arrays.stream((Object[]) val)
-                        .map(WindObjectDigestUtils::getValueText)
-                        .collect(Collectors.joining(WindConstants.COMMA));
+                return Arrays.toString((char[]) val);
             }
-        } else if (val instanceof Collection) {
-            // 集合类型
-            return ((Collection<?>) val).stream()
+        } else {
+            // 数组
+            return Arrays.stream((Object[]) val)
                     .map(WindObjectDigestUtils::getValueText)
                     .collect(Collectors.joining(WindConstants.COMMA));
-        } else if (val instanceof Map) {
-            // Map 使用 {}
-            return String.format("%s%s%s", WindConstants.DELIM_START, getMapText(((Map<?, ?>) val)), WindConstants.DELIM_END);
-        } else {
-            // 对象使用 {}
-            return String.format("%s%s%s", WindConstants.DELIM_START, genSha256Text(val, getObjectFieldNames(val), null, WindConstants.AND),
-                    WindConstants.DELIM_END);
         }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static String getMapText(Map map) {
+        // 保证 key 的顺序
         Map<Object, Object> sortedKeyParams = new TreeMap<>(map);
         return sortedKeyParams.entrySet()
                 .stream()
@@ -188,17 +224,22 @@ public final class WindObjectDigestUtils {
     }
 
     private static long getTemporalAccessorTimestamp(TemporalAccessor accessor) {
-        if (accessor instanceof LocalDateTime) {
-            Instant instant = ((LocalDateTime) accessor).toInstant(ZoneOffset.UTC);
-            return instant.toEpochMilli();
-        } else if (accessor instanceof LocalDate) {
-            Instant instant = ((LocalDate) accessor).atStartOfDay().toInstant(ZoneOffset.UTC);
-            return instant.toEpochMilli();
-        } else if (accessor instanceof LocalTime) {
-            // 计算从当天零点（午夜）开始到该时间点的 纳秒数
-            return ((LocalTime) accessor).toNanoOfDay();
-        } else {
-            return accessor.getLong(ChronoField.MILLI_OF_DAY);
+        switch (accessor) {
+            case LocalDateTime localDateTime -> {
+                Instant instant = localDateTime.toInstant(ZoneOffset.UTC);
+                return instant.toEpochMilli();
+            }
+            case LocalDate localDate -> {
+                Instant instant = localDate.atStartOfDay().toInstant(ZoneOffset.UTC);
+                return instant.toEpochMilli();
+            }
+            case LocalTime localTime -> {
+                // 计算从当天零点（午夜）开始到该时间点的 纳秒数
+                return localTime.toNanoOfDay();
+            }
+            default -> {
+                return accessor.getLong(ChronoField.MILLI_OF_DAY);
+            }
         }
     }
 }

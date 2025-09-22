@@ -11,7 +11,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -23,8 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Slf4j
 public final class SpringEventPublishUtils {
 
-    // TODO 使用 Dynamic-TP 监控执行
-    private static final ThreadPoolExecutor EXECUTOR = ExecutorServiceUtils.newExecutor("Spring-Event-", 1, 2, 256);
+    private static final ExecutorService EXECUTOR = ExecutorServiceUtils.custom("spring-event-publish-", 1, 4, 256);
 
     private static final AtomicReference<ApplicationEventPublisher> PUBLISHER = new AtomicReference<>();
 
@@ -67,8 +66,8 @@ public final class SpringEventPublishUtils {
     public static void publishEventIfInTransaction(Object event) {
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             // 在事务中，通过注册回调的方式发送消息
-            if (event instanceof SpringTransactionEvent) {
-                String eventId = ((SpringTransactionEvent) event).getEventId();
+            if (event instanceof SpringTransactionEvent ev) {
+                String eventId = ev.getEventId();
                 Set<String> eventIds = TRANSACTION_EVENT_IDS.get();
                 if (eventIds == null) {
                     eventIds = new HashSet<>();

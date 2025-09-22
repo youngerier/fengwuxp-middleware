@@ -43,20 +43,21 @@ public class JacksonConverterFactory extends Converter.Factory {
     @Override
     public Converter<?, RequestBody> requestBodyConverter(
             @NotNull Type type,
-            @NotNull Annotation[] parameterAnnotations,
-            @NotNull Annotation[] methodAnnotations,
+            @NotNull Annotation @NotNull [] parameterAnnotations,
+            @NotNull Annotation @NotNull [] methodAnnotations,
             @NotNull Retrofit retrofit) {
         JavaType javaType = objectMapper.getTypeFactory().constructType(type);
         ObjectWriter writer = objectMapper.writerFor(javaType);
         return new JacksonRequestBodyConverter<>(writer);
     }
 
+    @Override
     @SuppressWarnings({"rawtypes"})
     public @Nullable Converter<?, String> stringConverter(
             @NotNull Type type, Annotation @NotNull [] annotations, @NotNull Retrofit retrofit) {
         return (Converter<Object, String>) value -> {
-            if (value instanceof Collection) {
-                return joinAsQueryString((Collection) value);
+            if (value instanceof Collection val) {
+                return joinAsQueryString(val);
             }
             if (value.getClass().isArray()) {
                 List args = Arrays.asList((Object[]) value);

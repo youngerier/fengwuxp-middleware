@@ -24,7 +24,7 @@ public interface SequenceGenerator {
      * @return 序列号
      */
     static String randomNumeric(int len) {
-        return RandomStringUtils.randomNumeric(len);
+        return RandomStringUtils.secure().nextNumeric(len);
     }
 
     /**
@@ -45,7 +45,7 @@ public interface SequenceGenerator {
      * @return 序列号
      */
     static String randomAlphanumeric(int len) {
-        return RandomStringUtils.randomAlphanumeric(len);
+        return RandomStringUtils.secure().nextAlphanumeric(len);
     }
 
     /**

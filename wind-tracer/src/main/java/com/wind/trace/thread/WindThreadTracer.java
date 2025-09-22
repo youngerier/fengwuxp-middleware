@@ -5,13 +5,13 @@ import com.wind.common.util.IpAddressUtils;
 import com.wind.core.WritableContextVariables;
 import com.wind.sequence.SequenceGenerator;
 import com.wind.trace.WindTracer;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.MDC;
 
-import javax.validation.constraints.NotNull;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.wind.common.WindConstants.LOCAL_HOST_IP_V4;
 import static com.wind.common.WindConstants.TRACE_ID_NAME;
@@ -32,7 +32,7 @@ public final class WindThreadTracer implements WindTracer {
     /**
      * 线程 trace context
      */
-    private static final ThreadLocal<Map<String, Object>> TRACE_CONTEXT = ThreadLocal.withInitial(HashMap::new);
+    private static final ThreadLocal<Map<String, Object>> TRACE_CONTEXT = ThreadLocal.withInitial(ConcurrentHashMap::new);
 
     @Override
     public void trace() {
@@ -67,17 +67,19 @@ public final class WindThreadTracer implements WindTracer {
 
     @Override
     public Map<String, Object> getContextVariables() {
-        // TODO copy context
-        return Collections.unmodifiableMap(nullSecurityGetVariables());
+        // 返回一个快照，避免外部遍历时内部修改引发 ConcurrentModificationException
+        return Map.copyOf(nullSecurityGetVariables());
     }
 
     @Override
     public WritableContextVariables putVariable(String name, Object val) {
-        // TODO 待优化
-        nullSecurityGetVariables().put(name, val);
-        if (val instanceof String) {
-            // 字符传类型变量同步到 MDC 中
-            MDC.put(name, (String) val);
+        if (name != null && val != null) {
+            // TODO 待优化
+            nullSecurityGetVariables().put(name, val);
+            if (val instanceof String str) {
+                // 字符传类型变量同步到 MDC 中
+                MDC.put(name, str);
+            }
         }
         return this;
     }
@@ -98,7 +100,7 @@ public final class WindThreadTracer implements WindTracer {
     private Map<String, Object> nullSecurityGetVariables() {
         Map<String, Object> variables = TRACE_CONTEXT.get();
         if (variables == null) {
-            variables = new HashMap<>();
+            variables = new ConcurrentHashMap<>();
             TRACE_CONTEXT.set(variables);
         }
         return variables;

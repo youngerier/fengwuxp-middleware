@@ -6,7 +6,7 @@ import com.wind.server.web.supports.ApiResp;
 import com.wind.web.util.HttpServletRequestUtils;
 import org.springframework.http.HttpHeaders;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -25,9 +25,10 @@ public class WebAuditLogRecorder extends ScriptAuditLogRecorder {
     }
 
     @Override
+    @SuppressWarnings("rawtypes")
     protected Object resolveMethodReturnValue(Object methodReturnValue) {
-        if (methodReturnValue instanceof ApiResp) {
-            return ((ApiResp<?>) methodReturnValue).getData();
+        if (methodReturnValue instanceof ApiResp resp) {
+            return resp.getData();
         }
         return super.resolveMethodReturnValue(methodReturnValue);
     }

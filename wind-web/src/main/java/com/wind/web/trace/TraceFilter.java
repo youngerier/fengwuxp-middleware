@@ -10,10 +10,10 @@ import com.wind.web.util.HttpResponseMessageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.annotation.Nonnull;
-import javax.servlet.FilterChain;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Nonnull;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -55,6 +55,12 @@ public class TraceFilter extends OncePerRequestFilter {
             "HTTP_CLIENT_IP",
             "HTTP_X_FORWARDED_FOR"
     );
+
+    @Override
+    protected boolean shouldNotFilterAsyncDispatch() {
+        // 允许在异步分派阶段再次执行
+        return false;
+    }
 
     @Override
     protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain chain) {
