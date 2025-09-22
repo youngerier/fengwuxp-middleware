@@ -5,6 +5,7 @@ import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.exception.ExceptionCode;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.common.message.MessagePlaceholder;
+import com.wind.web.exception.GlobalExceptionLogDecisionMaker;
 import org.springframework.lang.Nullable;
 
 import java.util.Objects;
@@ -50,6 +51,9 @@ public interface FriendlyExceptionMessageConverter {
                 }
                 return throwable.getMessage();
             }
+            if (GlobalExceptionLogDecisionMaker.isSpringSecurityException(throwable)) {
+                return throwable.getMessage();
+            }
             // 非业务异常统一返回通用错误提示语
             return DefaultExceptionCode.COMMON_FRIENDLY_ERROR.getDesc();
         };
@@ -70,6 +74,9 @@ public interface FriendlyExceptionMessageConverter {
                 if (placeholder != null) {
                     return SpringI18nMessageUtils.getMessage(placeholder.getPattern(), placeholder.getArgs());
                 }
+            }
+            if (GlobalExceptionLogDecisionMaker.isSpringSecurityException(throwable)) {
+                return SpringI18nMessageUtils.getMessage(throwable.getMessage());
             }
             String result = SpringI18nMessageUtils.getMessage(throwable.getMessage());
             if (Objects.equals(result, throwable.getMessage())) {

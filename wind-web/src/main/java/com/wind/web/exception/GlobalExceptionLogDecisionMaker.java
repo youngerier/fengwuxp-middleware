@@ -4,6 +4,9 @@ import com.wind.common.WindHttpConstants;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.ExceptionLogLevel;
 import com.wind.web.util.HttpServletRequestUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
+import org.springframework.util.ClassUtils;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
@@ -15,11 +18,25 @@ import java.util.function.Predicate;
  * @author wuxp
  * @date 2024-12-23 09:59
  **/
+@Slf4j
 public final class GlobalExceptionLogDecisionMaker {
 
     private static final AtomicReference<Predicate<Throwable>> SHOULD_ERROR_LOG =
             // spring security authentication 相关异常忽略打印错误日志
             new AtomicReference<>(throwable -> !isSpringSecurityAuthenticationException(throwable));
+
+    /**
+     * spring security 认证异常
+     */
+    @Nullable
+    private static final Class<?> SECURITY_AUTHENTICATION_EXCEPTION = loadClass("org.springframework.security.core.AuthenticationException");
+
+    /**
+     * spring security 访问异常
+     */
+    @Nullable
+    private static final Class<?> SECURITY_ACCESS_DENIED_EXCEPTION = loadClass("org.springframework.security.access.AccessDeniedException");
+
 
     private GlobalExceptionLogDecisionMaker() {
         throw new AssertionError();
@@ -56,10 +73,30 @@ public final class GlobalExceptionLogDecisionMaker {
     }
 
     public static boolean isSpringSecurityAuthenticationException(Throwable throwable) {
-        if (throwable == null) {
+        if (throwable == null || SECURITY_AUTHENTICATION_EXCEPTION == null) {
             return false;
         }
-        Class<? extends Throwable> throwableClass = throwable.getClass();
-        return throwableClass.getName().startsWith("org.springframework.security.authentication");
+        return SECURITY_AUTHENTICATION_EXCEPTION.isInstance(throwable);
+    }
+
+    public static boolean isSpringSecurityAccessDeniedException(Throwable throwable) {
+        if (throwable == null || SECURITY_ACCESS_DENIED_EXCEPTION == null) {
+            return false;
+        }
+        return SECURITY_ACCESS_DENIED_EXCEPTION.isInstance(throwable);
+    }
+
+    public static boolean isSpringSecurityException(Throwable throwable) {
+        return isSpringSecurityAuthenticationException(throwable) || isSpringSecurityAccessDeniedException(throwable);
+    }
+
+    @Nullable
+    private static Class<?> loadClass(String className) {
+        try {
+            return ClassUtils.resolveClassName(className, ClassUtils.getDefaultClassLoader());
+        } catch (IllegalArgumentException exception) {
+            log.error("load class error, message = {}", className, exception);
+            return null;
+        }
     }
 }
