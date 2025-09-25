@@ -56,6 +56,21 @@ class WindReflectUtilsTests {
     }
 
     @Test
+    void testGetFieldValue() {
+        Example2 target = new Example2();
+        target.setName("test");
+        String name = WindReflectUtils.getFieldValue("name", target);
+        Assertions.assertEquals(target.getName(), name);
+    }
+
+    @Test
+    void testSetFieldValue() {
+        Example2 target = new Example2();
+        WindReflectUtils.setFieldValue("name", target, "test");
+        Assertions.assertEquals("test", target.getName());
+    }
+
+    @Test
     void testFindFields() {
         List<String> fieldNames = WindReflectUtils.getFieldNames(Example2.class);
         Field[] fields = WindReflectUtils.findFields(Example2.class, fieldNames);

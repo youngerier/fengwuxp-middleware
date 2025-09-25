@@ -3,7 +3,9 @@ package com.wind.common.util;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
+import com.wind.common.message.MessagePlaceholder;
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import org.springframework.aop.support.AopUtils;
@@ -230,6 +232,52 @@ public final class WindReflectUtils {
         List<Field> result = new ArrayList<>(Arrays.asList(clazz.getDeclaredFields()));
         result.addAll(getClazzFields(clazz.getSuperclass()));
         return result;
+    }
+
+    /**
+     * 获取字段值
+     *
+     * @param fieldName 字段名称
+     * @param target    目标对象
+     * @return 字段值
+     */
+    public static <T> T getFieldValue(@NotBlank String fieldName, @NotNull Object target) {
+        return getFieldValue(findField(target.getClass(), fieldName), target);
+    }
+
+    /**
+     * 获取字段值
+     *
+     * @param field  字段
+     * @param target 目标对象
+     * @return 字段值
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T getFieldValue(Field field, Object target) {
+        try {
+            return (T) exchangeGetterHandle(field).invoke(target);
+        } catch (Throwable e) {
+            throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, MessagePlaceholder.of("get field value error, name = {}", field.getName()), e);
+        }
+    }
+
+    /**
+     * 设置字段值
+     *
+     * @param fieldName 字段名称
+     * @param target    目标对象
+     * @param val       值
+     */
+    public static void setFieldValue(@NotBlank String fieldName, @NotNull Object target, Object val) {
+        setFieldValue(findField(target.getClass(), fieldName), target, val);
+    }
+
+    public static void setFieldValue(@NotNull Field field, @NotNull Object target, Object val) {
+        try {
+            exchangeSetterHandle(field).invoke(target, val);
+        } catch (Throwable e) {
+            throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, MessagePlaceholder.of("set field value error, name = {}", field.getName()), e);
+        }
     }
 
     /**
