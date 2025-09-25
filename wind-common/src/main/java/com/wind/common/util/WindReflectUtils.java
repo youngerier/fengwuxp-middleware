@@ -1,6 +1,8 @@
 package com.wind.common.util;
 
 import com.wind.common.exception.AssertUtils;
+import com.wind.common.exception.BaseException;
+import com.wind.common.exception.DefaultExceptionCode;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
@@ -9,6 +11,8 @@ import org.springframework.core.ResolvableType;
 import org.springframework.util.ConcurrentReferenceHashMap;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -20,21 +24,34 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
- * 反射工具类，注意不支持静态字段
+ * 反射工具类，JDK21+ 兼容
+ * - 不再强制使用 setAccessible
+ * - 增加对 MethodHandle 的支持来读写字段
+ * 注意：不支持静态字段
  *
  * @author wuxp
  * @date 2024-08-02 14:57
  **/
 public final class WindReflectUtils {
 
+    private static final String ERROR_MESSAGE = "argument clazz must not null";
+
     private static final Field[] EMPTY = new Field[0];
 
-    private static final Map<Class<?>, List<Field>> FIELDS = new ConcurrentReferenceHashMap<>();
+    /**
+     * 字段缓存
+     *
+     * @key 类类型
+     * @value 字段列表
+     */
+    private static final Map<Class<?>, List<Field>> CLASS_FIELDS_CACHES = new ConcurrentReferenceHashMap<>();
+
+    private WindReflectUtils() {
+        throw new AssertionError();
+    }
 
     /**
      * 根据注解查找 {@link Field}，会递归查找超类
@@ -44,15 +61,12 @@ public final class WindReflectUtils {
      * @return 字段列表
      */
     @NotNull
-    public static Field[] findFields(Class<?> clazz, Class<? extends Annotation> annotationClass) {
-        AssertUtils.notNull(clazz, "argument clazz must not null");
+    public static Field[] findFields(@NotNull Class<?> clazz, Class<? extends Annotation> annotationClass) {
+        AssertUtils.notNull(clazz, ERROR_MESSAGE);
         AssertUtils.notNull(annotationClass, "argument annotationClass must not null");
-        Field[] result = getMemberFields(clazz)
-                .stream()
+        return getMemberFields(clazz).stream()
                 .filter(field -> field.isAnnotationPresent(annotationClass))
                 .toArray(Field[]::new);
-        trySetAccessible(result);
-        return result;
     }
 
     /**
@@ -63,19 +77,16 @@ public final class WindReflectUtils {
      * @return 字段列表
      */
     @NotNull
-    public static Field[] findFields(Class<?> clazz, Collection<String> fieldNames) {
+    public static Field[] findFields(@NotNull Class<?> clazz, Collection<String> fieldNames) {
+        AssertUtils.notNull(clazz, ERROR_MESSAGE);
         if (fieldNames == null || fieldNames.isEmpty()) {
             return EMPTY;
         }
-        AssertUtils.notNull(clazz, "argument clazz must not null");
         Set<String> names = new HashSet<>(fieldNames);
-        Field[] result = getMemberFields(clazz)
-                .stream()
+        return getMemberFields(clazz).stream()
                 .filter(field -> names.contains(field.getName()))
                 .distinct()
                 .toArray(Field[]::new);
-        trySetAccessible(result);
-        return result;
     }
 
     /**
@@ -86,7 +97,7 @@ public final class WindReflectUtils {
      * @return 字段
      */
     @NotNull
-    public static Field findField(Class<?> clazz, String fieldName) {
+    public static Field findField(@NotNull Class<?> clazz, String fieldName) {
         Field result = findFieldNullable(clazz, fieldName);
         AssertUtils.notNull(result, String.format("not found name = %s field", fieldName));
         return result;
@@ -97,19 +108,22 @@ public final class WindReflectUtils {
      *
      * @param clazz     类类型
      * @param fieldName 字段名称
-     * @return 字段
+     * @return 字段，未找到时返回 null
      */
     @Null
-    public static Field findFieldNullable(Class<?> clazz, String fieldName) {
+    public static Field findFieldNullable(@NotNull Class<?> clazz, String fieldName) {
         Field[] fields = findFields(clazz, Collections.singleton(fieldName));
-        if (fields.length == 0) {
-            return null;
-        }
-        return fields[0];
+        return fields.length == 0 ? null : fields[0];
     }
 
+    /**
+     * 获取类的所有字段（会递归父类）
+     *
+     * @param clazz 类类型
+     * @return 字段数组
+     */
     @NotNull
-    public static Field[] getFields(Class<?> clazz) {
+    public static Field[] getFields(@NotNull Class<?> clazz) {
         return findFields(clazz, getFieldNames(clazz));
     }
 
@@ -119,30 +133,29 @@ public final class WindReflectUtils {
      * @param clazz 类类型
      * @return 字段名称列表
      */
-    public static List<String> getFieldNames(Class<?> clazz) {
-        AssertUtils.notNull(clazz, "argument clazz must not null");
-        return getMemberFields(clazz)
-                .stream()
+    public static List<String> getFieldNames(@NotNull Class<?> clazz) {
+        AssertUtils.notNull(clazz, ERROR_MESSAGE);
+        return getMemberFields(clazz).stream()
                 .map(Field::getName)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
-     * 获取类的 方法列表
+     * 获取类的所有公有方法
      *
      * @param clazz 类类型
-     * @return 方法列表
+     * @return 方法数组
      */
-    public static Method[] getMethods(Class<?> clazz) {
-        AssertUtils.notNull(clazz, "argument clazz must not null");
+    public static Method[] getMethods(@NotNull Class<?> clazz) {
+        AssertUtils.notNull(clazz, ERROR_MESSAGE);
         return clazz.getMethods();
     }
 
     /**
-     * 获取字段的 getter 方法
+     * 获取字段的 getter 方法（仅支持 public）
      *
      * @param field 字段
-     * @return get 方法
+     * @return get 方法，未找到时返回 null
      */
     public static Method findFieldGetMethod(Field field) {
         Class<?> clazz = field.getDeclaringClass();
@@ -150,15 +163,13 @@ public final class WindReflectUtils {
         Class<?> fieldType = field.getType();
         // 构建 getter 方法名
         String capitalized = Character.toUpperCase(fieldName.charAt(0)) + fieldName.substring(1);
-        String getterName = "get" + capitalized;
         try {
-            return clazz.getMethod(getterName); // 只找 public 方法
+            return clazz.getMethod("get" + capitalized);
         } catch (NoSuchMethodException e) {
-            // fallback：尝试找 getXxx 形式（boolean 时 isXxx 可能找不到）
             if (fieldType == boolean.class || fieldType == Boolean.class) {
                 try {
                     return clazz.getMethod("is" + capitalized);
-                } catch (NoSuchMethodException ex) {
+                } catch (NoSuchMethodException ignored) {
                     return null;
                 }
             }
@@ -166,63 +177,107 @@ public final class WindReflectUtils {
         }
     }
 
-
     /**
-     * 获取类的公有 getter 方法列表
+     * 获取类的所有 getter 方法（public 且符合 JavaBean 规范）
      *
      * @param clazz 类类型
-     * @return 方法列表
+     * @return 方法数组
      */
     public static Method[] getGetterMethods(Class<?> clazz) {
-        AssertUtils.notNull(clazz, "argument clazz must not null");
+        AssertUtils.notNull(clazz, ERROR_MESSAGE);
         return Arrays.stream(getMethods(clazz))
                 .filter(WindReflectUtils::isGetterMethod)
                 .toArray(Method[]::new);
     }
 
+    /**
+     * 判断方法是否是 getter
+     */
     private static boolean isGetterMethod(Method method) {
         String name = method.getName();
-        if (Objects.equals(name, "getClass")) {
-            // getClass 是 object 中的方法，忽略
+        if ("getClass".equals(name)) {
+            // getClass 是 Object 中的方法，忽略
             return false;
         }
-        // 1. 方法名必须以 "get" 开头，长度 > 3，或以 "is" 开头且长度 > 2
         boolean isGet = name.startsWith("get") && name.length() > 3;
         boolean isBooleanGet = name.startsWith("is") && name.length() > 2;
-        // 2. 方法必须没有参数
         boolean noParams = method.getParameterCount() == 0;
-        // 3. 方法返回类型不能是 void
         boolean hasReturn = method.getReturnType() != void.class;
-        // 4. 非静态方法
         boolean isNotStatic = !Modifier.isStatic(method.getModifiers());
-        // 5. 公有方法
         boolean isPublic = Modifier.isPublic(method.getModifiers());
-        // 综合判断
         return isPublic && isNotStatic && noParams && hasReturn && (isGet || isBooleanGet);
     }
 
     /**
-     * 获取成员变量
+     * 获取成员变量（递归父类，排除静态字段）
      *
      * @param clazz 类类型
      * @return 字段列表
      */
     private static List<Field> getMemberFields(Class<?> clazz) {
-        return FIELDS.computeIfAbsent(clazz, WindReflectUtils::getClazzFields)
-                .stream()
-                // 过滤静态变量
+        return CLASS_FIELDS_CACHES.computeIfAbsent(clazz, WindReflectUtils::getClazzFields).stream()
                 .filter(field -> !Modifier.isStatic(field.getModifiers()))
-                .collect(Collectors.toList());
+                .toList();
     }
 
+    /**
+     * 获取类及其父类的所有字段
+     */
     private static List<Field> getClazzFields(Class<?> clazz) {
         if (clazz == null || clazz == Object.class) {
             return Collections.emptyList();
         }
-        Field[] fields = clazz.getDeclaredFields();
-        List<Field> result = new ArrayList<>(Arrays.asList(fields));
+        List<Field> result = new ArrayList<>(Arrays.asList(clazz.getDeclaredFields()));
         result.addAll(getClazzFields(clazz.getSuperclass()));
         return result;
+    }
+
+    /**
+     * 获取字段的 MethodHandle Getter（JDK21+ 推荐方式）
+     *
+     * @param field 字段
+     * @return MethodHandle
+     */
+    public static MethodHandle exchangeGetterHandle(@NotNull Field field) {
+        AssertUtils.notNull(field, "argument field must not null");
+        try {
+            MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(field.getDeclaringClass(), MethodHandles.lookup());
+            return lookup.unreflectGetter(field);
+        } catch (IllegalAccessException e) {
+            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "Cannot access getter for field = " + field.getDeclaringClass().getName() + "#" + field.getName(), e);
+        }
+    }
+
+    /**
+     * 获取字段的 MethodHandle Setter（JDK21+ 推荐方式）
+     *
+     * @param field 字段
+     * @return MethodHandle
+     */
+    public static MethodHandle exchangeSetterHandle(@NotNull Field field) {
+        AssertUtils.notNull(field, "argument field must not null");
+        try {
+            MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(field.getDeclaringClass(), MethodHandles.lookup());
+            return lookup.unreflectSetter(field);
+        } catch (IllegalAccessException e) {
+            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "Cannot access setter for field = " + field.getDeclaringClass().getName() + "#" + field.getName(), e);
+        }
+    }
+
+    /**
+     * 获取方法句柄
+     *
+     * @param method 方法
+     * @return MethodHandle
+     */
+    @NotNull
+    public static MethodHandle exchangeMethodHandle(Method method) {
+        AssertUtils.notNull(method, "argument method must not null");
+        try {
+            return MethodHandles.lookup().unreflect(method);
+        } catch (IllegalAccessException e) {
+            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "Cannot access method  = " + method.getDeclaringClass().getName() + "#" + method.getName(), e);
+        }
     }
 
     /**
@@ -266,7 +321,7 @@ public final class WindReflectUtils {
     }
 
     /**
-     * 解析对象继承的超类或实现的接口上设置的泛型
+     * 解析对象继承的超类或实现的接口上设置的所有泛型
      *
      * @param bean 对象
      * @return 父类或者接口上设置的所有泛型
@@ -284,18 +339,14 @@ public final class WindReflectUtils {
             return null;
         }
         Class<?> rawClass = type.getRawClass();
-        if (rawClass != null && supperClass.equals(rawClass)) {
+        if (supperClass.equals(rawClass)) {
             return type;
         }
-
-        // 先递归查找父类
         ResolvableType superType = type.getSuperType();
         ResolvableType result = findGenericTypeRecursive(superType, supperClass);
         if (result != null) {
             return result;
         }
-
-        // 再递归查找接口
         for (ResolvableType iface : type.getInterfaces()) {
             result = findGenericTypeRecursive(iface, supperClass);
             if (result != null) {
@@ -303,11 +354,5 @@ public final class WindReflectUtils {
             }
         }
         return null;
-    }
-
-    private static void trySetAccessible(Field[] fields) {
-        for (Field field : fields) {
-            field.trySetAccessible();
-        }
     }
 }

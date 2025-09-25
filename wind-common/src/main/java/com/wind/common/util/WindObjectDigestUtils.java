@@ -13,9 +13,8 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.StringUtils;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -128,17 +127,11 @@ public final class WindObjectDigestUtils {
             Field field = fieldMaps.get(name);
             AssertUtils.notNull(field, String.format("field name = %s not found", name));
             try {
-                Object val;
-                if (field.trySetAccessible()) {
-                    val = field.get(target);
-                } else {
-                    Method method = WindReflectUtils.findFieldGetMethod(field);
-                    AssertUtils.notNull(method, () -> String.format("not find get method, field = %s#%s", field.getDeclaringClass().getName(), field.getName()));
-                    val = method.invoke(target);
-                }
+                MethodHandle getterMethod = WindReflectUtils.exchangeGetterHandle(field);
+                Object val = getterMethod.invoke(target);
                 result.append(name).append(WindConstants.EQ).append(getValueText(val)).append(joiner);
-            } catch (IllegalAccessException | InvocationTargetException exception) {
-                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("get object value error, name = %s", name), exception);
+            } catch (Throwable throwable) {
+                throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, String.format("get object value error, name = %s", name), throwable);
             }
         }
         result.deleteCharAt(result.length() - 1);

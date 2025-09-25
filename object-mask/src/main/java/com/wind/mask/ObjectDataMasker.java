@@ -8,6 +8,7 @@ import com.wind.mask.annotation.Sensitive;
 import lombok.AllArgsConstructor;
 import org.springframework.util.ClassUtils;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
@@ -70,28 +71,29 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
         Class<?> clazz = object.getClass();
         if (registry.requireMask(clazz)) {
             for (MaskRule rule : registry.getRuleGroup(clazz).getRules()) {
-                try {
-                    maskObjectField(rule, object);
-                } catch (Exception exception) {
-                    throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "object mask error", exception);
-                }
+                maskObjectField(rule, object);
             }
         }
         return object;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private void maskObjectField(MaskRule rule, Object val) throws Exception {
+    private void maskObjectField(MaskRule rule, Object val) {
         Field field = WindReflectUtils.findField(val.getClass(), rule.getName());
-        Object o = field.get(val);
-        if (o == null) {
-            return;
-        }
-        WindMasker masker = rule.getMasker();
-        if (masker instanceof ObjectMasker objectMasker) {
-            field.set(val, objectMasker.mask(o, rule.getKeys()));
-        } else {
-            field.set(val, masker.mask(o));
+        try {
+            Object o = WindReflectUtils.exchangeGetterHandle(field).invoke(val);
+            if (o == null) {
+                return;
+            }
+            MethodHandle setterHandle = WindReflectUtils.exchangeSetterHandle(field);
+            WindMasker masker = rule.getMasker();
+            if (masker instanceof ObjectMasker objectMasker) {
+                setterHandle.invoke(val, objectMasker.mask(o, rule.getKeys()));
+            } else {
+                setterHandle.invoke(val, masker.mask(o));
+            }
+        } catch (Throwable exception) {
+            throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, "object mask error", exception);
         }
     }
 
@@ -132,8 +134,8 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
             // TODO 优化改用 json path ？
             MaskRuleGroup group = registry.getRuleGroup(Map.class);
             map.replaceAll((key, value) -> {
-                if (key instanceof String && value instanceof String) {
-                    MaskRule rule = group.matchesWithKey((String) key);
+                if (key instanceof String k && value instanceof String) {
+                    MaskRule rule = group.matchesWithKey(k);
                     return rule == null ? value : rule.getMasker().mask(value);
                 }
                 return maskAs(value);
