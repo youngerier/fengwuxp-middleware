@@ -1,14 +1,11 @@
 package com.wind.mask;
 
-import com.wind.common.exception.BaseException;
-import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.util.WindDeepCopyUtils;
 import com.wind.common.util.WindReflectUtils;
 import com.wind.mask.annotation.Sensitive;
 import lombok.AllArgsConstructor;
 import org.springframework.util.ClassUtils;
 
-import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
@@ -80,20 +77,15 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void maskObjectField(MaskRule rule, Object val) {
         Field field = WindReflectUtils.findField(val.getClass(), rule.getName());
-        try {
-            Object o = WindReflectUtils.exchangeGetterHandle(field).invoke(val);
-            if (o == null) {
-                return;
-            }
-            MethodHandle setterHandle = WindReflectUtils.exchangeSetterHandle(field);
-            WindMasker masker = rule.getMasker();
-            if (masker instanceof ObjectMasker objectMasker) {
-                setterHandle.invoke(val, objectMasker.mask(o, rule.getKeys()));
-            } else {
-                setterHandle.invoke(val, masker.mask(o));
-            }
-        } catch (Throwable exception) {
-            throw new BaseException(DefaultExceptionCode.COMMON_FRIENDLY_ERROR, "object mask error", exception);
+        Object o = WindReflectUtils.getFieldValue(field, val);
+        if (o == null) {
+            return;
+        }
+        WindMasker masker = rule.getMasker();
+        if (masker instanceof ObjectMasker objectMasker) {
+            WindReflectUtils.setFieldValue(field, val, objectMasker.mask(o, rule.getKeys()));
+        } else {
+            WindReflectUtils.setFieldValue(field, val, masker.mask(o));
         }
     }
 

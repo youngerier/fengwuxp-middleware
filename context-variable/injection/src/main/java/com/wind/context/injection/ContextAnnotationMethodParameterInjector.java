@@ -277,19 +277,15 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
     }
 
     static void injectField(Field field, ContextVariable annotation, Object object, Map<String, Object> contextVariables) {
-        try {
-            Object value = evalVariable(annotation, contextVariables);
-            if (annotation.override()) {
-                // 强制覆盖
-                field.set(object, value);
-            } else {
-                if (field.get(object) == null) {
-                    // 空则覆盖
-                    field.set(object, value);
-                }
+        Object value = evalVariable(annotation, contextVariables);
+        if (annotation.override()) {
+            // 强制覆盖
+            WindReflectUtils.setFieldValue(field, object, value);
+        } else {
+            if (WindReflectUtils.getFieldValue(field, object) == null) {
+                // 空则覆盖
+                WindReflectUtils.setFieldValue(field, object, value);
             }
-        } catch (IllegalAccessException exception) {
-            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "inject filed error", exception);
         }
     }
 
