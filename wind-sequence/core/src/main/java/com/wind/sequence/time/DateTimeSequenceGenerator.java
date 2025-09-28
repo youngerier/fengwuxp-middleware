@@ -14,16 +14,7 @@ import java.util.Date;
  * @author wuxp
  * @date 2023-10-18 08:02
  **/
-public class DateTimeSequenceGenerator implements SequenceGenerator {
-
-    private final SequenceTimeScopeType timeScope;
-
-    private final SequenceGenerator dateCounter;
-
-    private DateTimeSequenceGenerator(SequenceTimeScopeType timeScope, SequenceGenerator dateCounter) {
-        this.timeScope = timeScope;
-        this.dateCounter = dateCounter;
-    }
+public record DateTimeSequenceGenerator(SequenceTimeScopeType timeScope, SequenceGenerator dateCounter) implements SequenceGenerator {
 
     @Override
     public String next() {

@@ -5,9 +5,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.ToString;
 import lombok.experimental.FieldNameConstants;
 
 import java.time.LocalDateTime;
@@ -22,27 +19,10 @@ import java.util.Map;
  * @date 2025-05-30 10:59
  **/
 @Builder
-@Getter
-@ToString
-@EqualsAndHashCode
 @FieldNameConstants
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ImmutableChatMessage implements ChatMessage {
-
-    private final String id;
-
-    private final String fromUserId;
-
-    private final String sessionId;
-
-    private final List<ChatMessageContent> body;
-
-    private final LocalDateTime gmtCreate;
-
-    private final Long sequenceId;
-
-    @NotNull
-    private final Map<String, String> metadata;
+public record ImmutableChatMessage(String id, String fromUserId, String sessionId, List<ChatMessageContent> body, LocalDateTime gmtCreate, Long sequenceId,
+                                   @NotNull Map<String, String> metadata) implements ChatMessage {
 
     @JsonCreator
     public ImmutableChatMessage(
@@ -51,7 +31,7 @@ public class ImmutableChatMessage implements ChatMessage {
             @JsonProperty(Fields.sessionId) String sessionId,
             @JsonProperty(Fields.body) List<ChatMessageContent> body,
             @JsonProperty(Fields.gmtCreate) LocalDateTime gmtCreate,
-            @JsonProperty(Fields.sequenceId)Long sequenceId,
+            @JsonProperty(Fields.sequenceId) Long sequenceId,
             @JsonProperty(Fields.metadata) Map<String, String> metadata) {
         this.id = id;
         this.fromUserId = fromUserId;

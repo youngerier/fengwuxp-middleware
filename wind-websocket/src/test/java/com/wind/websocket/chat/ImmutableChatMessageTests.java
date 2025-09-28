@@ -54,13 +54,13 @@ class ImmutableChatMessageTests {
         ImmutableChatMessage deserialized = objectMapper.readValue(json, ImmutableChatMessage.class);
 
         // 断言字段值正确
-        Assertions.assertEquals(message.getId(), deserialized.getId());
-        Assertions.assertEquals(message.getFromUserId(), deserialized.getFromUserId());
-        Assertions.assertEquals(message.getSessionId(), deserialized.getSessionId());
-        Assertions.assertEquals(message.getBody().size(), deserialized.getBody().size());
-        Assertions.assertEquals(message.getBody().get(0).getContent(), deserialized.getBody().get(0).getContent());
-        Assertions.assertEquals(message.getGmtCreate(), deserialized.getGmtCreate());
-        Assertions.assertEquals(message.getSequenceId(), deserialized.getSequenceId());
-        Assertions.assertEquals(message.getMetadata().get("metaKey"), deserialized.getMetadata().get("metaKey"));
+        Assertions.assertEquals(message.id(), deserialized.id());
+        Assertions.assertEquals(message.fromUserId(), deserialized.fromUserId());
+        Assertions.assertEquals(message.sessionId(), deserialized.sessionId());
+        Assertions.assertEquals(message.body().size(), deserialized.body().size());
+        Assertions.assertEquals(message.body().get(0).content(), deserialized.body().get(0).content());
+        Assertions.assertEquals(message.gmtCreate(), deserialized.gmtCreate());
+        Assertions.assertEquals(message.sequenceId(), deserialized.sequenceId());
+        Assertions.assertEquals(message.metadata().get("metaKey"), deserialized.metadata().get("metaKey"));
     }
 }

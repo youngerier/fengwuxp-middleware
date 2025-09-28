@@ -47,7 +47,6 @@ public class SimplePictureGenerator implements PictureGenerator {
      */
     private static final Pattern CHINESE_REGX = Pattern.compile("[一-龥]");
 
-
     @Override
     public Image generate(String content, int width, int height) {
         char[] chars = content.toCharArray();
@@ -80,7 +79,6 @@ public class SimplePictureGenerator implements PictureGenerator {
         return bi;
     }
 
-
     /**
      * 随机画干扰圆
      *
@@ -112,9 +110,12 @@ public class SimplePictureGenerator implements PictureGenerator {
         int num = nextInt(1, 2);
         for (int i = 0; i < num; i++) {
             g.setColor(bezierCurveColor());
-            int x1 = 5, y1 = nextInt(5, height / 2);
-            int x2 = width - 5, y2 = nextInt(height / 2, height - 5);
-            int ctrlX = nextInt(width / 4, width / 4 * 3), ctrlY = nextInt(5, height - 5);
+            int x1 = 5;
+            int y1 = nextInt(5, height / 2);
+            int x2 = width - 5;
+            int y2 = nextInt(height / 2, height - 5);
+            int ctrlX = nextInt(width / 4, width / 4 * 3);
+            int ctrlY = nextInt(5, height - 5);
             if (nextInt(2) == 0) {
                 int ty = y1;
                 y1 = y2;
@@ -127,7 +128,8 @@ public class SimplePictureGenerator implements PictureGenerator {
                 g.draw(shape);
             } else {
                 // 三阶贝塞尔曲线
-                int ctrlX1 = nextInt(width / 4, width / 4 * 3), ctrlY1 = nextInt(5, height - 5);
+                int ctrlX1 = nextInt(width / 4, width / 4 * 3);
+                int ctrlY1 = nextInt(5, height - 5);
                 CubicCurve2D shape = new CubicCurve2D.Double(x1, y1, ctrlX, ctrlY, ctrlX1, ctrlY1, x2, y2);
                 g.draw(shape);
             }
@@ -177,7 +179,7 @@ public class SimplePictureGenerator implements PictureGenerator {
      * @return 随机数
      */
     private int nextInt(int min, int max) {
-        return RandomUtils.nextInt(min, max);
+        return RandomUtils.secure().randomInt(min, max);
     }
 
     /**

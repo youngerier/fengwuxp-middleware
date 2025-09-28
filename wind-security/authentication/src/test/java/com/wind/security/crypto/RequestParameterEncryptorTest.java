@@ -9,20 +9,19 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 
-class AuthenticationParameterEncryptorTest {
+class RequestParameterEncryptorTest {
 
     @Test
     void decrypt() {
         KeyPair keyPair = genKeyPir();
-        AuthenticationParameterEncryptor.TEXT_ENCRYPTOR.set(RasTextEncryptor.ofPublicEncrypt(keyPair.getPublic(), keyPair.getPrivate()));
+        RequestParameterEncryptor.TEXT_ENCRYPTOR.set(RasTextEncryptor.ofPublicEncrypt(keyPair.getPublic(), keyPair.getPrivate()));
         String principal = RandomStringUtils.secure().nextAlphabetic(16);
         String credentials = RandomStringUtils.secure().nextAlphabetic(16);
-        AuthenticationParameterEncryptor.AuthenticationParameter encrypt1 = AuthenticationParameterEncryptor.encrypt(principal, credentials);
-        AuthenticationParameterEncryptor.AuthenticationParameter encrypt2 = AuthenticationParameterEncryptor.encrypt(principal, credentials);
+        RequestParameterEncryptor.AuthenticationParameter encrypt1 = RequestParameterEncryptor.encryptAuthenticationParameter(principal, credentials);
+        RequestParameterEncryptor.AuthenticationParameter encrypt2 = RequestParameterEncryptor.encryptAuthenticationParameter(principal, credentials);
         Assertions.assertNotEquals(encrypt1.principal(), encrypt2.principal());
         Assertions.assertNotEquals(encrypt1.credentials(), encrypt2.credentials());
-        AuthenticationParameterEncryptor.AuthenticationParameter decrypt = AuthenticationParameterEncryptor.decrypt(encrypt1.principal(),
-                encrypt1.credentials());
+        RequestParameterEncryptor.AuthenticationParameter decrypt = RequestParameterEncryptor.decryptAuthenticationParameter(encrypt1.principal(), encrypt1.credentials());
         Assertions.assertEquals(principal, decrypt.principal());
         Assertions.assertEquals(credentials, decrypt.credentials());
     }
@@ -50,12 +49,12 @@ class AuthenticationParameterEncryptorTest {
                 "+PV52oLj7t7IrbxFbF1Y/KFl1mIlxAoGAfZTPT4UD5wYJgvues31TR6LKVowIcDAwgw0FgBlMoeLVOYMncY9sfFJPrPfyj1DqVaTjcPyAQBaa4SStFwrYJ" +
                 "/AUID8ibuw9q7fupUR+keO1myqYHspvQ9CeuwblFO9RNirursSW9ra6Kr5zeMKptvQSHA4YtXXBLIXr6q/8uRs=");
         KeyPair keyPair = properties.getKeyPair();
-        AuthenticationParameterEncryptor.TEXT_ENCRYPTOR.set(RasTextEncryptor.ofPublicEncrypt(keyPair.getPublic(), keyPair.getPrivate()));
+        RequestParameterEncryptor.TEXT_ENCRYPTOR.set(RasTextEncryptor.ofPublicEncrypt(keyPair.getPublic(), keyPair.getPrivate()));
         String content = "TGPerUamYrUFvSbSe3+QUfUgwDaVEQHq3IekyopWblZeEJBXWot261kwN4hX/1WduuVFilNMo9bOobuG7" +
                 "/1PrZGcO2q0STpvyof8H6H8VU3d1mhp1dUIQoF23ZJIPZHe+1/BBz/Raw9DyMvJczaI5yNrgnuPO0KHcn3LUST/ZxH9eLL1jAByOg56Gnjrw" +
                 "/d4Qt5KWrGZF5DdrVQjZ0IXiFA41GBPbXd6/yPIx6PXhtrmsEiSlPcinYKF95NVIYYJZPORKHjEnPPLAs2or7xXRLShswwD9TT6kI8ZZusxE8rH0lpxR5xm3C/hD9UnMKv" +
                 "+zH3Et1DemhHxZHdLGywXmA==";
-        AuthenticationParameterEncryptor.AuthenticationParameter parameter = AuthenticationParameterEncryptor.decrypt(content, content);
+        RequestParameterEncryptor.AuthenticationParameter parameter = RequestParameterEncryptor.decryptAuthenticationParameter(content, content);
         Assertions.assertNotNull(parameter);
 
     }

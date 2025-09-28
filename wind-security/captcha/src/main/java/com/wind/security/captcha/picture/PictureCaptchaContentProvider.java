@@ -4,7 +4,6 @@ import com.wind.security.captcha.Captcha;
 import com.wind.security.captcha.CaptchaContentProvider;
 import com.wind.security.captcha.CaptchaValue;
 import com.wind.security.captcha.SimpleCaptchaType;
-import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.time.Duration;
@@ -16,17 +15,12 @@ import java.util.Objects;
  * @author wuxp
  * @date 2023-09-24 10:33
  **/
-@AllArgsConstructor
-public class PictureCaptchaContentProvider implements CaptchaContentProvider {
+public record PictureCaptchaContentProvider(PictureCaptchaProperties properties, PictureGenerator pictureGenerator) implements CaptchaContentProvider {
 
     /**
      * 随机范围，移除数字 0、2 字母 i、o、z
      */
     private static final String RANDOM_STRINGS = "13456789ABCDEFGHJKMNPQRSTUVWXYabcdefghjkmnpqrstuvwxy13456789";
-
-    private final PictureCaptchaProperties properties;
-
-    private final PictureGenerator pictureGenerator;
 
     @Override
     public Duration getEffectiveTime() {
@@ -54,7 +48,7 @@ public class PictureCaptchaContentProvider implements CaptchaContentProvider {
         int length = RANDOM_STRINGS.length();
         StringBuilder content = new StringBuilder();
         for (int i = 0; i < properties.getLength(); ++i) {
-            int index = RandomUtils.nextInt(0, length);
+            int index = RandomUtils.secure().randomInt(0, length);
             content.append(RANDOM_STRINGS.charAt(index));
         }
         return content.toString();

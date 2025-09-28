@@ -4,6 +4,7 @@ import com.wind.common.spring.SpringEventPublishUtils;
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 @Getter
 public class RbacResourceChangeEvent extends ApplicationEvent {
 
+    @Serial
     private static final long serialVersionUID = -4959621536894633454L;
 
     private final Class<?> resourceType;

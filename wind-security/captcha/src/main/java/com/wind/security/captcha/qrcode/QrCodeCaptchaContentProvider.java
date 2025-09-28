@@ -4,7 +4,6 @@ import com.wind.security.captcha.Captcha;
 import com.wind.security.captcha.CaptchaContentProvider;
 import com.wind.security.captcha.CaptchaValue;
 import com.wind.security.captcha.SimpleCaptchaType;
-import lombok.AllArgsConstructor;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -13,20 +12,12 @@ import java.util.function.Supplier;
 /**
  * 二维码验证码生成
  *
+ * @param qrCodeValueSupplier 二维码值提供者
  * @author wuxp
  * @date 2023-09-24 14:12
- **/
-@AllArgsConstructor
-public class QrCodeCaptchaContentProvider implements CaptchaContentProvider {
-
-    /**
-     * 二维码值提供者
-     */
-    private final Supplier<String> qrCodeValueSupplier;
-
-    private final QrCodeGenerator qrCodeGenerator;
-
-    private final QrCodeCaptchaProperties properties;
+ */
+public record QrCodeCaptchaContentProvider(Supplier<String> qrCodeValueSupplier, QrCodeGenerator qrCodeGenerator,
+                                           QrCodeCaptchaProperties properties) implements CaptchaContentProvider {
 
     public QrCodeCaptchaContentProvider(Supplier<String> qrCodeValueSupplier, QrCodeCaptchaProperties properties) {
         this(qrCodeValueSupplier, new ZxingQrCodeGenerator(), properties);

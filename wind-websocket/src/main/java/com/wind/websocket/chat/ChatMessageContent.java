@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.wind.core.WritableContextVariables;
-import lombok.Getter;
 import lombok.experimental.FieldNameConstants;
 
 import jakarta.validation.constraints.NotBlank;
@@ -21,19 +20,12 @@ import java.util.Map;
  * @author wuxp
  * @date 2025-05-27 10:36
  **/
-@Getter
 @FieldNameConstants
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class ChatMessageContent implements WritableContextVariables, Serializable {
+public record ChatMessageContent(ChatMessageContentType contentType, String content, Map<String, Object> variables) implements WritableContextVariables, Serializable {
 
     @Serial
     private static final long serialVersionUID = 8540381989783804113L;
-
-    private final ChatMessageContentType contentType;
-
-    private final String content;
-
-    private final Map<String, Object> variables;
 
     @JsonCreator
     public ChatMessageContent(@JsonProperty(Fields.contentType) ChatMessageContentType contentType,

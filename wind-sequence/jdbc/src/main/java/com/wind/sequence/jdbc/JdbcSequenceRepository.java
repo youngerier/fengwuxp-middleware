@@ -14,8 +14,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.List;
 
-import static org.springframework.transaction.TransactionDefinition.PROPAGATION_REQUIRED;
-
 /**
  * 基于数据库的序列号存储
  *

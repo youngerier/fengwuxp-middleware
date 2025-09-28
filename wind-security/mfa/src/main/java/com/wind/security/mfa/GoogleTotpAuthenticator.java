@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Base64;
 
 /**
+ * Google TOTP 认证
  * @author wuxp
  * @date 2024-03-05 15:21
  **/

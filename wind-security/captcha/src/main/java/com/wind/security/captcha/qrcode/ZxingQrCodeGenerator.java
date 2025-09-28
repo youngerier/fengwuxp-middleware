@@ -19,7 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 
@@ -58,7 +58,7 @@ public class ZxingQrCodeGenerator implements QrCodeGenerator {
      * @param margin  边距
      */
     private BitMatrix createQrCodeMatrix(String content, int size, int margin) {
-        Map<EncodeHintType, Object> hints = new HashMap<>();
+        Map<EncodeHintType, Object> hints = new EnumMap<>(EncodeHintType.class);
         // 设置字符编码
         hints.put(EncodeHintType.CHARACTER_SET, StandardCharsets.UTF_8.name());
         // 指定纠错等级

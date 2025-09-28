@@ -1,9 +1,7 @@
 package com.wind.security.authority;
 
 import com.wind.security.core.SecurityAccessOperations;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.lang.Nullable;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
@@ -21,19 +19,14 @@ import static com.wind.security.WebSecurityConstants.REQUEST_REQUIRED_AUTHORITIE
  * @author wuxp
  * @date 2023-10-23 08:52
  **/
-@AllArgsConstructor
 @Slf4j
-public class WebRequestAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext> {
+public record WebRequestAuthorizationManager(WebRequestAuthorityLoader webRequestAuthorityLoader,
+                                             SecurityAccessOperations securityAccessOperations) implements AuthorizationManager<RequestAuthorizationContext> {
 
     private static final AuthorizationDecision ACCESS_PASSED = new AuthorizationDecision(true);
 
     private static final AuthorizationDecision ACCESS_DENIED = new AuthorizationDecision(false);
 
-    private final WebRequestAuthorityLoader webRequestAuthorityLoader;
-
-    private final SecurityAccessOperations securityAccessOperations;
-
-    @Nullable
     @Override
     public AuthorizationDecision check(Supplier<Authentication> supplier, RequestAuthorizationContext context) {
         if (!supplier.get().isAuthenticated()) {

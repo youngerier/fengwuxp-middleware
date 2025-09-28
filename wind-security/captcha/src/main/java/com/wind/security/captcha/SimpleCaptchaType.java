@@ -11,7 +11,6 @@ import lombok.Getter;
 @Getter
 public enum SimpleCaptchaType implements Captcha.CaptchaType {
 
-
     MOBILE_PHONE("短信验证码"),
 
     EMAIL("邮箱验证码"),

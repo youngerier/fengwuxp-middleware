@@ -2,12 +2,12 @@ package com.wind.sentinel.metrics;
 
 
 import com.alibaba.csp.sentinel.metric.extension.MetricExtension;
+import com.alibaba.csp.sentinel.metric.extension.MetricExtensionProvider;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.wind.common.WindConstants;
 import io.micrometer.core.instrument.Metrics;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
-import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,17 +18,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 /**
  * Sentinel Metrics 采集
  *
+ * @param resourceType 资源类型
  * @author wuxp
  * @date 2024-03-13 11:16
- * @see com.alibaba.csp.sentinel.metric.extension.MetricExtensionProvider
+ * @see MetricExtensionProvider
  */
-@AllArgsConstructor
-public class SentinelMetricsCollector implements MetricExtension {
+public record SentinelMetricsCollector(String resourceType) implements MetricExtension {
 
     private static final AtomicBoolean ENABLE_METRICS_COLLECT = new AtomicBoolean(false);
 
@@ -78,11 +77,6 @@ public class SentinelMetricsCollector implements MetricExtension {
     private static final String ORIGIN_TAG_NAME = "origin";
 
     private static final Map<String, AtomicLong> RESOURCE_THREAD_COUNTERS = new ConcurrentHashMap<>();
-
-    /**
-     * 资源类型
-     */
-    private final String resourceType;
 
     public SentinelMetricsCollector() {
         this(WindConstants.EMPTY);
@@ -161,7 +155,7 @@ public class SentinelMetricsCollector implements MetricExtension {
                 .filter(Tags.class::isInstance)
                 .map(Tags.class::cast)
                 .flatMap(Tags::stream)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private String genName(String name) {

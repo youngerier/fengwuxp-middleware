@@ -19,49 +19,49 @@ public interface Captcha extends CaptchaValue {
      *
      * @return 验证码所有者
      */
-    String getOwner();
+    String owner();
 
     /**
      * @return 验证码类型
      */
-    CaptchaType getType();
+    CaptchaType type();
 
     /**
      * @return 验证码使用场景
      */
-    CaptchaUseScene getUseScene();
+    CaptchaUseScene useScene();
 
     /**
      * @return 已验证次数
      */
-    int getVerificationCount();
+    int verificationCount();
 
     /**
      * @return 已发送次数
      */
-    int getSendTimes();
+    int sendTimes();
 
     /**
      * @return 允许验证次数
      */
-    int getAllowVerificationTimes();
+    int allowVerificationTimes();
 
     /**
      * @return 验证码失效时间戳
      */
-    long getExpireTime();
+    long expireTime();
 
     /**
      * 累计一次发送次数
      *
-     * @return {@link #getVerificationCount()} 值更新后的验证码对象
+     * @return {@link #verificationCount()} 值更新后的验证码对象
      */
     Captcha increaseSendTimes();
 
     /**
      * 累计一次验证次数
      *
-     * @return {@link #getVerificationCount()} 值更新后的验证码对象
+     * @return {@link #verificationCount()} 值更新后的验证码对象
      */
     Captcha increaseVerificationCount();
 
@@ -70,12 +70,12 @@ public interface Captcha extends CaptchaValue {
      */
     @Transient
     default boolean isAvailable() {
-        if (getExpireTime() == 0L) {
+        if (expireTime() == 0L) {
             // 过期时间没有，表示位过期
             return false;
         }
         // 发送次数 < 3 & 验证次数 < 最大允许验证次数 & 失效时间 > 当前时间
-        return getSendTimes() < 3 && getVerificationCount() < getAllowVerificationTimes() && getExpireTime() > System.currentTimeMillis();
+        return sendTimes() < 3 && verificationCount() < allowVerificationTimes() && expireTime() > System.currentTimeMillis();
     }
 
     /**
