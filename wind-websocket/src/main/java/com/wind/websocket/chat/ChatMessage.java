@@ -41,13 +41,13 @@ public interface ChatMessage {
      * @return 消息 id
      */
     @NotBlank
-    String id();
+    String getId();
 
     /**
      * @return 发送者
      */
     @NotBlank
-    String fromUserId();
+    String getFromUserId();
 
     /**
      * 聊天会话 id
@@ -55,38 +55,38 @@ public interface ChatMessage {
      * @return 接收者
      */
     @NotBlank
-    String sessionId();
+    String getSessionId();
 
     /**
      * @return 消息内容，可能有多个条
      */
     @NotEmpty
-    List<ChatMessageContent> body();
+    List<ChatMessageContent> getBody();
 
     /**
      * @return 发送时间戳
      */
     @NotNull
     default Long getTimestamp() {
-        return gmtCreate().toInstant(ZoneOffset.UTC).getEpochSecond();
+        return getGmtCreate().toInstant(ZoneOffset.UTC).getEpochSecond();
     }
 
     /**
      * @return 创建时间
      */
     @NotBlank
-    LocalDateTime gmtCreate();
+    LocalDateTime getGmtCreate();
 
     /**
      * @return 消息序列号
      */
     @NotNull
-    Long sequenceId();
+    Long getSequenceId();
 
     /**
      * @return 元数据
      */
-    default Map<String, String> metadata() {
+    default Map<String, String> getMetadata() {
         return Collections.emptyMap();
     }
 
