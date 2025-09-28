@@ -24,7 +24,7 @@ class ImmutableChatMessageTests {
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
-        // 注册 Java 8 时间模块
+        // 注册时间模块
         objectMapper.registerModule(new JavaTimeModule());
     }
 
