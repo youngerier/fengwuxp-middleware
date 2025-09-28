@@ -12,11 +12,11 @@ public final class ContextVariableNames {
         throw new AssertionError();
     }
 
-    public static final String USER_ID = "@@__current_user_id__@@";
+    public static final String USER_ID = "@@wind__current_user_id__@@";
 
-    public static final String USER_NAME = "@@__current_user_name__@@";
+    public static final String USER_NAME = "@@wind__current_user_name__@@";
 
-    public static final String TENANT_ID = "@@__current_tenant_id__@@";
+    public static final String TENANT_ID = "@@wind__current_tenant_id__@@";
 
-    public static final String REQUEST_IP = "@@__current_request_ip__@@";
+    public static final String REQUEST_IP = "@@wind__current_request_ip__@@";
 }

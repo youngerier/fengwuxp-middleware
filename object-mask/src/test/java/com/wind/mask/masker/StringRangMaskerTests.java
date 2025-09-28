@@ -10,7 +10,7 @@ import static com.wind.mask.masker.StringRangMasker.MAX_MASK_SIZE;
  * @author wuxp
  * @date 2024-08-07 17:21
  **/
-public class StringRangMaskerTests {
+class StringRangMaskerTests {
 
     @Test
     void testBase() {

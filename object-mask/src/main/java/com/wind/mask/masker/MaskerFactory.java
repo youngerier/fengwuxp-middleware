@@ -4,6 +4,7 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.mask.WindMasker;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,9 +30,9 @@ public final class MaskerFactory {
                 return WindMasker.NONE;
             }
             try {
-                return maskerType.newInstance();
-            } catch (InstantiationException | IllegalAccessException exception) {
-                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "New WindMasker error", exception);
+                return maskerType.getDeclaredConstructor().newInstance();
+            } catch (InvocationTargetException | NoSuchMethodException | InstantiationException | IllegalAccessException exception) {
+                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "Create WindMasker exception, type = " + maskerType.getName(), exception);
             }
         });
     }

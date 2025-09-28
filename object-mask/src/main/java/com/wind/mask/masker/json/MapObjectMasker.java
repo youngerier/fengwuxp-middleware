@@ -4,6 +4,7 @@ package com.wind.mask.masker.json;
 import com.alibaba.fastjson2.JSONPath;
 import com.wind.mask.ObjectMaskPrinter;
 import com.wind.mask.ObjectMasker;
+import com.wind.mask.WindMasker;
 
 import java.util.Collection;
 import java.util.Map;
@@ -28,7 +29,7 @@ public final class MapObjectMasker implements ObjectMasker<Map<String, Object>, 
             try {
                 Object eval = JSONPath.eval(map, key);
                 if (eval != null) {
-                    JSONPath.set(map, key, ObjectMaskPrinter.ASTERISK.mask(eval));
+                    JSONPath.set(map, key, WindMasker.ASTERISK.mask(eval));
                 }
             } catch (Exception exception) {
                 // ignore

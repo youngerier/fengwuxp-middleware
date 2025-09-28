@@ -11,19 +11,13 @@ import org.springframework.util.StringUtils;
  * @author wuxp
  * @date 2024-08-07 17:07
  **/
-public class StringRangMasker implements WindMasker<String, String> {
+public record StringRangMasker(int begin, int end) implements WindMasker<String, String> {
 
     @VisibleForTesting
     static final int MAX_MASK_SIZE = 8;
 
-    private final int begin;
-
-    private final int end;
-
-    public StringRangMasker(int begin, int end) {
+    public StringRangMasker {
         AssertUtils.isTrue(begin <= end, "argument begin must lte end");
-        this.begin = begin;
-        this.end = end;
     }
 
     public static StringRangMasker phone() {
@@ -64,10 +58,8 @@ public class StringRangMasker implements WindMasker<String, String> {
         int distance = Integer.min(end, length) - begin;
         // 最多只保留 {@link MAX_MASK_SIZE} 位字符串
         int maskSize = Integer.min(distance, MAX_MASK_SIZE);
-        for (int i = 0; i < maskSize; i++) {
-            // TODO 待优化
-            masked.append('*');
-        }
+        // TODO 待优化
+        masked.append("*".repeat(Math.max(0, maskSize)));
         if (end < length) {
             // 保留结尾字符
             masked.append(input, end, length);
