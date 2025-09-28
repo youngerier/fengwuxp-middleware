@@ -72,7 +72,7 @@ public interface FriendlyExceptionMessageConverter {
                 }
                 MessagePlaceholder placeholder = baseException.getMessagePlaceholder();
                 if (placeholder != null) {
-                    return SpringI18nMessageUtils.getMessage(placeholder.getPattern(), placeholder.getArgs());
+                    return SpringI18nMessageUtils.getMessage(placeholder.pattern(), placeholder.args());
                 }
             }
             if (GlobalExceptionLogDecisionMaker.isSpringSecurityException(throwable)) {

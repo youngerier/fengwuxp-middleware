@@ -45,7 +45,7 @@ public final class AssertUtils {
     }
 
     public static void isTrue(boolean expression, MessagePlaceholder placeholder) {
-        isTrue(expression, placeholder.getPattern(), placeholder.getArgs());
+        isTrue(expression, placeholder.pattern(), placeholder.args());
     }
 
     /**
@@ -80,7 +80,7 @@ public final class AssertUtils {
     }
 
     public static void isFalse(boolean expression, MessagePlaceholder placeholder) {
-        isFalse(expression, placeholder.getPattern(), placeholder.getArgs());
+        isFalse(expression, placeholder.pattern(), placeholder.args());
     }
 
     public static void isFalse(boolean expression, String message, Object... args) {
@@ -121,7 +121,7 @@ public final class AssertUtils {
     }
 
     public static void notNull(Object object, MessagePlaceholder placeholder) {
-        notNull(object, placeholder.getPattern(), placeholder.getArgs());
+        notNull(object, placeholder.pattern(), placeholder.args());
     }
 
     /**
@@ -154,7 +154,7 @@ public final class AssertUtils {
     }
 
     public static void hasLength(String text, MessagePlaceholder placeholder) {
-        hasLength(text, placeholder.getPattern(), placeholder.getArgs());
+        hasLength(text, placeholder.pattern(), placeholder.args());
     }
 
     /**
@@ -257,7 +257,7 @@ public final class AssertUtils {
     }
 
     public static void notEmpty(@Nullable Object[] array, MessagePlaceholder placeholder) {
-        notEmpty(array, placeholder.getPattern(), placeholder.getArgs());
+        notEmpty(array, placeholder.pattern(), placeholder.args());
     }
 
     /**
@@ -333,7 +333,7 @@ public final class AssertUtils {
     }
 
     public static void notEmpty(@Nullable Collection<?> collection, MessagePlaceholder placeholder) {
-        notEmpty(collection, placeholder.getPattern(), placeholder.getArgs());
+        notEmpty(collection, placeholder.pattern(), placeholder.args());
     }
 
     /**
@@ -412,7 +412,7 @@ public final class AssertUtils {
     }
 
     public static void notEmpty(@Nullable Map<?, ?> map, MessagePlaceholder placeholder) {
-        notEmpty(map, placeholder.getPattern(), placeholder.getArgs());
+        notEmpty(map, placeholder.pattern(), placeholder.args());
     }
 
     /**
