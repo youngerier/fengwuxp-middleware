@@ -49,7 +49,7 @@ public class WindApplicationStartedListener implements ApplicationListener<Appli
         List<SystemInitializer> initializers = new ArrayList<>(context.getBeansOfType(SystemInitializer.class).values());
         OrderComparator.sort(initializers);
         for (SystemInitializer initializer : initializers) {
-            if (initializer.requireInitialize()) {
+            if (initializer.shouldInitialize()) {
                 try {
                     initializer.initialize();
                 } catch (Exception exception) {
