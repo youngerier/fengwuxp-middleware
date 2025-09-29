@@ -1,6 +1,7 @@
 package com.wind.trace.thread;
 
 
+import com.wind.common.exception.AssertUtils;
 import com.wind.common.util.IpAddressUtils;
 import com.wind.core.WritableContextVariables;
 import com.wind.sequence.SequenceGenerator;
@@ -36,7 +37,7 @@ public final class WindThreadTracer implements WindTracer {
 
     @Override
     public void trace() {
-        trace(getTraceId());
+        trace(null);
     }
 
     @Override
@@ -68,14 +69,14 @@ public final class WindThreadTracer implements WindTracer {
     @Override
     public Map<String, Object> getContextVariables() {
         // 返回一个快照，避免外部遍历时内部修改引发 ConcurrentModificationException
-        return Map.copyOf(nullSecurityGetVariables());
+        return Map.copyOf(requireVariables());
     }
 
     @Override
     public WritableContextVariables putVariable(String name, Object val) {
-        if (name != null && val != null) {
-            // TODO 待优化
-            nullSecurityGetVariables().put(name, val);
+        AssertUtils.hasText(name, "argument name must not empty");
+        if (val != null) {
+            requireVariables().put(name, val);
             if (val instanceof String str) {
                 // 字符传类型变量同步到 MDC 中
                 MDC.put(name, str);
@@ -86,18 +87,18 @@ public final class WindThreadTracer implements WindTracer {
 
     @Override
     public WritableContextVariables removeVariable(String name) {
-        nullSecurityGetVariables().remove(name);
+        requireVariables().remove(name);
         return this;
     }
 
     @Override
     public void clear() {
         MDC.clear();
-        nullSecurityGetVariables().clear();
+        requireVariables().clear();
         TRACE_CONTEXT.remove();
     }
 
-    private Map<String, Object> nullSecurityGetVariables() {
+    private Map<String, Object> requireVariables() {
         Map<String, Object> variables = TRACE_CONTEXT.get();
         if (variables == null) {
             variables = new ConcurrentHashMap<>();

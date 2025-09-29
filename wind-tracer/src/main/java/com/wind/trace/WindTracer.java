@@ -3,6 +3,7 @@ package com.wind.trace;
 import com.wind.core.WritableContextVariables;
 import com.wind.trace.thread.WindThreadTracer;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import java.util.Collections;
@@ -50,6 +51,7 @@ public interface WindTracer extends WritableContextVariables {
      *
      * @return trace id
      */
+    @NotBlank
     String getTraceId();
 
     /**

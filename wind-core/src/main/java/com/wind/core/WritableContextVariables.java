@@ -2,6 +2,7 @@ package com.wind.core;
 
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
 
 import java.util.Collections;
@@ -23,6 +24,7 @@ public interface WritableContextVariables extends ReadonlyContextVariables {
      * @param val  变量值
      * @return this
      */
+    @NotNull
     WritableContextVariables putVariable(@NotBlank String name, @Nullable Object val);
 
     /**
@@ -31,8 +33,8 @@ public interface WritableContextVariables extends ReadonlyContextVariables {
      * @param name 变量名
      * @return this
      */
+    @NotNull
     WritableContextVariables removeVariable(@NotBlank String name);
-
 
     /**
      * 创建一个可写的上下文变量
