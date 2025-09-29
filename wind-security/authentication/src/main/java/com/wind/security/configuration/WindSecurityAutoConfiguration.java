@@ -9,10 +9,10 @@ import com.wind.security.authentication.jwt.DefaultJwtAuthenticationTokenCodecSe
 import com.wind.security.authentication.jwt.JwtProperties;
 import com.wind.security.crypto.RequestParameterEncryptor;
 import com.wind.security.jwt.JwtTokenCodec;
-import com.wind.security.authority.SimpleSecurityAccessOperations;
+import com.wind.security.authority.SimpleWindSecurityAccessOperations;
 import com.wind.security.authority.WebRequestAuthorityLoader;
 import com.wind.security.authority.WebRequestAuthorizationManager;
-import com.wind.security.core.SecurityAccessOperations;
+import com.wind.security.core.WindSecurityAccessOperations;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -77,15 +77,15 @@ public class WindSecurityAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean({SecurityAccessOperations.class})
-    public SecurityAccessOperations securityAccessOperations() {
-        return new SimpleSecurityAccessOperations("ROLE_");
+    @ConditionalOnMissingBean({WindSecurityAccessOperations.class})
+    public WindSecurityAccessOperations securityAccessOperations() {
+        return new SimpleWindSecurityAccessOperations("ROLE_");
     }
 
     @Bean
     @ConditionalOnBean({WebRequestAuthorityLoader.class})
     public WebRequestAuthorizationManager webRequestAuthorizationManager(WebRequestAuthorityLoader webRequestAuthorityLoader,
-                                                                         SecurityAccessOperations securityAccessOperations) {
+                                                                         WindSecurityAccessOperations securityAccessOperations) {
         return new WebRequestAuthorizationManager(webRequestAuthorityLoader, securityAccessOperations);
     }
 

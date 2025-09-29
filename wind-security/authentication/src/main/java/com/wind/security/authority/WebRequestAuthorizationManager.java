@@ -1,6 +1,6 @@
 package com.wind.security.authority;
 
-import com.wind.security.core.SecurityAccessOperations;
+import com.wind.security.core.WindSecurityAccessOperations;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
@@ -21,7 +21,7 @@ import static com.wind.security.WebSecurityConstants.REQUEST_REQUIRED_AUTHORITIE
  **/
 @Slf4j
 public record WebRequestAuthorizationManager(WebRequestAuthorityLoader webRequestAuthorityLoader,
-                                             SecurityAccessOperations securityAccessOperations) implements AuthorizationManager<RequestAuthorizationContext> {
+                                             WindSecurityAccessOperations securityAccessOperations) implements AuthorizationManager<RequestAuthorizationContext> {
 
     private static final AuthorizationDecision ACCESS_PASSED = new AuthorizationDecision(true);
 

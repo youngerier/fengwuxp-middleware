@@ -18,11 +18,13 @@ import java.time.Duration;
 import static com.wind.common.WindConstants.WIND_I18N_MESSAGE_PREFIX;
 
 /**
+ * 国际化配置创建
+ *
  * @author wuxp
  * @date 2023-10-30 09:43
  **/
 @Configuration
-@ConditionalOnProperty(prefix = WIND_I18N_MESSAGE_PREFIX, name = WindConstants.ENABLED_NAME)
+@ConditionalOnProperty(prefix = WIND_I18N_MESSAGE_PREFIX, name = WindConstants.ENABLED_NAME, havingValue = WindConstants.TRUE)
 public class I18nMessageSourceAutoConfiguration {
 
     @Bean

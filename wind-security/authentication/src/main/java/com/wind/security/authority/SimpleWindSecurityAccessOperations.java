@@ -1,7 +1,7 @@
 package com.wind.security.authority;
 
 import com.wind.common.WindConstants;
-import com.wind.security.core.SecurityAccessOperations;
+import com.wind.security.core.WindSecurityAccessOperations;
 import org.springframework.security.authorization.AuthorityAuthorizationManager;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,9 +14,9 @@ import java.util.Objects;
  * @author wuxp
  * @date 2023-10-24 08:06
  */
-public record SimpleSecurityAccessOperations(String rolePrefix) implements SecurityAccessOperations {
+public record SimpleWindSecurityAccessOperations(String rolePrefix) implements WindSecurityAccessOperations {
 
-    public SimpleSecurityAccessOperations() {
+    public SimpleWindSecurityAccessOperations() {
         this(WindConstants.EMPTY);
     }
 
