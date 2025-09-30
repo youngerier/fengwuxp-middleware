@@ -61,18 +61,6 @@ public abstract class AbstractPageQuery<OrderField extends QueryOrderField> impl
     }
 
     /**
-     * 是否需要处理排序
-     *
-     * @return <code>true</code> 需要处理排序
-     */
-    public boolean requireOrderBy() {
-        if (orderFields == null || orderTypes == null) {
-            return false;
-        }
-        return orderFields.length > 0 && orderFields.length == orderTypes.length;
-    }
-
-    /**
      * 配置查询大小最大值
      *
      * @param querySize 查询大小

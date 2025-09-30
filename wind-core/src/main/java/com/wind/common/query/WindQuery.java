@@ -36,4 +36,23 @@ public interface WindQuery<OrderField> {
     QueryOrderType[] getOrderTypes();
 
     void setOrderTypes(@NonNull QueryOrderType[] orderTypes);
+
+    @Deprecated
+    default boolean requireOrderBy() {
+        return shouldOrderBy();
+    }
+
+    /**
+     * 是否需要处理排序
+     *
+     * @return <code>true</code> 需要处理排序
+     */
+    default boolean shouldOrderBy() {
+        OrderField[] orderFields = getOrderFields();
+        QueryOrderType[] orderTypes = getOrderTypes();
+        if (orderFields == null || orderTypes == null) {
+            return false;
+        }
+        return orderFields.length > 0 && orderFields.length == orderTypes.length;
+    }
 }
