@@ -2,12 +2,11 @@ package com.wind.common.query.supports;
 
 
 import com.wind.common.query.WindPagination;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
-import jakarta.validation.constraints.NotNull;
 import java.beans.Transient;
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 
@@ -68,12 +67,12 @@ public interface Pagination<T> extends WindPagination<T> {
         return new ImmutablePagination<>();
     }
 
-    static <E> Pagination<E> of(List<E> records, AbstractPageQuery<?> query) {
+    static <E> Pagination<E> of(List<E> records, AbstractPageQuery<? extends QueryOrderField> query) {
         // 不关心总数的情况
         return of(records, query, -1);
     }
 
-    static <E> Pagination<E> of(List<E> records, AbstractPageQuery<?> query, long total) {
+    static <E> Pagination<E> of(List<E> records, AbstractPageQuery<? extends QueryOrderField> query, long total) {
         return of(records, query.getQueryPage(), query.getQuerySize(), query.getQueryType(), total);
     }
 

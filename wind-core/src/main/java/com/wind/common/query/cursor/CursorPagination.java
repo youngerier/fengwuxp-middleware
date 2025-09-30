@@ -1,6 +1,8 @@
 package com.wind.common.query.cursor;
 
 import com.wind.common.query.WindPagination;
+import com.wind.common.query.supports.QueryOrderField;
+import com.wind.common.util.WindReflectUtils;
 import jakarta.annotation.Nullable;
 import org.springframework.util.CollectionUtils;
 
@@ -48,8 +50,23 @@ public interface CursorPagination<T> extends WindPagination<T> {
         return new ImmutableCursorPagination<>(-1L, Collections.emptyList(), 0, null);
     }
 
-    static <E> CursorPagination<E> next(List<E> records, int querySize, String nextCursor) {
-        return of(-1L, records, querySize, nextCursor);
+    /**
+     * 创建下一页分页对象，查询数据的结果对象必须有 id 字段
+     *
+     * @param records 分页数据
+     * @param query   查询参数
+     * @param <E>     分页数据类型
+     * @return 分页对象
+     */
+    static <E> CursorPagination<E> next(List<E> records, AbstractCursorQuery<? extends QueryOrderField> query) {
+        E lasted = CollectionUtils.lastElement(records);
+        if (lasted == null) {
+            // 说明没有数据
+            return empty();
+        }
+        // TODO 待优化
+        String cursor = QueryCursorUtils.generateCursor(query, WindReflectUtils.getFieldValue("id", lasted));
+        return of(-1L, records, query.getQuerySize(), cursor);
     }
 
     static <E> CursorPagination<E> of(long total, List<E> records, int querySize, String nextCursor) {
