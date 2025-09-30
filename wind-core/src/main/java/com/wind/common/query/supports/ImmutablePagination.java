@@ -15,7 +15,7 @@ import java.util.List;
  **/
 @Getter
 @AllArgsConstructor
-public class ImmutablePagination<T> implements Pagination<T> {
+public final class ImmutablePagination<T> implements Pagination<T> {
 
     @Serial
     private static final long serialVersionUID = -4678352910174889294L;

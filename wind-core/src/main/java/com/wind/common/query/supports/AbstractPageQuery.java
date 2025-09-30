@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author wxup
  */
 @Data
-public abstract class AbstractPageQuery<OrderField extends QueryOrderField> implements WindPageQuery<OrderField> {
+public abstract class AbstractPageQuery<OrderField extends QueryOrderField> implements PageBasedQuery<OrderField> {
 
     /**
      * 避免查询页面数据过大，拖垮数据库

@@ -9,7 +9,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.AccessFlag;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,22 +23,8 @@ import java.util.function.Function;
 class WindReflectUtilsTests {
 
     @Test
-    void testResolveSuperGenericTypeV1() {
-        Type[] types = WindReflectUtils.resolveSuperGenericType(new Example());
-        Assertions.assertEquals(2, types.length);
-    }
-
-    @Test
-    void testResolveSuperGenericTypeV2() {
-        Assertions.assertEquals(2, WindReflectUtils.resolveSuperGenericType(new Example2()).length);
-        Type[] types = WindReflectUtils.resolveSuperGenericType(new Example2(), A.class);
-        Assertions.assertEquals(1, types.length);
-        Assertions.assertEquals(String.class, types[0]);
-    }
-
-    @Test
     void testFindFieldGetMethod() {
-        Field field = WindReflectUtils.findField(Example2.class, "name");
+        Field field = WindReflectUtils.findField(Example.class, "name");
         Assertions.assertNotNull(field);
         Method method = WindReflectUtils.findFieldGetMethod(field);
         Assertions.assertNotNull(method);
@@ -57,7 +42,7 @@ class WindReflectUtilsTests {
 
     @Test
     void testGetFieldValue() {
-        Example2 target = new Example2();
+        Example target = new Example();
         target.setName("test");
         String name = WindReflectUtils.getFieldValue("name", target);
         Assertions.assertEquals(target.getName(), name);
@@ -65,15 +50,15 @@ class WindReflectUtilsTests {
 
     @Test
     void testSetFieldValue() {
-        Example2 target = new Example2();
+        Example target = new Example();
         WindReflectUtils.setFieldValue("name", target, "test");
         Assertions.assertEquals("test", target.getName());
     }
 
     @Test
     void testFindFields() {
-        List<String> fieldNames = WindReflectUtils.getFieldNames(Example2.class);
-        Field[] fields = WindReflectUtils.findFields(Example2.class, fieldNames);
+        List<String> fieldNames = WindReflectUtils.getFieldNames(Example.class);
+        Field[] fields = WindReflectUtils.findFields(Example.class, fieldNames);
         boolean match = Arrays.stream(fields).map(Field::accessFlags)
                 .flatMap(Collection::stream)
                 .anyMatch(accessFlag -> accessFlag == AccessFlag.PRIVATE);
@@ -82,45 +67,45 @@ class WindReflectUtilsTests {
 
     @Test
     void testGetterMethods() {
-        Method[] getterMethods = WindReflectUtils.getGetterMethods(Example2.class);
+        Method[] getterMethods = WindReflectUtils.getGetterMethods(Example.class);
         Assertions.assertNotNull(getterMethods);
         Assertions.assertEquals(1, getterMethods.length);
     }
 
     @Test
     void testExchangeGetterHandle() throws Throwable {
-        List<String> fieldNames = WindReflectUtils.getFieldNames(Example2.class);
-        Field[] fields = WindReflectUtils.findFields(Example2.class, fieldNames);
+        List<String> fieldNames = WindReflectUtils.getFieldNames(Example.class);
+        Field[] fields = WindReflectUtils.findFields(Example.class, fieldNames);
         MethodHandle getterHandle = WindReflectUtils.exchangeGetterHandle(fields[0]);
         Assertions.assertNotNull(getterHandle);
         Assertions.assertEquals(fields[0].getType(), getterHandle.type().returnType());
-        Example2 example2 = new Example2();
-        example2.setName("1");
-        Object result = getterHandle.invoke(example2);
-        Assertions.assertEquals(example2.name, result);
+        Example example = new Example();
+        example.setName("1");
+        Object result = getterHandle.invoke(example);
+        Assertions.assertEquals(example.name, result);
     }
 
     @Test
     void testExchangeSetterHandle() throws Throwable {
-        List<String> fieldNames = WindReflectUtils.getFieldNames(Example2.class);
-        Field[] fields = WindReflectUtils.findFields(Example2.class, fieldNames);
+        List<String> fieldNames = WindReflectUtils.getFieldNames(Example.class);
+        Field[] fields = WindReflectUtils.findFields(Example.class, fieldNames);
         MethodHandle setterHandle = WindReflectUtils.exchangeSetterHandle(fields[0]);
         Assertions.assertNotNull(setterHandle);
-        Example2 example2 = new Example2();
-        setterHandle.invoke(example2, "11");
-        Assertions.assertEquals("11", example2.name);
+        Example example = new Example();
+        setterHandle.invoke(example, "11");
+        Assertions.assertEquals("11", example.name);
     }
 
     @Test
     void testExchangeMethodHandle() throws Throwable {
-        Method[] getterMethods = WindReflectUtils.getGetterMethods(Example2.class);
+        Method[] getterMethods = WindReflectUtils.getGetterMethods(Example.class);
         Assertions.assertNotNull(getterMethods);
         MethodHandle methodHandle = WindReflectUtils.exchangeMethodHandle(getterMethods[0]);
         Assertions.assertNotNull(methodHandle);
-        Example2 example2 = new Example2();
-        example2.setName("1");
-        Object result = methodHandle.invoke(example2);
-        Assertions.assertEquals(example2.name, result);
+        Example example = new Example();
+        example.setName("1");
+        Object result = methodHandle.invoke(example);
+        Assertions.assertEquals(example.name, result);
 
     }
 
@@ -129,20 +114,12 @@ class WindReflectUtilsTests {
         void say(E e);
     }
 
-    static class Example implements Function<String, List<String>> {
-
-        @Override
-        public List<String> apply(String s) {
-            return Collections.emptyList();
-        }
-    }
-
     abstract static class AbstractDemo<T, R> implements Function<T, R> {
     }
 
     @EqualsAndHashCode(callSuper = true)
     @Data
-    static class Example2 extends AbstractDemo<String, List<String>> implements A<String> {
+    static class Example extends AbstractDemo<String, List<String>> implements A<String> {
 
         private String name;
 

@@ -1,24 +1,16 @@
-package com.wind.common.query.supports;
+package com.wind.common.query;
 
-
+import com.wind.common.query.supports.QueryOrderType;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 /**
- * 通用的分页查询对象
+ * win query 对象
  *
  * @author wuxp
- * @date 2025-01-16 16:20
+ * @date 2025-09-30 14:18
  **/
-public interface WindPageQuery<OrderField> {
-
-    /**
-     * @return 查询页码
-     */
-    @NonNull
-    Integer getQueryPage();
-
-    void setQueryPage(@NonNull Integer queryPage);
+public interface WindQuery<OrderField> {
 
     /**
      * @return 查询大小
@@ -27,14 +19,6 @@ public interface WindPageQuery<OrderField> {
     Integer getQuerySize();
 
     void setQuerySize(@NonNull Integer querySize);
-
-    /**
-     * @return 查询类型
-     */
-    @NonNull
-    QueryType getQueryType();
-
-    void setQueryType(@NonNull QueryType queryType);
 
     /**
      * 排序字段和排序类型安装数组顺序一一对应

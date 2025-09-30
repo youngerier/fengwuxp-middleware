@@ -1,6 +1,7 @@
 package com.wind.common.query.supports;
 
 
+import com.wind.common.query.WindPagination;
 import org.springframework.lang.Nullable;
 import org.springframework.util.CollectionUtils;
 
@@ -15,7 +16,7 @@ import java.util.List;
  *
  * @author wuxp
  */
-public interface Pagination<T> extends Serializable {
+public interface Pagination<T> extends WindPagination<T> {
 
     /**
      * @return 总记录数据

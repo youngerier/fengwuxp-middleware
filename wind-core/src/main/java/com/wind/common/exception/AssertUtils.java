@@ -26,7 +26,6 @@ public final class AssertUtils {
         throw new AssertionError();
     }
 
-
     /**
      * Assert a boolean expression, throwing an {@code BaseException}
      * if the expression evaluates to {@code false}.
@@ -73,7 +72,7 @@ public final class AssertUtils {
      * @param messageSupplier a supplier for the exception message to use if the
      *                        assertion fails
      * @throws BaseException if {@code expression} is {@code false}
-     * @since 5.0
+     *
      */
     public static void isTrue(boolean expression, Supplier<String> messageSupplier) {
         state(expression, () -> BaseException.common(nullSafeGet(messageSupplier)));
@@ -114,7 +113,7 @@ public final class AssertUtils {
      * @param messageSupplier a supplier for the exception message to use if the
      *                        assertion fails
      * @throws BaseException if the object is not {@code null}
-     * @since 5.0
+     *
      */
     public static void isNull(@Nullable Object object, Supplier<String> messageSupplier) {
         isTrue(object == null, messageSupplier);
@@ -147,7 +146,7 @@ public final class AssertUtils {
      * @param messageSupplier a supplier for the exception message to use if the
      *                        assertion fails
      * @throws BaseException if the object is {@code null}
-     * @since 5.0
+     *
      */
     public static void notNull(@Nullable Object object, Supplier<String> messageSupplier) {
         isTrue(object != null, messageSupplier);
@@ -184,7 +183,7 @@ public final class AssertUtils {
      *                        assertion fails
      * @throws BaseException if the text is empty
      * @see StringUtils#hasLength
-     * @since 5.0
+     *
      */
     public static void hasLength(@Nullable String text, Supplier<String> messageSupplier) {
         isTrue(StringUtils.hasLength(text), messageSupplier);
@@ -217,12 +216,44 @@ public final class AssertUtils {
      *                        assertion fails
      * @throws BaseException if the text does not contain valid text content
      * @see StringUtils#hasText
-     * @since 5.0
+     *
      */
     public static void hasText(@Nullable String text, Supplier<String> messageSupplier) {
         isTrue(StringUtils.hasText(text), messageSupplier);
     }
 
+    /**
+     * Assert that two objects are equal.
+     *
+     * @param actual   the actual value
+     * @param expected the expected value
+     * @param message  the exception message to use if the assertion fails
+     */
+    public static void equals(@Nullable Object actual, @Nullable Object expected, String message) {
+        equals(actual, expected, message, MessagePlaceholder.of(message));
+    }
+
+    /**
+     * Assert that two objects are equal.
+     *
+     * @param actual      the actual value
+     * @param expected    the expected value
+     * @param placeholder a supplier for the exception message to use if the assertion fails
+     */
+    public static void equals(@Nullable Object actual, @Nullable Object expected, MessagePlaceholder placeholder) {
+        equals(actual, expected, placeholder.pattern(), placeholder.args());
+    }
+
+    /**
+     * Assert that two objects are equal.
+     *
+     * @param actual   the actual value
+     * @param expected the expected value
+     * @param message  a supplier for the exception message to use if the assertion fails
+     */
+    public static void equals(@Nullable Object actual, @Nullable Object expected, String message, Object... args) {
+        isTrue(Objects.equals(actual, expected), message, args);
+    }
 
     /**
      * Assert that the given text does not contain the given substring.
@@ -249,7 +280,7 @@ public final class AssertUtils {
      * @param messageSupplier a supplier for the exception message to use if the
      *                        assertion fails
      * @throws BaseException if the text contains the substring
-     * @since 5.0
+     *
      */
     public static void doesNotContain(@Nullable String textToSearch, String substring, Supplier<String> messageSupplier) {
         isFalse(StringUtils.hasLength(textToSearch) && StringUtils.hasLength(substring) &&
@@ -284,7 +315,7 @@ public final class AssertUtils {
      * @param messageSupplier a supplier for the exception message to use if the
      *                        assertion fails
      * @throws BaseException if the object array is {@code null} or contains no elements
-     * @since 5.0
+     *
      */
     public static void notEmpty(@Nullable Object[] array, Supplier<String> messageSupplier) {
         isFalse(ObjectUtils.isEmpty(array), messageSupplier);
@@ -320,7 +351,7 @@ public final class AssertUtils {
      * @param messageSupplier a supplier for the exception message to use if the
      *                        assertion fails
      * @throws BaseException if the object array contains a {@code null} element
-     * @since 5.0
+     *
      */
     public static void noNullElements(@Nullable Object[] array, Supplier<String> messageSupplier) {
         if (array != null) {
@@ -362,7 +393,7 @@ public final class AssertUtils {
      *                        assertion fails
      * @throws BaseException if the collection is {@code null} or
      *                       contains no elements
-     * @since 5.0
+     *
      */
     public static void notEmpty(@Nullable Collection<?> collection, Supplier<String> messageSupplier) {
         isFalse(CollectionUtils.isEmpty(collection), messageSupplier);
@@ -376,7 +407,7 @@ public final class AssertUtils {
      * @param collection the collection to check
      * @param message    the exception message to use if the assertion fails
      * @throws BaseException if the collection contains a {@code null} element
-     * @since 5.2
+     *
      */
     public static void noNullElements(@Nullable Collection<?> collection, String message, Object... args) {
         if (collection != null) {
@@ -399,7 +430,6 @@ public final class AssertUtils {
      * @param messageSupplier a supplier for the exception message to use if the
      *                        assertion fails
      * @throws BaseException if the collection contains a {@code null} element
-     * @since 5.2
      */
     public static void noNullElements(@Nullable Collection<?> collection, Supplier<String> messageSupplier) {
         if (collection != null) {
@@ -439,7 +469,7 @@ public final class AssertUtils {
      * @param messageSupplier a supplier for the exception message to use if the
      *                        assertion fails
      * @throws BaseException if the map is {@code null} or contains no entries
-     * @since 5.0
+     *
      */
     public static void notEmpty(@Nullable Map<?, ?> map, Supplier<String> messageSupplier) {
         isFalse(CollectionUtils.isEmpty(map), messageSupplier);
@@ -476,7 +506,7 @@ public final class AssertUtils {
      * @param messageSupplier a supplier for the exception message to use if the
      *                        assertion fails. See {@link #isInstanceOf(Class, Object, String)} for details.
      * @throws BaseException if the object is not an instance of type
-     * @since 5.0
+     *
      */
     public static void isInstanceOf(Class<?> type, @Nullable Object obj, Supplier<String> messageSupplier) {
         notNull(type, "Type to check against must not be null");
@@ -517,7 +547,7 @@ public final class AssertUtils {
      * @param messageSupplier a supplier for the exception message to use if the
      *                        assertion fails. See {@link #isAssignable(Class, Class, String)} for details.
      * @throws BaseException if the classes are not assignable
-     * @since 5.0
+     *
      */
     public static void isAssignable(Class<?> superType, @Nullable Class<?> subType, Supplier<String> messageSupplier) {
         notNull(superType, "Super type to check against must not be null");

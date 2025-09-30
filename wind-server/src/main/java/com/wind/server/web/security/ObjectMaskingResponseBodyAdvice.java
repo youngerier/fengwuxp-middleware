@@ -1,5 +1,6 @@
 package com.wind.server.web.security;
 
+import com.wind.common.query.WindPagination;
 import com.wind.common.query.supports.Pagination;
 import com.wind.mask.MaskRuleRegistry;
 import com.wind.mask.ObjectDataMasker;
@@ -55,7 +56,7 @@ public class ObjectMaskingResponseBodyAdvice implements ResponseBodyAdvice<Objec
     }
 
     private void sanitizeReturnValue(Object result) {
-        if (result instanceof Pagination<?> pagination) {
+        if (result instanceof WindPagination<?> pagination) {
             // 分页对象
             MASKER.mask(pagination.getRecords());
         } else {
