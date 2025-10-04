@@ -49,7 +49,7 @@ public final class WindDeepCopyUtils {
     }
 
     /**
-     * @see https://github.com/EsotericSoftware/kryo
+     * @link https://github.com/EsotericSoftware/kryo
      */
     private static final class KryoCodec {
 
@@ -65,21 +65,21 @@ public final class WindDeepCopyUtils {
 
         public KryoCodec(ClassLoader classLoader) {
 
-            this.kryoPool = new Pool<Kryo>(true, false, 1024) {
+            this.kryoPool = new Pool<>(true, false, 1024) {
                 @Override
                 protected Kryo create() {
                     return createKryo(classLoader);
                 }
             };
 
-            this.inputPool = new Pool<Input>(true, false, 512) {
+            this.inputPool = new Pool<>(true, false, 512) {
                 @Override
                 protected Input create() {
                     return new Input(8192);
                 }
             };
 
-            this.outputPool = new Pool<Output>(true, false, 512) {
+            this.outputPool = new Pool<>(true, false, 512) {
                 @Override
                 protected Output create() {
                     return new Output(8192, -1);

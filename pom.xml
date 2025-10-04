@@ -41,7 +41,7 @@
     </modules>
 
     <properties>
-        <revision>1.0.1-jdk21-SNAPSHOT</revision>
+        <revision>1.0.0-SNAPSHOT</revision>
         <!--   测试相关     -->
         <jacoco-coverage-agent/>
         <tests.fork.count/>
@@ -63,29 +63,29 @@
         <spring-boot.version>3.5.0</spring-boot.version>
         <spring-cloud-commons.version>4.3.0</spring-cloud-commons.version>
         <spring-cloud-albaba.version>2023.0.3.3</spring-cloud-albaba.version>
-        <rocketmq-spring-boot-starter.version>2.3.3</rocketmq-spring-boot-starter.version>
+        <rocketmq-spring-boot-starter.version>2.3.4</rocketmq-spring-boot-starter.version>
         <sentinel.version>1.8.8</sentinel.version>
-        <mybatis-flex.version>1.10.9</mybatis-flex.version>
+        <mybatis-flex.version>1.11.3</mybatis-flex.version>
         <mybatis.version>3.5.19</mybatis.version>
-        <commons-io.version>2.14.0</commons-io.version>
-        <commons-lang3.version>3.18.0</commons-lang3.version>
-        <commons-text.version>1.10.0</commons-text.version>
+        <commons-io.version>2.20.0</commons-io.version>
+        <commons-lang3.version>3.19.0</commons-lang3.version>
+        <commons-text.version>1.14.0</commons-text.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <redisson.version>3.50.0</redisson.version>
-        <kryo.version>5.6.0</kryo.version>
+        <kryo.version>5.6.2</kryo.version>
         <elasticjob.version>3.0.4</elasticjob.version>
         <dynamic-tp.version>1.2.2-x</dynamic-tp.version>
-        <guava.version>32.0.1-jre</guava.version>
-        <fastjson2.version>2.0.53</fastjson2.version>
+        <guava.version>33.5.0-jre</guava.version>
+        <fastjson2.version>2.0.59</fastjson2.version>
         <javet.version>4.0.0</javet.version>
-        <google-zxing.version>3.5.2</google-zxing.version>
+        <google-zxing.version>3.5.3</google-zxing.version>
         <logback-encoder.version>8.1</logback-encoder.version>
         <okhttp.version>4.12.0</okhttp.version>
         <retrofit.version>3.0.0</retrofit.version>
-        <kafka.version>3.8.0</kafka.version>
-        <datafaker.version>2.4.3</datafaker.version>
+        <kafka.version>3.9.0</kafka.version>
+        <datafaker.version>2.5.1</datafaker.version>
         <zookeeper.version>3.9.3</zookeeper.version>
-        <nacos.version>3.0.3</nacos.version>
+        <nacos.version>3.1.0</nacos.version>
 
         <swagger-openapiv3.version>2.2.36</swagger-openapiv3.version>
         <springdoc-openapi.version>2.8.12</springdoc-openapi.version>

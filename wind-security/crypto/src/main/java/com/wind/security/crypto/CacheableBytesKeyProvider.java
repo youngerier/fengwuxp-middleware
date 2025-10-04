@@ -3,6 +3,7 @@ package com.wind.security.crypto;
 import java.util.function.Function;
 
 /**
+ * 缓存字节密钥提供者
  * @author wuxp
  * @date 2024-07-15 13:06
  **/

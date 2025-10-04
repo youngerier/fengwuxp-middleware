@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 
+import java.io.Serial;
 import java.time.Duration;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +38,9 @@ public class JdkLockFactory implements LockFactory {
     }
 
     private static final class WindReentrantLock extends ReentrantLock implements WindLock {
+
+        @Serial
+        private static final long serialVersionUID = -5565832830168093900L;
 
         @Override
         public boolean tryLock(long waitTime, long leaseTime, TimeUnit unit) throws InterruptedException {

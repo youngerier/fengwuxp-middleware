@@ -3,8 +3,6 @@ package com.wind.common.util;
 import com.wind.common.WindConstants;
 import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
-import com.wind.common.exception.BaseException;
-import com.wind.common.exception.DefaultExceptionCode;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -14,8 +12,6 @@ import org.springframework.util.ConcurrentReferenceHashMap;
 import org.springframework.util.StringUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -127,19 +123,8 @@ public final class WindObjectDigestUtils {
         for (String name : sortedNames) {
             Field field = fieldMaps.get(name);
             AssertUtils.notNull(field, String.format("field name = %s not found", name));
-            try {
-                Object val;
-                if (field.trySetAccessible()) {
-                    val = field.get(target);
-                } else {
-                    Method method = WindReflectUtils.findFieldGetMethod(field);
-                    AssertUtils.notNull(method, () -> String.format("not find get method, field = %s#%s", field.getDeclaringClass().getName(), field.getName()));
-                    val = method.invoke(target);
-                }
-                result.append(name).append(WindConstants.EQ).append(getValueText(val)).append(joiner);
-            } catch (IllegalAccessException | InvocationTargetException exception) {
-                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("get object value error, name = %s", name), exception);
-            }
+            Object val = WindReflectUtils.getFieldValue(field, target);
+            result.append(name).append(WindConstants.EQ).append(getValueText(val)).append(joiner);
         }
         result.deleteCharAt(result.length() - 1);
         return result.toString();

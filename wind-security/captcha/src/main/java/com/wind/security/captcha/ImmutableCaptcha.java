@@ -2,63 +2,25 @@ package com.wind.security.captcha;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 
 import java.beans.Transient;
 
 /**
+ * @param owner                  验证码所有者
+ * @param type                   验证码类型
+ * @param useScene               验证码使用场景
+ * @param value                  验证码值
+ * @param content                验证码内容
+ * @param verificationCount      已验证次数
+ * @param sendTimes              已发送次数，从 1 开始
+ * @param allowVerificationTimes 允许验证次数
+ * @param expireTime             过期时间
  * @author wuxp
  * @date 2023-09-24 09:48
- **/
-@Getter
+ */
 @Builder
-@AllArgsConstructor
-public class ImmutableCaptcha implements Captcha {
-
-    /**
-     * 验证码所有者
-     */
-    private final String owner;
-
-    /**
-     * 验证码类型
-     */
-    private final CaptchaType type;
-
-    /**
-     * 验证码使用场景
-     */
-    private final CaptchaUseScene useScene;
-
-    /**
-     * 验证码值
-     */
-    private final String value;
-
-    /**
-     * 验证码内容
-     */
-    private final String content;
-
-    /**
-     * 已验证次数
-     */
-    private final int verificationCount;
-
-    /**
-     * 已发送次数，从 1 开始
-     */
-    private final int sendTimes;
-
-    /**
-     * 允许验证次数
-     */
-    private final int allowVerificationTimes;
-
-    /**
-     * 过期时间
-     */
-    private final long expireTime;
+public record ImmutableCaptcha(String owner, CaptchaType type, CaptchaUseScene useScene, String value, String content,
+                               int verificationCount, int sendTimes, int allowVerificationTimes, long expireTime) implements Captcha {
 
     /**
      * 为了给序列化框架使用，提供一个空构造
@@ -90,8 +52,9 @@ public class ImmutableCaptcha implements Captcha {
     /**
      * 不进行持久化
      */
+    @Override
     @Transient
-    public String getContent() {
+    public String content() {
         return content;
     }
 }

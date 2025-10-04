@@ -2,12 +2,12 @@ package com.wind.common.config;
 
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.util.StringJoinSplitUtils;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.lang.Nullable;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.lang.Nullable;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
@@ -20,7 +20,6 @@ import java.util.Set;
  **/
 public interface SystemConfigRepository extends SystemConfigStorage {
 
-
     /**
      * 获取配置，如果配置为 null 抛出异常
      *
@@ -30,7 +29,7 @@ public interface SystemConfigRepository extends SystemConfigStorage {
     @NotNull
     default String requireConfig(@NotBlank String name) {
         String result = getConfig(name);
-        AssertUtils.notNull(result, () -> String.format("config %s not found", name));
+        AssertUtils.notNull(result, "config {} value must not null", name);
         return result;
     }
 
@@ -44,6 +43,21 @@ public interface SystemConfigRepository extends SystemConfigStorage {
     @Nullable
     default <T> T getConfig(@NotBlank String name, @NotNull Class<T> clazz) {
         return getConfig(name, clazz, null);
+    }
+
+    /**
+     * 获取配置，如果配置为 null 抛出异常
+     *
+     * @param name         配置名称
+     * @param targetType   类类型
+     * @param defaultValue 默认值
+     * @return 配置值
+     */
+    @NotNull
+    default <T> T requireConfig(@NotBlank String name, @NotNull Class<T> targetType, T defaultValue) {
+        T result = getConfig(name, targetType, defaultValue);
+        AssertUtils.notNull(result, "config {} value or default value is null", name);
+        return result;
     }
 
     /**
@@ -121,7 +135,7 @@ public interface SystemConfigRepository extends SystemConfigStorage {
      */
     @NotNull
     default Map<String, Object> getJsonConfig(@NotBlank String name) {
-        Map<String, Object> result = getJsonConfig(name, new ParameterizedTypeReference<Map<String, Object>>() {
+        Map<String, Object> result = getJsonConfig(name, new ParameterizedTypeReference<>() {
         });
         return result == null ? Collections.emptyMap() : result;
     }

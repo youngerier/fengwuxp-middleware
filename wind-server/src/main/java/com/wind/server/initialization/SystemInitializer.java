@@ -18,9 +18,9 @@ public interface SystemInitializer extends Ordered {
     /**
      * 是否需要初始化
      *
-     * @return true 需要
+     * @return @return true 需要
      */
-    default boolean requireInitialize() {
+    default boolean shouldInitialize() {
         return true;
     }
 

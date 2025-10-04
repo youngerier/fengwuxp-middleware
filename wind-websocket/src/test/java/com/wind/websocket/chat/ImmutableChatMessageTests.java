@@ -24,7 +24,7 @@ class ImmutableChatMessageTests {
     @BeforeEach
     void setup() {
         objectMapper = new ObjectMapper();
-        // 注册 Java 8 时间模块
+        // 注册时间模块
         objectMapper.registerModule(new JavaTimeModule());
     }
 
@@ -58,7 +58,7 @@ class ImmutableChatMessageTests {
         Assertions.assertEquals(message.getFromUserId(), deserialized.getFromUserId());
         Assertions.assertEquals(message.getSessionId(), deserialized.getSessionId());
         Assertions.assertEquals(message.getBody().size(), deserialized.getBody().size());
-        Assertions.assertEquals(message.getBody().get(0).getContent(), deserialized.getBody().get(0).getContent());
+        Assertions.assertEquals(message.getBody().getFirst().content(), deserialized.getBody().getFirst().content());
         Assertions.assertEquals(message.getGmtCreate(), deserialized.getGmtCreate());
         Assertions.assertEquals(message.getSequenceId(), deserialized.getSequenceId());
         Assertions.assertEquals(message.getMetadata().get("metaKey"), deserialized.getMetadata().get("metaKey"));

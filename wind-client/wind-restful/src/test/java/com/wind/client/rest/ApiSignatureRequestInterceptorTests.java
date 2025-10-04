@@ -31,10 +31,11 @@ class ApiSignatureRequestInterceptorTests {
     @Test
     void testSha256() throws IOException {
         ApiSignatureRequestInterceptor interceptor = new ApiSignatureRequestInterceptor(httpRequest -> secretAccount);
-        ClientHttpResponse response = interceptor.intercept(mockHttpRequest(), new byte[0], mockExecution());
-        HttpHeaders headers = response.getHeaders();
-        String sign = new SignatureHttpHeaderNames(null).sign();
-        Assertions.assertNotNull(headers.get(sign));
+        try (ClientHttpResponse response = interceptor.intercept(mockHttpRequest(), new byte[0], mockExecution())) {
+            HttpHeaders headers = response.getHeaders();
+            String sign = new SignatureHttpHeaderNames(null).sign();
+            Assertions.assertNotNull(headers.get(sign));
+        }
     }
 
     private static ClientHttpRequestExecution mockExecution() {

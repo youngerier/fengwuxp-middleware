@@ -4,20 +4,19 @@ import com.google.common.collect.ImmutableSet;
 import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.exception.AssertUtils;
 import com.wind.common.exception.BaseException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Collection;
 import java.util.Set;
 
 /**
+ * @param verificationIgnoreCase 验证时忽略大小写
  * @author wuxp
  * @date 2023-09-24 10:13
- **/
-@AllArgsConstructor
+ */
 @Slf4j
-public class DefaultCaptchaManager implements CaptchaManager {
+public record DefaultCaptchaManager(Collection<CaptchaContentProvider> delegates, CaptchaStorage captchaStorage, CaptchaGenerateChecker generateChecker,
+                                    boolean verificationIgnoreCase) implements CaptchaManager {
 
     /**
      * 生成时允许使用之前的值的验证码类型
@@ -25,18 +24,6 @@ public class DefaultCaptchaManager implements CaptchaManager {
     @VisibleForTesting
     static final Set<Captcha.CaptchaType> ALLOW_USE_PREVIOUS_CAPTCHA_TYPES = ImmutableSet.of(SimpleCaptchaType.EMAIL,
             SimpleCaptchaType.MOBILE_PHONE);
-
-    private final Collection<CaptchaContentProvider> delegates;
-
-    @Getter
-    private final CaptchaStorage captchaStorage;
-
-    private final CaptchaGenerateChecker generateChecker;
-
-    /**
-     * 验证时忽略大小写
-     */
-    private final boolean verificationIgnoreCase;
 
     public DefaultCaptchaManager(Collection<CaptchaContentProvider> delegates, CaptchaStorage captchaStorage, boolean verificationIgnoreCase) {
         this(delegates, captchaStorage, (owner, type) -> {
@@ -75,8 +62,8 @@ public class DefaultCaptchaManager implements CaptchaManager {
         CaptchaContentProvider delegate = getDelegate(type, useScene);
         CaptchaValue captchaValue = delegate.getValue(realOwner, useScene);
         Captcha result = ImmutableCaptcha.builder()
-                .content(captchaValue.getContent())
-                .value(captchaValue.getValue())
+                .content(captchaValue.content())
+                .value(captchaValue.value())
                 .owner(realOwner)
                 .type(type)
                 .useScene(useScene)
@@ -107,7 +94,7 @@ public class DefaultCaptchaManager implements CaptchaManager {
             captchaStorage.remove(type, useScene, realOwner);
             throw BaseException.common(CaptchaI18nMessageKeys.getCaptchaNotExistOrExpired(type));
         }
-        boolean isPass = verificationIgnoreCase ? captcha.getValue().equalsIgnoreCase(expected.trim()) : captcha.getValue().equals(expected.trim());
+        boolean isPass = verificationIgnoreCase ? captcha.value().equalsIgnoreCase(expected.trim()) : captcha.value().equals(expected.trim());
         if (isPass) {
             // 移除
             captchaStorage.remove(type, useScene, realOwner);

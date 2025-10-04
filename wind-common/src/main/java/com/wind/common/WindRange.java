@@ -3,28 +3,12 @@ package com.wind.common;
 /**
  * 区间对象
  *
+ * @param minimum The minimum value in this range (inclusive).
+ * @param maximum The maximum value in this range (inclusive).
  * @author wuxp
  * @date 2024-08-28 18:33
- **/
-public final class WindRange<T extends Comparable<T>> {
-
-    /**
-     * The minimum value in this range (inclusive).
-     */
-    private final T minimum;
-
-    /**
-     * The maximum value in this range (inclusive).
-     */
-    private final T maximum;
-
-    private final boolean openRight;
-
-    private WindRange(T minimum, T maximum, boolean openRight) {
-        this.minimum = minimum;
-        this.maximum = maximum;
-        this.openRight = openRight;
-    }
+ */
+public record WindRange<T extends Comparable<T>>(T minimum, T maximum, boolean openRight) {
 
     /**
      * 创建一个左闭又开的区间

@@ -28,7 +28,7 @@ import static org.springframework.core.env.StandardEnvironment.SYSTEM_PROPERTIES
  * @author wuxp
  * @date 2025-03-11 10:17
  **/
-public final class ConfigFunctionEvaluator {
+public record ConfigFunctionEvaluator(Object rootObject) {
 
     private static final Logger LOGGER = WindJulLogFactory.getLogger(ConfigFunctionEvaluator.class);
 
@@ -37,12 +37,6 @@ public final class ConfigFunctionEvaluator {
     private static final SpringExpressionEvaluator EVALUATOR = new SpringExpressionEvaluator(new TemplateParserContext("@{", "}"));
 
     private static final ConfigFunctionEvaluator INSTANCE = new ConfigFunctionEvaluator(new ConfigFunctionRootObject());
-
-    private final Object rootObject;
-
-    public ConfigFunctionEvaluator(Object rootObject) {
-        this.rootObject = rootObject;
-    }
 
     /**
      * 执行配置内容中的函数

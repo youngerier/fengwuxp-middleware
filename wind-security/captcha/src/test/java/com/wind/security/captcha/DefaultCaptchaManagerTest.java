@@ -58,8 +58,8 @@ class DefaultCaptchaManagerTest {
             if (ALLOW_USE_PREVIOUS_CAPTCHA_TYPES.contains(type)) {
                 captcha = captchaManager.generate(type, scene, owner);
             }
-            captchaManager.verify(captcha.getValue(), type, scene, captcha.getOwner());
-            Assertions.assertNull(captchaManager.getCaptchaStorage().get(captcha.getType(), captcha.getUseScene(), captcha.getOwner()));
+            captchaManager.verify(captcha.value(), type, scene, captcha.owner());
+            Assertions.assertNull(captchaManager.captchaStorage().get(captcha.type(), captcha.useScene(), captcha.owner()));
         }
     }
 
@@ -111,10 +111,10 @@ class DefaultCaptchaManagerTest {
         Captcha captcha1 = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
         Captcha captcha2 = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
         Captcha captcha3 = captchaManager.generate(SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
-        Assertions.assertEquals(captcha1.getValue(), captcha2.getValue());
-        Assertions.assertNotEquals(captcha1.getValue(), captcha3.getValue());
-        captchaManager.verify(captcha3.getValue(), SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
-        Assertions.assertNull(captchaManager.getCaptchaStorage().get(captcha1.getType(), SimpleUseScene.LOGIN, owner));
+        Assertions.assertEquals(captcha1.value(), captcha2.value());
+        Assertions.assertNotEquals(captcha1.value(), captcha3.value());
+        captchaManager.verify(captcha3.value(), SimpleCaptchaType.MOBILE_PHONE, SimpleUseScene.LOGIN, owner);
+        Assertions.assertNull(captchaManager.captchaStorage().get(captcha1.type(), SimpleUseScene.LOGIN, owner));
     }
 
     private void assertCaptchaError(Captcha.CaptchaType type, int maxAllowVerificationTimes) {
@@ -125,7 +125,7 @@ class DefaultCaptchaManagerTest {
             String expected = RandomStringUtils.secure().nextAlphanumeric(4);
             BaseException exception = Assertions.assertThrows(BaseException.class, () -> captchaManager.verify(expected, type, scene, owner));
             Assertions.assertEquals(CaptchaI18nMessageKeys.getCaptchaVerityFailure(type), exception.getMessage());
-            Captcha result = captchaManager.getCaptchaStorage().get(captcha.getType(), captcha.getUseScene(), owner);
+            Captcha result = captchaManager.captchaStorage().get(captcha.type(), captcha.useScene(), owner);
             if (maxAllowVerificationTimes <= 1) {
                 Assertions.assertNull(result);
             } else {

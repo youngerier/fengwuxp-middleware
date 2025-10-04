@@ -12,7 +12,6 @@ import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.jul.WindJulLogFactory;
 import com.wind.configcenter.core.ConfigFunctionEvaluator;
 import com.wind.configcenter.core.ConfigRepository;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.PropertySource;
 
@@ -27,15 +26,10 @@ import java.util.logging.Logger;
  * @author wuxp
  * @date 2023-10-15 14:59
  **/
-@AllArgsConstructor
 @Slf4j
-public class NacosConfigRepository implements ConfigRepository {
+public record NacosConfigRepository(ConfigService configService, NacosConfigProperties properties) implements ConfigRepository {
 
     private static final Logger LOGGER = WindJulLogFactory.getLogger(NacosConfigRepository.class);
-
-    private final ConfigService configService;
-
-    private final NacosConfigProperties properties;
 
     @Override
     public void saveTextConfig(ConfigDescriptor descriptor, String content) {

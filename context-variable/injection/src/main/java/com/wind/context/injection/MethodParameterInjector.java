@@ -19,7 +19,6 @@ public interface MethodParameterInjector {
      */
     void inject(Method method, Object[] arguments);
 
-
     /**
      * 合并一组方法参数注入器
      *

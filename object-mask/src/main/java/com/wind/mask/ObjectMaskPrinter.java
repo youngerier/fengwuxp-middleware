@@ -1,6 +1,5 @@
 package com.wind.mask;
 
-import com.google.common.collect.ImmutableSet;
 import com.wind.common.WindConstants;
 import com.wind.common.annotations.VisibleForTesting;
 import com.wind.common.util.WindReflectUtils;
@@ -9,10 +8,8 @@ import com.wind.mask.masker.MaskerFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,20 +31,20 @@ import static com.wind.mask.MaskRuleGroup.convertMapRules;
  * @date 2024-03-11 13:27
  **/
 @Slf4j
-public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
+public record ObjectMaskPrinter(MaskRuleRegistry rueRegistry) implements ObjectMasker<Object, String> {
 
     /**
      * 不需要计算循环引用的类类型
      */
     private static final Set<Class<?>> IGNORE_CYCLE_REF_CLASSES = new HashSet<>(
-            Arrays.asList(
+            List.of(
                     CharSequence.class,
                     Number.class,
                     Date.class,
                     Temporal.class
             ));
 
-    private static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(ImmutableSet.of(Date.class));
+    private static final Set<Class<?>> IGNORE_CLASSES = new LinkedHashSet<>(List.of(Date.class));
 
     private static final Set<String> IGNORE_PACKAGES = new LinkedHashSet<>();
 
@@ -94,12 +91,6 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
      * 对象不为空（null） toSting 后的最小长度
      */
     private static final int MIN_LENGTH = REMOVE_LENGTH + 1;
-
-    private final MaskRuleRegistry rueRegistry;
-
-    public ObjectMaskPrinter(MaskRuleRegistry rueRegistry) {
-        this.rueRegistry = rueRegistry;
-    }
 
     @Override
     public String mask(Object obj, Collection<String> keys) {
@@ -323,14 +314,7 @@ public final class ObjectMaskPrinter implements ObjectMasker<Object, String> {
             Class<?> clazz = obj.getClass();
             StringBuilder result = new StringBuilder(obj.getClass().getSimpleName()).append("(");
             for (Field field : WindReflectUtils.getFields(clazz)) {
-                Object value;
-                if (field.trySetAccessible()) {
-                    value = ReflectionUtils.getField(field, obj);
-                } else {
-                    // 改用 getter 方法获取
-                    Method method = WindReflectUtils.findFieldGetMethod(field);
-                    value = method == null ? null : ReflectionUtils.invokeMethod(method, obj);
-                }
+                Object value = WindReflectUtils.getFieldValue(field, obj);
                 MaskRule rule = getFieldMaskRule(field);
                 result.append(field.getName()).append("=").append(printWithMaskRule(value, rule)).append(", ");
             }

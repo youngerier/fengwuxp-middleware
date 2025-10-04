@@ -1,7 +1,5 @@
 package com.wind.security.captcha;
 
-import lombok.Getter;
-
 import java.beans.Transient;
 
 /**
@@ -15,7 +13,7 @@ public interface CaptchaValue {
     /**
      * @return 验证码值，用于验证
      */
-    String getValue();
+    String value();
 
     /**
      * 不进行持久化，减少存储压力
@@ -23,35 +21,25 @@ public interface CaptchaValue {
      * @return 验证码内容，用于展示或发送给用户
      */
     @Transient
-    String getContent();
+    String content();
 
     static CaptchaValue of(String value, String content) {
         return new ImmtableCaptchaValue(value, content);
     }
 
-    @Getter
-    class ImmtableCaptchaValue implements CaptchaValue {
 
-        /**
-         * 验证码值
-         */
-        private final String value;
-
-        /**
-         * 验证码内容
-         */
-        private final String content;
-
-        ImmtableCaptchaValue(String value, String content) {
-            this.value = value;
-            this.content = content;
-        }
+    /**
+     * @param value   验证码值
+     * @param content 验证码内容
+     */
+    record ImmtableCaptchaValue(String value, String content) implements CaptchaValue {
 
         /**
          * 不进行持久化
          */
+        @Override
         @Transient
-        public String getContent() {
+        public String content() {
             return content;
         }
     }

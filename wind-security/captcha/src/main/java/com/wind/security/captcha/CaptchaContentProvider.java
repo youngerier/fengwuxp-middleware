@@ -8,7 +8,6 @@ package com.wind.security.captcha;
  **/
 public interface CaptchaContentProvider extends Captcha.CaptchaConfiguration {
 
-
     /**
      * @return 获取验证码值
      */

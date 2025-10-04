@@ -43,7 +43,7 @@ public final class SentinelResourceBuilder {
     /**
      * http api 资源构建者
      */
-    public final static class HttpApiResourceBuilder {
+    public static final class HttpApiResourceBuilder {
 
         /**
          * 接口路径 pattern

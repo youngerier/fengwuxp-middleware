@@ -27,13 +27,13 @@ public abstract class AbstractBytesKeyProvider<T> implements BytesKeyGenerator {
      */
     private final T loadKeyParam;
 
-    public AbstractBytesKeyProvider(T loadKeyParam, Function<String, byte[]> keyDecryptor) {
+    protected AbstractBytesKeyProvider(T loadKeyParam, Function<String, byte[]> keyDecryptor) {
         this.loadKeyParam = loadKeyParam;
         this.keyDecryptor = keyDecryptor;
         this.keyBytes = loadKeyBytes();
     }
 
-    public AbstractBytesKeyProvider(T loadKeyParam) {
+    protected AbstractBytesKeyProvider(T loadKeyParam) {
         this(loadKeyParam, NONE);
     }
 

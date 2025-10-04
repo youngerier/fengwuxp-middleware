@@ -1,68 +1,77 @@
 package com.wind.security.crypto;
 
 import com.wind.common.annotations.VisibleForTesting;
+import com.wind.common.exception.AssertUtils;
 import com.wind.security.authentication.WindAuthenticationProperties;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.util.StringUtils;
 
 import java.security.KeyPair;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * 非常规用法，主要是为了方便使用
- * 鉴权参数加加解密者
+ * 接口请求参数加密器
  *
  * @author wuxp
  * @date 2023-11-02 20:24
  **/
 @Slf4j
-public final class AuthenticationParameterEncryptor implements ApplicationListener<ApplicationStartedEvent> {
+public final class RequestParameterEncryptor implements ApplicationListener<ApplicationStartedEvent> {
 
     /**
      * 加密配置
      */
     @VisibleForTesting
-    static final AtomicReference<RasTextEncryptor> TEXT_ENCRYPTOR = new AtomicReference<>();
+    static final AtomicReference<TextEncryptor> TEXT_ENCRYPTOR = new AtomicReference<>();
 
-    public static String tryEncrypt(String content) {
-        RasTextEncryptor encryptor = TEXT_ENCRYPTOR.get();
-        if (encryptor == null) {
-            return content;
-        }
+    /**
+     * 加密请求内容
+     *
+     * @param content 加密内容
+     * @return 加密结果
+     */
+    public static String encrypt(@NotNull String content) {
+        TextEncryptor encryptor = getEncryptor();
         return StringUtils.hasLength(content) ? encryptor.encrypt(content) : content;
     }
 
-    public static String tryDecrypt(String content) {
-        RasTextEncryptor encryptor = TEXT_ENCRYPTOR.get();
-        if (encryptor == null) {
-            return content;
-        }
+    /**
+     * 解密请求内容
+     *
+     * @param content 解密内容
+     * @return 解密结果
+     */
+    public static String decrypt(@NotNull String content) {
+        TextEncryptor encryptor = getEncryptor();
         return StringUtils.hasLength(content) ? encryptor.decrypt(content) : content;
     }
 
     /**
-     * 认证相关参数（公钥加密）
+     * 认证相关参数加密
      *
      * @param principal   登录主体，例如：手机号码、用户名、邮箱等
      * @param credentials 登录证书，例如：密码、验证码等
      * @return 认证参数
      */
-    public static AuthenticationParameter encrypt(String principal, String credentials) {
-        return new AuthenticationParameter(tryEncrypt(principal), tryEncrypt(credentials));
+    public static AuthenticationParameter encryptAuthenticationParameter(@NotBlank String principal, @NotBlank String credentials) {
+        return new AuthenticationParameter(encrypt(principal), encrypt(credentials));
     }
 
     /**
-     * 解密认证相关参数（私钥加密）
+     * 解密认证相关参数
      *
      * @param principal   登录主体，例如：手机号码、用户名、邮箱等
      * @param credentials 登录验证密码
      * @return 认证参数
      */
-    public static AuthenticationParameter decrypt(String principal, String credentials) {
-        return new AuthenticationParameter(tryDecrypt(principal), tryDecrypt(credentials));
+    public static AuthenticationParameter decryptAuthenticationParameter(@NotBlank String principal, @NotBlank String credentials) {
+        return new AuthenticationParameter(decrypt(principal), decrypt(credentials));
     }
 
     @Override
@@ -76,6 +85,11 @@ public final class AuthenticationParameterEncryptor implements ApplicationListen
         }
     }
 
+    private static TextEncryptor getEncryptor() {
+        TextEncryptor encryptor = TEXT_ENCRYPTOR.get();
+        AssertUtils.notNull(encryptor, "un configure parameter encryptor");
+        return encryptor;
+    }
 
     /**
      * @param principal   登录主体，例如：手机号码、用户名、邮箱等

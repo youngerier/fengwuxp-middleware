@@ -3,6 +3,7 @@ package com.wind.security.mfa;
 import org.springframework.security.core.AuthenticationException;
 
 /**
+ * MFA 未认证异常
  * @author wuxp
  * @date 2024-03-06 11:06
  **/

@@ -93,12 +93,10 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
                 }
             } else if (parameterType.isArray()) {
                 // 数组
-                ObjectArrayParameterInjectionDescriptor descriptor = new ObjectArrayParameterInjectionDescriptor(parameterType.getComponentType(),
-                        parameter, i);
+                ObjectArrayParameterInjectionDescriptor descriptor = new ObjectArrayParameterInjectionDescriptor(parameterType.getComponentType(), parameter, i);
                 if (!descriptor.getFieldAnnotations().isEmpty()) {
                     result.add(descriptor);
                 }
-
             } else if (isCollection(parameterType)) {
                 // 集合对象
                 Type genericType = parameter.getParameterizedType();
@@ -113,8 +111,8 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
                         result.add(descriptor);
                     }
                 } else {
-                    throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("find method = %s, parameter = %s parameterizedType " +
-                            "error", method.getName(), parameter.getName()));
+                    throw new BaseException(DefaultExceptionCode.COMMON_ERROR, String.format("find method = %s, parameter = %s parameterizedType error", method.getName(),
+                            parameter.getName()));
                 }
             } else {
                 if (isAllowInject(parameterType)) {
@@ -129,11 +127,8 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
         return result.isEmpty() ? EMPTY : result.toArray(new AbstractInjectionDescriptor[0]);
     }
 
-
     private boolean isSimpleType(Class<?> clazz) {
-        return ClassUtils.isPrimitiveOrWrapper(clazz) ||
-                Objects.equals(String.class, clazz) ||
-                clazz.isEnum();
+        return ClassUtils.isPrimitiveOrWrapper(clazz) || Objects.equals(String.class, clazz) || clazz.isEnum();
     }
 
     private boolean isCollection(Class<?> clazz) {
@@ -277,19 +272,15 @@ public class ContextAnnotationMethodParameterInjector implements MethodParameter
     }
 
     static void injectField(Field field, ContextVariable annotation, Object object, Map<String, Object> contextVariables) {
-        try {
-            Object value = evalVariable(annotation, contextVariables);
-            if (annotation.override()) {
-                // 强制覆盖
-                field.set(object, value);
-            } else {
-                if (field.get(object) == null) {
-                    // 空则覆盖
-                    field.set(object, value);
-                }
+        Object value = evalVariable(annotation, contextVariables);
+        if (annotation.override()) {
+            // 强制覆盖
+            WindReflectUtils.setFieldValue(field, object, value);
+        } else {
+            if (WindReflectUtils.getFieldValue(field, object) == null) {
+                // 空则覆盖
+                WindReflectUtils.setFieldValue(field, object, value);
             }
-        } catch (IllegalAccessException exception) {
-            throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "inject filed error", exception);
         }
     }
 

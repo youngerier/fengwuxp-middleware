@@ -188,7 +188,7 @@ public final class MaskRuleGroup {
         }
 
         private void addRules(String[] names, Function<String, MaskRule> rueFactory) {
-            fieldRules.addAll(Arrays.stream(names).map(rueFactory).collect(Collectors.toList()));
+            fieldRules.addAll(Arrays.stream(names).map(rueFactory).toList());
         }
 
         private MaskRuleGroup createRuleGroup() {

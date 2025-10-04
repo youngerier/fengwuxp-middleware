@@ -1,7 +1,5 @@
 package com.wind.mask;
 
-import com.wind.common.exception.BaseException;
-import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.util.WindDeepCopyUtils;
 import com.wind.common.util.WindReflectUtils;
 import com.wind.mask.annotation.Sensitive;
@@ -70,28 +68,24 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
         Class<?> clazz = object.getClass();
         if (registry.requireMask(clazz)) {
             for (MaskRule rule : registry.getRuleGroup(clazz).getRules()) {
-                try {
-                    maskObjectField(rule, object);
-                } catch (Exception exception) {
-                    throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "object mask error", exception);
-                }
+                maskObjectField(rule, object);
             }
         }
         return object;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private void maskObjectField(MaskRule rule, Object val) throws Exception {
+    private void maskObjectField(MaskRule rule, Object val) {
         Field field = WindReflectUtils.findField(val.getClass(), rule.getName());
-        Object o = field.get(val);
+        Object o = WindReflectUtils.getFieldValue(field, val);
         if (o == null) {
             return;
         }
         WindMasker masker = rule.getMasker();
         if (masker instanceof ObjectMasker objectMasker) {
-            field.set(val, objectMasker.mask(o, rule.getKeys()));
+            WindReflectUtils.setFieldValue(field, val, objectMasker.mask(o, rule.getKeys()));
         } else {
-            field.set(val, masker.mask(o));
+            WindReflectUtils.setFieldValue(field, val, masker.mask(o));
         }
     }
 
@@ -132,8 +126,8 @@ public class ObjectDataMasker implements WindMasker<Object, Object> {
             // TODO 优化改用 json path ？
             MaskRuleGroup group = registry.getRuleGroup(Map.class);
             map.replaceAll((key, value) -> {
-                if (key instanceof String && value instanceof String) {
-                    MaskRule rule = group.matchesWithKey((String) key);
+                if (key instanceof String k && value instanceof String) {
+                    MaskRule rule = group.matchesWithKey(k);
                     return rule == null ? value : rule.getMasker().mask(value);
                 }
                 return maskAs(value);

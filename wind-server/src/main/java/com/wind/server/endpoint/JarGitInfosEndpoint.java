@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * 获取构建的 git info
+ * 获取 wind 相关 jar 构建的 git info
  *
  * @author wuxp
  * @date 2023-12-13 14:04

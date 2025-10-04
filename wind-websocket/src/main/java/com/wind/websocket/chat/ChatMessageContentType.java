@@ -14,15 +14,15 @@ import lombok.Getter;
 @Getter
 public enum ChatMessageContentType implements DescriptiveEnum {
 
-    TEXT("text"),
+    TEXT("Text"),
 
-    IMAGE("image"),
+    IMAGE("Image"),
 
-    VIDEO("video"),
+    VIDEO("Video"),
 
-    AUDIO("audio"),
+    AUDIO("Audio"),
 
-    FILE("file");
+    FILE("File");
 
     private final String desc;
 }

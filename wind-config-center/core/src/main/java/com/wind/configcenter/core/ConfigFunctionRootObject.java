@@ -8,14 +8,12 @@ import com.wind.common.jul.WindJulLogFactory;
 import com.wind.common.util.ServiceInfoUtils;
 import com.wind.core.WindCredentialsProvider;
 import com.wind.security.crypto.symmetric.AesTextEncryptor;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
 import org.springframework.util.StringUtils;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
@@ -25,18 +23,12 @@ import java.util.logging.Logger;
  * @author wuxp
  * @date 2025-03-11 10:44
  **/
-@AllArgsConstructor
-@Getter
-final class ConfigFunctionRootObject {
+record ConfigFunctionRootObject(TextEncryptor encryptor, WindCredentialsProvider windCredentialsProvider) {
 
     private static final Logger LOGGER = WindJulLogFactory.getLogger(ConfigFunctionRootObject.class);
 
     @VisibleForTesting
     static final String SECRET_KEY = "WIND_SAE_KEY";
-
-    private final TextEncryptor encryptor;
-
-    private final WindCredentialsProvider windCredentialsProvider;
 
     public ConfigFunctionRootObject() {
         this(getDefaultEncryptor(), getCredentialsProvider());

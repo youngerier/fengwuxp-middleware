@@ -57,13 +57,7 @@ import static com.wind.common.WindDateFormatPatterns.YYYY_MM_DD_HH_MM_SS;
  * @date 2024-02-27 11:32
  **/
 @Slf4j
-public final class RetrofitClientFactory {
-
-    private final Retrofit retrofit;
-
-    private RetrofitClientFactory(Retrofit retrofit) {
-        this.retrofit = retrofit;
-    }
+public record RetrofitClientFactory(Retrofit retrofit) {
 
     public <T> T create(Class<T> apiClientClass) {
         return retrofit.create(apiClientClass);

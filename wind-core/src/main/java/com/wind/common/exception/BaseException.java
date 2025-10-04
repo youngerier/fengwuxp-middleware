@@ -63,7 +63,7 @@ public class BaseException extends RuntimeException {
     }
 
     public BaseException(ExceptionCode code, MessagePlaceholder placeholder, ExceptionLogLevel level, Throwable cause) {
-        super(MESSAGE_FORMATTER.format(placeholder.getPattern(), placeholder.getArgs()), cause);
+        super(MESSAGE_FORMATTER.format(placeholder.pattern(), placeholder.args()), cause);
         this.code = code;
         this.messagePlaceholder = placeholder;
         this.logLevel = level;

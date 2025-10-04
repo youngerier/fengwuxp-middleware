@@ -1,6 +1,5 @@
 package com.wind.security.crypto;
 
-import lombok.AllArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.security.crypto.encrypt.BytesEncryptor;
 import org.springframework.security.crypto.encrypt.TextEncryptor;
@@ -18,12 +17,9 @@ import java.util.Base64;
  * @author wuxp
  * @date 2025-02-02 19:56
  **/
-@AllArgsConstructor
-public final class RasTextEncryptor implements TextEncryptor {
+public record RasTextEncryptor(BytesEncryptor delegate) implements TextEncryptor {
 
     private static final String ALGORITHM = "RSA/ECB/PKCS1Padding";
-
-    private final BytesEncryptor delegate;
 
     /**
      * 私钥加密，公钥解密

@@ -2,8 +2,8 @@ package com.wind.mask.masker.json;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONPath;
-import com.wind.mask.ObjectMaskPrinter;
 import com.wind.mask.ObjectMasker;
+import com.wind.mask.WindMasker;
 import org.springframework.util.StringUtils;
 
 import java.util.Collection;
@@ -24,7 +24,7 @@ public final class JsonStringMasker implements ObjectMasker<String, String> {
                 try {
                     Object eval = JSONPath.eval(val, key);
                     if (eval != null) {
-                        JSONPath.set(val, key, ObjectMaskPrinter.ASTERISK.mask(eval));
+                        JSONPath.set(val, key, WindMasker.ASTERISK.mask(eval));
                     }
                 } catch (Exception exception) {
                     // ignore

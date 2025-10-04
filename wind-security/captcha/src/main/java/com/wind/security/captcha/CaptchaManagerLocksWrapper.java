@@ -5,7 +5,6 @@ import com.wind.common.exception.BaseException;
 import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.locks.LockFactory;
 import com.wind.common.locks.WindLock;
-import lombok.AllArgsConstructor;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;

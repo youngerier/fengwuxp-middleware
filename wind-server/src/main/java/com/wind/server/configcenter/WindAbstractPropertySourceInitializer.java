@@ -14,6 +14,8 @@ import org.springframework.lang.NonNull;
 import static com.wind.common.WindConstants.WIND_SERVER_CONFIG_CENTER_PROPERTIES_PREFIX;
 
 /**
+ * 抽象配置中心加载器
+ *
  * @author wuxp
  * @date 2023-12-29 11:28
  **/

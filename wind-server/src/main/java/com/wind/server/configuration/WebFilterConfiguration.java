@@ -65,7 +65,7 @@ public class WebFilterConfiguration {
 
     @SuppressWarnings("unchecked")
     @Bean
-    @ConditionalOnProperty(prefix = INDEX_HTML_FILTER_EXPRESSION, name = ENABLED_NAME, havingValue = TRUE, matchIfMissing = true)
+    @ConditionalOnProperty(prefix = INDEX_HTML_FILTER_EXPRESSION, name = ENABLED_NAME, havingValue = TRUE)
     @ConditionalOnBean(name = INDEX_HTML_RESOURCE_LOADER_BEAN_NAME)
     public FilterRegistrationBean<IndexHtmlResourcesFilter> webIndexHtmlResourcesFilter(ApplicationContext context) {
         FilterRegistrationBean<IndexHtmlResourcesFilter> result = new FilterRegistrationBean<>();

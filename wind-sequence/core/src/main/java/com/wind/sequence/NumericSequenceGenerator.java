@@ -1,7 +1,6 @@
 package com.wind.sequence;
 
 import com.wind.common.exception.AssertUtils;
-import lombok.AllArgsConstructor;
 
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -11,12 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author wuxp
  * @date 2023-10-18 08:18
  **/
-@AllArgsConstructor
-public class NumericSequenceGenerator implements SequenceGenerator {
-
-    private final AtomicLong counter;
-
-    private final int length;
+public record NumericSequenceGenerator(AtomicLong counter, int length) implements SequenceGenerator {
 
     public NumericSequenceGenerator(AtomicLong counter) {
         this(counter, 8);

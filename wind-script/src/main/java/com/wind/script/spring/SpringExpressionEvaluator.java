@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @date 2023-09-23 10:07
  **/
 @Slf4j
-public final class SpringExpressionEvaluator {
+public record SpringExpressionEvaluator(@Nullable ParserContext context) {
 
     private static final AtomicBoolean SECURITY_MODE = new AtomicBoolean(true);
 
@@ -60,13 +60,6 @@ public final class SpringExpressionEvaluator {
      * @see <a href="https://docs.spring.io/spring-framework/reference/core/expressions/language-ref/templating.html">templating</a>
      */
     public static final SpringExpressionEvaluator TEMPLATE = new SpringExpressionEvaluator(TEMPLATE_PARSER_CONTEXT);
-
-    @Nullable
-    private final ParserContext context;
-
-    public SpringExpressionEvaluator(@Nullable ParserContext context) {
-        this.context = context;
-    }
 
     /**
      * @param expression spring 表达式

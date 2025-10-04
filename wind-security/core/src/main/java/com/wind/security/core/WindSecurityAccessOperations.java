@@ -7,7 +7,7 @@ package com.wind.security.core;
  * @date 2023-10-24 07:51
  * @see org.springframework.security.access.expression.SecurityExpressionOperations
  **/
-public interface SecurityAccessOperations {
+public interface WindSecurityAccessOperations {
 
     /**
      * 超级管理员角色名称

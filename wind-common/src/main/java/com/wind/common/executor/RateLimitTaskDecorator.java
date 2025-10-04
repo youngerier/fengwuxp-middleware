@@ -9,6 +9,7 @@ import org.springframework.core.task.TaskDecorator;
 import org.springframework.lang.NonNull;
 
 import java.time.Duration;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * 限流任务装饰器
@@ -19,6 +20,8 @@ import java.time.Duration;
 @AllArgsConstructor
 @Slf4j
 public class RateLimitTaskDecorator implements TaskDecorator {
+
+    private static final AtomicBoolean THROW_EXCEPTION_WITH_LIMIT = new AtomicBoolean(false);
 
     private final String taskName;
 
@@ -67,7 +70,12 @@ public class RateLimitTaskDecorator implements TaskDecorator {
                 log.debug("execute rate limit decorate task, name = {}", taskName);
                 runnable.run();
             } else {
-                throw new BaseException(DefaultExceptionCode.TO_MANY_REQUESTS, "task name  = %s rate limit exceeded".formatted(taskName));
+                if (THROW_EXCEPTION_WITH_LIMIT.get()) {
+                    throw new BaseException(DefaultExceptionCode.TO_MANY_REQUESTS, "task name  = %s rate limit exceeded".formatted(taskName));
+                } else {
+                    // 仅打印警告
+                    log.warn("task name  = {} rate limit exceeded", taskName);
+                }
             }
         };
     }
@@ -79,5 +87,9 @@ public class RateLimitTaskDecorator implements TaskDecorator {
      */
     public void execute(@NonNull Runnable runnable) {
         decorate(runnable).run();
+    }
+
+    public static void setThrowExceptionWithLimit(boolean throwExceptionWithLimit) {
+        THROW_EXCEPTION_WITH_LIMIT.set(throwExceptionWithLimit);
     }
 }

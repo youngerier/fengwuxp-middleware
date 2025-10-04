@@ -5,25 +5,16 @@ import com.wind.common.exception.AssertUtils;
 import com.wind.security.captcha.Captcha;
 import com.wind.security.captcha.CaptchaConstants;
 import com.wind.security.captcha.CaptchaStorage;
-import lombok.AllArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.lang.NonNull;
 
 /**
+ * @param group 业务模块分组
  * @author wuxp
  * @date 2023-09-24 14:43
- **/
-@AllArgsConstructor
-public class CacheCaptchaStorage implements CaptchaStorage {
-
-
-    private final CacheManager cacheManager;
-
-    /**
-     * 业务模块分组
-     */
-    private final String group;
+ */
+public record CacheCaptchaStorage(CacheManager cacheManager, String group) implements CaptchaStorage {
 
     public CacheCaptchaStorage(CacheManager cacheManager) {
         this(cacheManager, WindConstants.DEFAULT_TEXT.toUpperCase());
@@ -31,7 +22,7 @@ public class CacheCaptchaStorage implements CaptchaStorage {
 
     @Override
     public void store(Captcha captcha) {
-        requiredCache(captcha.getType(), captcha.getUseScene()).put(captcha.getOwner(), captcha);
+        requiredCache(captcha.type(), captcha.useScene()).put(captcha.owner(), captcha);
     }
 
     @Override

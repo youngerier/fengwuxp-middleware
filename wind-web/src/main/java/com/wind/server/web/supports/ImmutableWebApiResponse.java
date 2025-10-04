@@ -8,6 +8,7 @@ import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
 import java.beans.Transient;
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -20,6 +21,7 @@ import java.io.Serializable;
 @EqualsAndHashCode
 public class ImmutableWebApiResponse<T> implements ApiResp<T>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = -7557721954943132992L;
 
     /**

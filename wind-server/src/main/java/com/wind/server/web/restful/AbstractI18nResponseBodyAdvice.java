@@ -1,13 +1,13 @@
 package com.wind.server.web.restful;
 
 import com.wind.common.annotations.I18n;
-import com.wind.common.exception.BaseException;
-import com.wind.common.exception.DefaultExceptionCode;
 import com.wind.common.i18n.SpringI18nMessageUtils;
 import com.wind.common.query.supports.Pagination;
 import com.wind.common.util.WindReflectUtils;
 import com.wind.script.spring.SpringExpressionEvaluator;
 import com.wind.server.web.supports.ApiResp;
+import jakarta.annotation.Nonnull;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.core.MethodParameter;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -17,8 +17,6 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import jakarta.annotation.Nonnull;
-import jakarta.validation.constraints.NotNull;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Locale;
@@ -37,11 +35,11 @@ public abstract class AbstractI18nResponseBodyAdvice implements ResponseBodyAdvi
 
     private final Locale defaultLocal;
 
-    public AbstractI18nResponseBodyAdvice(Locale defaultLocal) {
+    protected AbstractI18nResponseBodyAdvice(Locale defaultLocal) {
         this.defaultLocal = defaultLocal;
     }
 
-    public AbstractI18nResponseBodyAdvice() {
+    protected AbstractI18nResponseBodyAdvice() {
         this(Locale.CHINA);
     }
 
@@ -84,20 +82,16 @@ public abstract class AbstractI18nResponseBodyAdvice implements ResponseBodyAdvi
         }
         Field[] fields = this.parseI18nFields(val.getClass());
         for (Field field : fields) {
-            try {
-                if (field.getType() == String.class) {
-                    fillI18nMessage(val, field);
-                } else {
-                    // 字段为复杂对象
-                    handleReturnValueI18n(field.get(val));
-                }
-            } catch (IllegalAccessException exception) {
-                throw new BaseException(DefaultExceptionCode.COMMON_ERROR, "i18n message fill error", exception);
+            if (field.getType() == String.class) {
+                fillI18nMessage(val, field);
+            } else {
+                // 字段为复杂对象
+                handleReturnValueI18n(WindReflectUtils.getFieldValue(field, val));
             }
         }
     }
 
-    private void fillI18nMessage(Object val, Field field) throws IllegalAccessException {
+    private void fillI18nMessage(Object val, Field field) {
         I18n annotation = field.getAnnotation(I18n.class);
         String name = annotation.name();
         String messageKey;
@@ -107,11 +101,11 @@ public abstract class AbstractI18nResponseBodyAdvice implements ResponseBodyAdvi
             context.setVariable(I18n.OBJECT_VARIABLE_NAME, val);
             messageKey = SpringExpressionEvaluator.TEMPLATE.eval(name, context);
         } else {
-            messageKey = (String) field.get(val);
+            messageKey = WindReflectUtils.getFieldValue(field, val);
         }
         String i18nMessage = getI18nMessage(messageKey);
         if (StringUtils.hasText(i18nMessage)) {
-            field.set(val, i18nMessage);
+            WindReflectUtils.setFieldValue(field, val, i18nMessage);
         }
     }
 

@@ -47,6 +47,7 @@ public record WindSslCertificateMeticsCollector() {
             SSLSocketFactory factory = (SSLSocketFactory) SSLSocketFactory.getDefault();
             String[] parts = parseHost(host);
             try (SSLSocket socket = (SSLSocket) factory.createSocket(parts[0], Integer.parseInt(parts[1]))) {
+                socket.setSoTimeout(5000);
                 socket.startHandshake();
                 SSLSession session = socket.getSession();
                 X509Certificate cert = (X509Certificate) session.getPeerCertificates()[0];

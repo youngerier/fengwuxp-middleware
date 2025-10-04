@@ -1,5 +1,6 @@
 package com.wind.security.authority;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -21,8 +22,10 @@ public interface WebRequestAuthorityLoader {
      * @param request http 请求对象
      * @return 请求需要的权限集合，不需要权限则返回空
      */
+    @NotNull
     Collection<String> load(HttpServletRequest request);
 
+    @NotNull
     default Collection<GrantedAuthority> loadAuthorities(HttpServletRequest request) {
         return load(request).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toSet());
     }

@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -19,6 +20,9 @@ import java.io.Serializable;
 @ToString
 @EqualsAndHashCode
 public class ImmutableApiResponse<T> implements ApiResponse<T>, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = -1646126781398091817L;
 
     /**
      * 响应数据
